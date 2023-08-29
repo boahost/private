@@ -1,0 +1,16 @@
+{
+    "name": "Repair",
+    "alias": "Reparo - Ordem de Serviço",
+    "description": "Módulo de Reparo e Ordem de Serviço focado em eletrônicos",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\Repair\\Providers\\RepairServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": []
+}

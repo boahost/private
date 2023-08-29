@@ -1,0 +1,25 @@
+{
+    "name": "twf/manufacturing",
+    "description": "",
+    "authors": [
+        {
+            "name": "NexusWeb",
+            "email": "lojadodesenvolvedor@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Manufacturing\\Providers\\ManufacturingServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Manufacturing\\": ""
+        }
+    }
+}

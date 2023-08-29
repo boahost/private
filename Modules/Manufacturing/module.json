@@ -1,0 +1,16 @@
+{
+    "name": "Manufacturing",
+    "alias": "Fabricação",
+    "description": "Usado para empresas onde os produtos precisam ser fabricados",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\Manufacturing\\Providers\\ManufacturingServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": []
+}

@@ -1,0 +1,25 @@
+{
+    "name": "twf/repair",
+    "description": "",
+    "authors": [
+        {
+            "name": "NexusWeb",
+            "email": "lojadodesenvolvedor@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Repair\\Providers\\RepairServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Repair\\": ""
+        }
+    }
+}
