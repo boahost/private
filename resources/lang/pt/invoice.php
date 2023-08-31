@@ -10,6 +10,7 @@ return [
     "edit_invoice"                      => "Editar esquema de fatura",
     "name"                              => "Name",
     "prefix"                            => "Prefixo",
+    "cpf"                               => "CPF",
     "start_number"                      => "Iniciar de",
     "total_digits"                      => "Número de dígitos",
     "preview"                           => "Avançar",

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\Currency;
+use App\Models\Integration;
 use App\Notifications\TestEmailNotification;
 use App\Models\System;
 use App\Models\TaxRate;
@@ -12,6 +13,7 @@ use App\Models\Product;
 use App\Models\Unit;
 use App\Models\User;
 use App\Utils\BusinessUtil;
+use Illuminate\Support\Facades\File;
 use Modules\Superadmin\Entities\Package;
 use App\Utils\ModuleUtil;
 use App\Utils\RestaurantUtil;
@@ -85,7 +87,6 @@ class BusinessController extends Controller
     /**
      * Shows registration form
      *
-     * @return \Illuminate\Http\Response
      */
     public function getRegister()
     {
@@ -361,7 +362,6 @@ class BusinessController extends Controller
     /**
      * Shows business settings form
      *
-     * @return \Illuminate\Http\Response
      */
     public function getBusinessSettings()
     {
@@ -377,6 +377,13 @@ class BusinessController extends Controller
 
         $business_id = request()->session()->get('user.business_id');
         $business    = Business::where('id', $business_id)->first();
+
+        $integrations_raw = Integration::where('business_id', $business_id)->get()->toArray();
+
+        $integrations = [];
+        foreach ($integrations_raw as $item) {
+            $integrations[$item['integration']] = $item;
+        }
 
         $currencies  = $this->businessUtil->allCurrencies();
         $tax_details = TaxRate::forBusinessDropdown($business_id);
@@ -458,7 +465,33 @@ class BusinessController extends Controller
             }
         }
 
-        return view('business.settings', compact('business', 'currencies', 'tax_rates', 'timezone_list', 'months', 'accounting_methods', 'commission_agent_dropdown', 'units_dropdown', 'date_formats', 'shortcuts', 'pos_settings', 'modules', 'theme_colors', 'email_settings', 'sms_settings', 'mail_drivers', 'allow_superadmin_email_settings', 'custom_labels', 'common_settings', 'weighing_scale_setting', 'not_in_package'))
+        return view(
+            'business.settings',
+            compact(
+                'business',
+                'integrations',
+                'currencies',
+                'tax_rates',
+                'timezone_list',
+                'months',
+                'accounting_methods',
+                'commission_agent_dropdown',
+                'units_dropdown',
+                'date_formats',
+                'shortcuts',
+                'pos_settings',
+                'modules',
+                'theme_colors',
+                'email_settings',
+                'sms_settings',
+                'mail_drivers',
+                'allow_superadmin_email_settings',
+                'custom_labels',
+                'common_settings',
+                'weighing_scale_setting',
+                'not_in_package'
+            )
+        )
             ->with('infoCertificado', $this->getInfoCertificado($business))
             ->with('listaCSTCSOSN', $listaCSTCSOSN)
             ->with('listaCST_PIS_COFINS', $listaCST_PIS_COFINS)
@@ -532,7 +565,6 @@ class BusinessController extends Controller
      */
     public function postBusinessSettings(Request $request)
     {
-
         $this->_validate($request);
 
         if (!auth()->user()->can('business_settings.access')) {
@@ -703,8 +735,8 @@ class BusinessController extends Controller
                 'enable_position',
                 'enable_sub_units'
             ];
-            foreach ($checkboxes as $value) {
-                $business_details[$value] = !empty($request->input($value)) && $request->input($value) == 1 ? 1 : 0;
+            foreach ($checkboxes as $integration) {
+                $business_details[$integration] = !empty($request->input($integration)) && $request->input($integration) == 1 ? 1 : 0;
             }
 
             $business_id = request()->session()->get('user.business_id');
@@ -724,9 +756,9 @@ class BusinessController extends Controller
             //pos_settings
             $pos_settings         = $request->input('pos_settings');
             $default_pos_settings = $this->businessUtil->defaultPosSettings();
-            foreach ($default_pos_settings as $key => $value) {
+            foreach ($default_pos_settings as $key => $integration) {
                 if (!isset($pos_settings[$key])) {
-                    $pos_settings[$key] = $value;
+                    $pos_settings[$key] = $integration;
                 }
             }
 
@@ -744,6 +776,40 @@ class BusinessController extends Controller
 
             $business->fill($business_details);
             $business->save();
+
+
+            $integrations = $request->input('integrations');
+
+            foreach ($integrations as $key => $integration) {
+                $data = [
+                    'integration'       => $key,
+                    'business_id'       => $business_id,
+                    'payee_code'        => $integration['payee_code'],
+                    'key_client_id'     => $integration['key_client_id'],
+                    'key_client_secret' => $integration['key_client_secret'],
+                ];
+
+                if ($file = $request->file("integrations.{$key}.certificate")) {
+                    $filename = time() . '_' . $key . '_certificate.' . $file->getClientOriginalExtension();
+
+                    if (!$certificate_path = $file->storeAs($business_id, $filename, 'certificates')) {
+                        redirect('business/settings')->with('status', [
+                            'success' => 0,
+                            'msg'     => __('messages.something_went_wrong')
+                        ]);
+                    }
+
+                    $data['certificate'] = $certificate_path;
+                }
+
+                $new = Integration::firstOrCreate([
+                    'integration' => $key,
+                    'business_id' => $business_id
+                ], $data);
+
+                $new->fill($data);
+                $new->save();
+            }
 
             //update session data
             $request->session()->put('business', $business);

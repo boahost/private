@@ -90,7 +90,7 @@ class PaymentController extends Controller
             PaymentPlan::create($data);
             $output = [
                 'success' => 1,
-                'msg' => "Qrcode gerado escaneie ou copie o código para efetuar o pagamento."
+                'msg' => "QRcode gerado escaneie ou copie o código para efetuar o pagamento."
             ];
             return redirect('/payment/finish/' . (string)$payment->id)
             ->with('status', $output);
@@ -148,7 +148,7 @@ class PaymentController extends Controller
         } elseif ($package->interval == 'years') {
             $output['end'] = $start_date->addYears($package->interval_count)->toDateString();
         }
-        
+
         $output['trial'] = $start_date->addDays($package->trial_days);
 
         return $output;

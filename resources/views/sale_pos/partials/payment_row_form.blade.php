@@ -89,6 +89,78 @@
             </div>
         </div>
     @endif
+
+
+    <div class="payment_details_div @if ($payment_line['method'] !== 'pix_efi') {{ 'hide' }} @endif" data-type="pix_efi">
+        <div class="col-md-8">
+            <div class="form-group">
+                {!! Form::label("cpf_number_$row_index", __('invoice.cpf')) !!}
+                <div class="input-group">
+                    {!! Form::text("payment[$row_index][cpf]", $payment_line['cpf'] ?? '', [
+                        'class' => 'form-control cpf_cnpj',
+                        'placeholder' => __('invoice.cpf'),
+                        'id' => "cpf_number_$row_index",
+                        'data-mask="000.000.000-00"',
+                        'data-mask-reverse="true"',
+                    ]) !!}
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default bg-white btn-flat"
+                            trigger="gen_efi_qr_code">
+                            Gerar QRCode <i class="fa fa-edit ml-2"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .over-modal .body {
+                position: fixed;
+                z-index: 2000;
+                margin: 0 auto;
+                max-width: 500px;
+                left: 0;
+                top: 50px;
+                background-color: white;
+                right: 0;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .over-modal .modal-backdrop {
+                z-index: 1999;
+            }
+        </style>
+
+        <div id="modal_efi_{{ $row_index }}" class="over-modal hidden">
+            <div class="modal-backdrop in"></div>
+            <div class="text-center body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <img src="/img/imageonline-co-placeholder-image.jpg" name="efi_qr_code_img"
+                            alt="Aguardando Gerar">
+                    </div>
+                    <div class="col-xs-12">
+                        <span class="row">
+                            <div class="col-xs-6">
+                                <button trigger="close" type="button" class="btn btn-flat btn-secondary btn-block">
+                                    <i class="fa fa-chevron-left mr-8"></i>
+                                    Cancelar
+                                </button>
+                            </div>
+                            <div class="col-xs-6">
+                                <button trigger="update" type="button" class="btn btn-flat btn-primary btn-block">
+                                    <i class="fa fa-redo-alt mr-8"></i>
+                                    Atualizar Status
+                                </button>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="clearfix"></div>
     @include('sale_pos.partials.payment_type_details')
     <div class="col-md-12">

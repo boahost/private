@@ -28,30 +28,35 @@ return [
     |
     */
 
-    'disks' => [
+    'disks'   => [
 
-        'local' => [
+        'certificates' => [
             'driver' => 'local',
-            'root' => public_path('uploads'),
+            'root'   => storage_path('app/certificates'),
         ],
 
-        'public' => [
+        'local'        => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'root'   => public_path('uploads'),
+        ],
+
+        'public'       => [
+            'driver'     => 'local',
+            'root'       => storage_path('app/public'),
+            'url'        => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 
-        's3' => [
+        's3'           => [
             'driver' => 's3',
-            'key' => env('AWS_KEY'),
+            'key'    => env('AWS_KEY'),
             'secret' => env('AWS_SECRET'),
             'region' => env('AWS_REGION'),
             'bucket' => env('AWS_BUCKET'),
         ],
 
-        'dropbox' => [
-            'driver' => 'dropbox',
+        'dropbox'      => [
+            'driver'             => 'dropbox',
             'authorizationToken' => env('DROPBOX_ACCESS_TOKEN')
         ],
     ],
@@ -67,7 +72,7 @@ return [
     |
     */
 
-    'links' => [
+    'links'   => [
         public_path('storage') => storage_path('app/public'),
     ],
 

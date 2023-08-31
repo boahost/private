@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\PixHelper;
 use App\Models\Account;
 use App\Models\Brands;
 use App\Models\City;
 use App\Models\Business;
 use App\Models\BusinessLocation;
 use App\Models\Category;
+use App\Models\PaymentPlan;
 use App\Models\SangriaSuprimento;
 use App\Models\Contact;
 use App\Models\CustomerGroup;
@@ -103,10 +105,42 @@ class SellPosController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
      */
     public function index()
     {
+        try {
+            $pix = new PixHelper();
+
+            $pix->setDevedor('Cliente Teste', '12345678901');
+            $pix->setSolicitacao('Pagamento de teste');
+            $pix->setValor(15.00);
+            // $pix->gerarChave();
+            $pix->gerar();
+
+            // $data = [
+            //     'payerFirstName'  => $request->payerFirstName,
+            //     'payerLastName'   => $request->payerLastName,
+            //     'payerEmail'      => $request->payerEmail,
+            //     'docNumber'       => $doc,
+            //     'valor'           => (float) $plano->price,
+            //     'transacao_id'    => (string) $payment->id,
+            //     'status'          => $payment->status,
+            //     'forma_pagamento' => 'pix',
+            //     'qr_code_base64'  => $payment->point_of_interaction->transaction_data->qr_code_base64,
+            //     'qr_code'         => $payment->point_of_interaction->transaction_data->qr_code,
+            //     'link_boleto'     => '',
+            //     'numero_cartao'   => '',
+            //     'package_id'      => $plano->id,
+            //     'business_id'     => $business_id
+            // ];
+
+            // PaymentPlan::create($data);
+
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 400);
+        }
+
+        dd('PixHelper - Seguiu a vida');
 
         if (!auth()->user()->can('sell.view') && !auth()->user()->can('sell.create')) {
             abort(403, 'Unauthorized action.');
@@ -142,7 +176,6 @@ class SellPosController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
      */
     public function create()
     {
@@ -190,6 +223,8 @@ class SellPosController extends Controller
         $payment_lines[] = $this->dummyPaymentLine;
 
         $default_location = BusinessLocation::findOrFail($register_details->location_id);
+
+        // dd($default_location->toArray());
 
         $payment_types = $this->productUtil->payment_types($default_location);
 
@@ -248,6 +283,7 @@ class SellPosController extends Controller
         $pos_module_data = $this->moduleUtil->getModuleData('get_pos_screen_view', $sub_type);
         $invoice_layouts = InvoiceLayout::forDropdown($business_id);
 
+        // dd($payment_types);
 
         return view('sale_pos.create')
             ->with('cities', $this->prepareCities())

@@ -5,6 +5,7 @@ namespace App\Utils;
 use App\Models\Business;
 use App\Models\BusinessLocation;
 use App\Models\Contact;
+use App\Models\Integration;
 use App\Models\Product;
 use App\Models\ReferenceCount;
 use App\Models\Transaction;
@@ -260,6 +261,16 @@ class Util
             //     unset($payment_types[$key]);
             //   }
             // }
+        }
+
+        if (isset($location->business_id)) {
+            $integrations = Integration::where('business_id', $location->business_id)->get()->toArray();
+
+            foreach ($integrations as $key => $integration) {
+                if ($integration['integration'] == 'efi') {
+                    $payment_types['pix_efi'] = 'PIX - Banco EFI';
+                }
+            }
         }
 
         return $payment_types;
