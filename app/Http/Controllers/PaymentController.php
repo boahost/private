@@ -170,10 +170,12 @@ class PaymentController extends Controller
         return view('payment/finish', compact('paymentPlan'));
     }
 
-    public function consultaPixEfi($transacao_id)
+    public function consultaPixEfi(Request $request, $transacao_id)
     {
+        $business_id = auth()->user()->business_id;
+
         try {
-            $pix = new PixHelper();
+            $pix = new PixHelper($business_id);
 
             $pix->setDevedor('Cliente Teste', '12345678901');
             $pix->setSolicitacao('Pagamento de teste');

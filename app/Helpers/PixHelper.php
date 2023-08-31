@@ -10,6 +10,7 @@ use Gerencianet\Endpoints;
 
 class PixHelper
 {
+    private $business_id = null;
     private $sandbox = false;
 
     private array $options = [];
@@ -20,12 +21,15 @@ class PixHelper
 
     private ?Endpoints $gerencianet;
 
+    public function __construct($business_id)
+    {
+        $this->business_id = $business_id;
+    }
 
     public function &getConta()
     {
         if (!isset($this->conta)) {
-            $business_id = auth()->user()->business_id;
-            $this->conta = (object) Integration::where('business_id', $business_id)
+            $this->conta = (object) Integration::where('business_id', $this->business_id)
                 ->where('integration', 'efi')
                 ->firstOrFail()
                 ->toArray();
@@ -240,10 +244,10 @@ class PixHelper
         // dd($infoCertificado->);
 
         $options = [
-            "debug"         => true,
-            'sandbox'       => true,
+            "debug"         => false,
+            'sandbox'       => false,
             "timeout"       => 30,
-            'partner_token' => 'c6d2c3fe0d343601ea2becba877ecd7b3613c078',
+            'partner_token' => 'f0f2abeb04f61409150f93b60d1763c7',
             'client_id'     => &$conta->key_client_id,
             'client_secret' => &$conta->key_client_secret,
             'pix_cert'      => realpath(storage_path('app/certificates') . '/' . $conta->certificate),

@@ -70,7 +70,4 @@ Route::get('/bank/{id}', 'BankController@find');
 Route::get('/consultaPix/{transacao_id}', 'PaymentController@consultaPix');
 Route::get('/consultaValorPlano/{plano_id}', 'PaymentController@consultaValorPlano');
 
-Route::post('/efi/pix/', 'PaymentController@paymentPixEfi');
-Route::get('/efi/pix/{transacao_id}', 'PaymentController@consultaPixEfi');
-
 Route::get('/test', 'BankController@test');
