@@ -2,12 +2,11 @@
 
 namespace App\Helpers;
 
-use App\Models\Integration;
 use Exception;
+use App\Models\Integration;
 use Gerencianet\Exception\GerencianetException;
 use Gerencianet\Gerencianet;
 use Gerencianet\Endpoints;
-use NFePHP\Common\Certificate;
 
 class PixHelper
 {

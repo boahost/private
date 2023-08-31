@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\PixHelper;
 use App\Models\Account;
 use App\Models\Brands;
 use App\Models\City;
@@ -108,40 +107,6 @@ class SellPosController extends Controller
      */
     public function index()
     {
-        try {
-            $pix = new PixHelper();
-
-            $pix->setDevedor('Cliente Teste', '12345678901');
-            $pix->setSolicitacao('Pagamento de teste');
-            $pix->setValor(15.00);
-            // $pix->gerarChave();
-            $pix->gerar();
-
-            // $data = [
-            //     'payerFirstName'  => $request->payerFirstName,
-            //     'payerLastName'   => $request->payerLastName,
-            //     'payerEmail'      => $request->payerEmail,
-            //     'docNumber'       => $doc,
-            //     'valor'           => (float) $plano->price,
-            //     'transacao_id'    => (string) $payment->id,
-            //     'status'          => $payment->status,
-            //     'forma_pagamento' => 'pix',
-            //     'qr_code_base64'  => $payment->point_of_interaction->transaction_data->qr_code_base64,
-            //     'qr_code'         => $payment->point_of_interaction->transaction_data->qr_code,
-            //     'link_boleto'     => '',
-            //     'numero_cartao'   => '',
-            //     'package_id'      => $plano->id,
-            //     'business_id'     => $business_id
-            // ];
-
-            // PaymentPlan::create($data);
-
-        } catch (\Exception $e) {
-            return response()->json($e->getMessage(), 400);
-        }
-
-        dd('PixHelper - Seguiu a vida');
-
         if (!auth()->user()->can('sell.view') && !auth()->user()->can('sell.create')) {
             abort(403, 'Unauthorized action.');
         }
