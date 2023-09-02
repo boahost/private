@@ -3,6 +3,7 @@
 /public/*
 /public/storage
 /vendor
+/vendor.old
 /storage
 .env
 .env.backup

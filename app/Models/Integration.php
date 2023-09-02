@@ -14,6 +14,9 @@ class Integration extends Model
     public $key_client_id;
     public $key_client_secret;
 
+    public $pix_key;
+    public $pix_split_plan;
+
     /**
      * The attributes that aren't mass assignable.
      *

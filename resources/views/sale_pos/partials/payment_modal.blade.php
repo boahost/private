@@ -231,29 +231,159 @@
 
 <script>
     window.addEventListener('load', function() {
+
         $(() => {
-            $('body').on('click', '[trigger="gen_efi_qr_code"]', () => {
-                const row_index = $(this).closest('.payment_row').find('.payment_row_index').val()
+            $('body').on('click', '[trigger="gen_efi_qr_code"]', (e) => {
+                const el = $(e.currentTarget)
+                const row = el.closest('.payment_row')
+                const row_index = row.find('.payment_row_index').val()
                 const modal = $(`#modal_efi_${row_index}`)
+
+                const cpf = $(`[name="payment[${row_index}][cpf]"]`).val()
+                const amount = parseFloat($(`[name="payment[${row_index}][amount]"]`).val()
+                    .replace(',', '.'))
+                const customer_name = $('#default_customer_name').val()
+
+                if (amount < 0.01) {
+                    return swal(
+                        'Valor não informado',
+                        'Primeiro, informe o valor para gerar o QRCode',
+                        'warning'
+                    )
+                }
+
+                if (!cpf) {
+                    return swal('CPF não informado',
+                        'Informe o CPF para gerar o QRCode',
+                        'warning')
+                }
 
                 const modal_els = {
                     qr_code: modal.find('[name="efi_qr_code_img"]'),
                     triggers: {
                         close: modal.find('[trigger="close"]'),
+                        cancel: modal.find('[trigger="cancel"]'),
                         update: modal.find('[trigger="update"]'),
                     }
                 }
 
-                $(`[trigger="gen_efi_qr_code_${row_index}"]`).on('click', function() {
-                    const cpf = $(`[name="payment[${row_index}][cpf]"]`).val()
+                modal_els.qr_code.attr('src',
+                    'https://placehold.co/228x228/fff/222?text=Aguarde...');
 
-                    if (!cpf) {
-                        return swal('CPF não informado',
-                            'Informe o CPF para gerar o QRCode',
-                            'warning')
+                function buttonDisables(disabled = false) {
+                    if (disabled == true) {
+                        modal_els.triggers.cancel.attr('disabled', 'disabled')
+                        modal_els.triggers.update.attr('disabled', 'disabled')
+                    } else {
+                        modal_els.triggers.cancel.removeAttr('disabled')
+                        modal_els.triggers.update.removeAttr('disabled')
+                    }
+                }
+
+                let timer;
+
+                function refresh() {
+                    const data = modal.data('pix')
+                    const txid = data && data.txid
+
+                    if (!txid) {
+                        console.log('txid não encontrado');
+                        return;
                     }
 
-                    modal.removeClass('hidden');
+                    buttonDisables(true)
+
+                    $.ajax({
+                        method: 'GET',
+                        url: `/efi/pix/${txid}`,
+                        dataType: 'json',
+                        success: function(responseJSON) {
+                            console.log(responseJSON);
+
+                            buttonDisables(false)
+
+                            if (responseJSON.status == 'CONCLUIDA') {
+                                clearInterval(timer);
+
+                                modal_els.qr_code.attr('src',
+                                    'https://placehold.co/228x228/4caf50/fff?text=Pago!'
+                                );
+
+                                modal_els.triggers.close.removeClass('hidden')
+                                modal_els.triggers.cancel.addClass('hidden')
+                                modal_els.triggers.update.addClass('hidden')
+
+                                row.find(':input:not([trigger="close"])').attr(
+                                    'disabled', 'disabled')
+                            }
+                        },
+                        error: function(error) {
+                            buttonDisables(false)
+
+                            console.log(error);
+                        }
+                    });
+                }
+
+                function setTimer() {
+                    timer = setInterval(() => {
+                        // refresh()
+                    }, 10000);
+                }
+
+                function success(responseJSON) {
+                    console.log(responseJSON);
+
+                    buttonDisables(false)
+
+                    modal.data({
+                        pix: responseJSON
+                    })
+
+                    modal_els.qr_code.attr('src', responseJSON.qrcode.imagemQrcode);
+
+                    setTimer();
+                }
+
+                function error(response) {
+                    console.log(response);
+                    const responseJSON = response.responseJSON
+
+                    buttonDisables(false)
+                    modal_els.qr_code.attr('src',
+                        'https://placehold.co/228x228/fff/222?text=Tente%20Novamente');
+
+                    if (responseJSON && responseJSON.error) {
+                        return swal('Erro ao erar PIX', responseJSON.error, 'error')
+                    }
+
+                    return swal('Erro ao erar PIX', 'Por favor, tente novamente', 'error')
+                }
+
+                if (modal.data('pix'))
+                    return setTimer();
+
+                $.ajax({
+                    method: 'POST',
+                    url: '/efi/pix',
+                    data: {
+                        customer_name,
+                        amount,
+                        cpf,
+                    },
+                    dataType: 'json',
+                    success: success,
+                    error: error
+                });
+
+                buttonDisables(true)
+
+                modal.removeClass('hidden');
+
+                modal_els.triggers.cancel.on('click', function() {
+                    modal.addClass('hidden');
+                    modal.removeData('pix')
+                    clearInterval(timer);
                 })
 
                 modal_els.triggers.close.on('click', function() {
@@ -261,9 +391,7 @@
                 })
 
                 modal_els.triggers.update.on('click', function() {
-                    console.log('update');
-                    modal_els.qr_code.attr('src',
-                        '/img/imageonline-co-placeholder-image.jpg');
+                    refresh();
                 })
             })
         })

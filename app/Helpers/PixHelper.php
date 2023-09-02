@@ -8,6 +8,11 @@ use Gerencianet\Exception\GerencianetException;
 use Gerencianet\Gerencianet;
 use Gerencianet\Endpoints;
 
+// Edimilson Assis - Desenvolvedor
+// 75e4199575f0819c5d4ec469c9232bbc
+// Client_Id_b80de2caf31c4dfa5e47dd4a016da4b03d2c6fc7
+// Client_Secret_91a0498f3638db8b7b21bad1db9659dd115f16be
+
 class PixHelper
 {
     private $business_id = null;
@@ -15,9 +20,9 @@ class PixHelper
 
     private array $options = [];
     private array $body = [];
-    private object $conta;
-
     private string $webhook_url;
+
+    private object $integration;
 
     private ?Endpoints $gerencianet;
 
@@ -26,38 +31,37 @@ class PixHelper
         $this->business_id = $business_id;
     }
 
-    public function &getConta()
+    public function &getIntegration()
     {
-        if (!isset($this->conta)) {
-            $this->conta = (object) Integration::where('business_id', $this->business_id)
+        if (!isset($this->integration)) {
+            $this->integration = (object) Integration::where('business_id', $this->business_id)
                 ->where('integration', 'efi')
                 ->firstOrFail()
                 ->toArray();
         }
 
-        return $this->conta;
+        return $this->integration;
     }
 
-    public function gerarQRLoc($loc_id)
+    public function genQRLoc($loc_id)
     {
-        $api = $this->getGerencinet();
+        $api = $this->getApi();
         return $api->pixGenerateQRCode(['id' => $loc_id]);
     }
 
-    public function getGerencinet()
+    public function getApi()
     {
         if (!isset($this->gerencianet))
             $this->gerencianet = Gerencianet::getInstance(
                 $this->getOptions()
             );
-
         return $this->gerencianet;
     }
 
-    public function gerar(): object
+    public function create(): object
     {
-        $body  = $this->getBody();
-        $conta = $this->getConta();
+        $body        = $this->getBody();
+        $integration = $this->getIntegration();
 
         if (empty($body['valor']['original']))
             throw new Exception('Defina o valor');
@@ -68,53 +72,56 @@ class PixHelper
         if (empty($body['devedor']))
             throw new Exception('Nenhum cliente definido');
 
-        if (!$conta->key_pix ?? null)
-            $this->gerarChave();
+        if (!$integration->pix_key ?? null)
+            $this->getKey();
 
         try {
-            $api = $this->getGerencinet();
+            $api = $this->getApi();
             $pix = $api->pixCreateImmediateCharge([], $body);
         } catch (Exception $e) {
-            throw new Exception('Erro interno ao Gerar PIX. ' . $e->getMessage());
+            throw new Exception($e->getMessage());
         }
 
-        $pix['qrcode'] = $this->gerarQRLoc($pix['loc']['id']);
+        $pix['qrcode'] = $this->genQRLoc($pix['loc']['id']);
+
+        if (!empty($pix['txid']) and !empty($integration->pix_split_plan))
+            $this->splitLink($pix['txid'], $integration->pix_split_plan);
 
         return json_decode(json_encode($pix));
     }
 
-    public function generateQRCode(int $loc_id)
+    public function genQRCode(int $loc_id)
     {
-        $api = $this->getGerencinet();
+        $api = $this->getApi();
 
         return $api->pixGenerateQRCode(['id' => $loc_id]);
     }
 
-    public function consultarTxID(string $txid)
+    public function detailByTxID(string $txid)
     {
-        $api = $this->getGerencinet();
+        $api = $this->getApi();
 
         $pix = $api->pixDetailCharge(['txid' => $txid]);
 
         return json_decode(json_encode($pix));
     }
 
-    public function generateQRCodeTxID(string $txid)
+    public function genQRCodeTxID(string $txid)
     {
-        $pix = $this->consultarTxID($txid);
+        $pix = $this->detailByTxID($txid);
 
-        $pix->qrcode = self::generateQRCode($pix->loc->id);
+        $pix->qrcode = self::genQRCode($pix->loc->id);
 
         return json_decode(json_encode($pix));
     }
 
-    public function setSolicitacao(string $texto)
+    public function setDescription(string $texto)
     {
         $body                       = &$this->getBody();
         $body['solicitacaoPagador'] = strlen($texto) >= 140 ? (substr($texto, 0, 137) . '...') : $texto;
     }
 
-    public function setValor($valor)
+    public function setAmount($valor)
     {
         $body  = &$this->getBody();
         $valor = number_format($valor, 2, '.', '');
@@ -133,6 +140,8 @@ class PixHelper
             'nome' => $nome
         ];
 
+        $cpf_cnpj = preg_replace('/[^0-9]/', '', $cpf_cnpj);
+
         if (strlen($cpf_cnpj) == 11)
             $devedor['cpf'] = $cpf_cnpj;
         else
@@ -147,16 +156,16 @@ class PixHelper
         return $body['devedor'] = $devedor;
     }
 
-    public function gerarChave()
+    public function getKey()
     {
-        $api     = $this->getGerencinet();
+        $api     = $this->getApi();
         $options = $this->getOptions();
 
         if ($options['sandbox'])
             throw new Exception('Não é possível listar Chaves no modo Sandbox');
 
         try {
-            $chaves = $this->listarChaves();
+            $chaves = $this->getKeys();
         } catch (Exception $th) {
             throw new Exception('Não conseguimos permissão para obter nenhuma chaves PIX');
         }
@@ -167,22 +176,22 @@ class PixHelper
             throw new Exception('Não conseguimos permissão para gerar uma Chave PIX');
         }
 
-        $this->setChave($chave);
+        $this->setKey($chave);
 
-        $this->configWebhook();
+        // $this->configWebhook();
 
         return $chave;
     }
 
-    public function updateWebhookURL()
+    public function configWebhookURL()
     {
-        $api = $this->getGerencinet();
+        $api = $this->getApi();
 
-        $conta       = $this->getConta();
+        $integration = $this->getIntegration();
         $webhook_url = $this->getWebhookUrl();
 
         return $api->pixConfigWebhook(
-            ['chave' => $conta->key_pix],
+            ['chave' => $integration->pix_key],
             ['webhookUrl' => $webhook_url]
         );
     }
@@ -200,19 +209,20 @@ class PixHelper
         $this->webhook_url = $url;
     }
 
-    public function setChave($chave)
+    public function setKey($key)
     {
-        $conta          = &$this->getConta();
-        $conta->key_pix = $chave;
-        return $chave;
+        $integration          = &$this->getIntegration();
+        $integration->pix_key = $key;
+        return $key;
     }
 
-    public function listarChaves()
+    public function getKeys()
     {
-        $api = $this->getGerencinet();
+        $api = $this->getApi();
 
         try {
-            $chaves = $api->pixListEvp([]) ?: throw new Exception('Não foi possível obter a lista de chaves');
+            if (!$chaves = $api->pixListEvp([]))
+                throw new Exception('Não foi possível obter a lista de chaves');
         } catch (GerencianetException $e) {
             throw new Exception($e->error);
         }
@@ -238,19 +248,15 @@ class PixHelper
 
     private function newOptions()
     {
-        $conta = $this->getConta();
-
-        // $conta->CNPJ = preg_replace('/^[0-9]/', '', $conta->CNPJ ?? '');
-        // dd($infoCertificado->);
+        $integration = $this->getIntegration();
 
         $options = [
             "debug"         => false,
-            'sandbox'       => false,
+            'sandbox'       => $this->sandbox,
             "timeout"       => 30,
-            'partner_token' => 'f0f2abeb04f61409150f93b60d1763c7',
-            'client_id'     => &$conta->key_client_id,
-            'client_secret' => &$conta->key_client_secret,
-            'pix_cert'      => realpath(storage_path('app/certificates') . '/' . $conta->certificate),
+            'client_id'     => &$integration->key_client_id,
+            'client_secret' => &$integration->key_client_secret,
+            'pix_cert'      => realpath(storage_path('app/certificates') . '/' . $integration->certificate),
             'headers'       => [
                 'x-skip-mtls-checking' => 'true' // IMPORTANTE PRA GERAR NOTIFICAÇÃO
             ],
@@ -260,20 +266,23 @@ class PixHelper
             throw new Exception('Certificado não encontrado. Cadastrar um novo Certificado em configurações');
 
         if (empty($options['client_id']) or empty($options['client_secret']))
-            throw new Exception('Erro interno ao localizar Conta');
+            throw new Exception('Erro interno ao localizar conta do banco EFI');
 
         return $options;
     }
 
     private function newBody()
     {
-        $conta = $this->getConta();
+        $integration = $this->getIntegration();
+
+        if ($this->sandbox)
+            $integration->pix_key = 'd2b0b0b0-0b0b-0b0b-0b0b-0b0b0b0b0b0b';
 
         $body = [
             'calendario'         => [
                 'expiracao' => 3600 * 24 * 30
             ],
-            'chave'              => &$conta->key_pix,
+            'chave'              => &$integration->pix_key,
             'valor'              => [
                 'original' => null
             ],
@@ -281,5 +290,68 @@ class PixHelper
         ];
 
         return $body;
+    }
+
+    public function splitLink(string $txid, string $splitConfigId)
+    {
+        $params = [
+            "txid"          => $txid,
+            "splitConfigId" => $splitConfigId
+        ];
+
+        try {
+            $api      = $this->getApi();
+            $response = $api->pixSplitLinkCharge($params);
+
+            return $response;
+        } catch (GerencianetException $e) {
+            throw new Exception($e->error);
+        }
+    }
+
+    public function splitConfig(float $partnerPercent, string $splitConfigId = null)
+    {
+        $partnerPercent  = number_format($partnerPercent, 2);
+        $transferPercent = number_format(100 - $partnerPercent, 2);
+
+        $body = [
+            "descricao"  => "Private Sistemas - Plan 1",
+            "lancamento" => [
+                "imediato" => true
+            ],
+            "split"      => [
+                "divisaoTarifa" => "assumir_total",
+                //"assumir_total", "proporcional"
+                "minhaParte"    => [
+                    "tipo"  => "porcentagem",
+                    "valor" => "$partnerPercent"
+                ],
+                "repasses"      => [
+                    [
+                        "tipo"       => "porcentagem",
+                        "valor"      => "$transferPercent",
+                        "favorecido" => [
+                            "cpf"   => "70036923176",
+                            "conta" => "4299353"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        try {
+            $api = $this->getApi();
+
+            $params = [];
+
+            if (!empty($splitConfigId)) {
+                $params["id"] = $splitConfigId;
+                return $api->pixSplitConfigId($params, $body);
+            }
+
+            return $api->pixSplitConfig($params, $body);
+        } catch (GerencianetException $e) {
+            throw new Exception('Ocorreu um erro ao configurar o Split de Pagamento');
+        }
     }
 }

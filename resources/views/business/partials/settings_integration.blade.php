@@ -24,7 +24,7 @@
                     ]) }}
                 </div>
                 <p>
-                    <a href="https://cdn.discordapp.com/attachments/652136190006525955/809138574549188618/identificador-conta.jpg"
+                    <a href="https://dev.efipay.com.br/img/identificador.png"
                         target="_blank">
                         Como localizar meu @lang('integration.payee_code') <i class="fa fa-question-circle"></i>
                     </a>

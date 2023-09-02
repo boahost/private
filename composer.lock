@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f57bdf1cd86f00755ad22923950d8bc3",
+    "content-hash": "fe5f8906cad5455a2b89d496a487991e",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1496,6 +1496,83 @@
                 }
             ],
             "time": "2021-04-26T11:24:25+00:00"
+        },
+        {
+            "name": "gerencianet/gerencianet-sdk-php",
+            "version": "5.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gerencianet/gn-api-sdk-php.git",
+                "reference": "cad21f664f5adf6c93e30619538b04476a063e63"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gerencianet/gn-api-sdk-php/zipball/cad21f664f5adf6c93e30619538b04476a063e63",
+                "reference": "cad21f664f5adf6c93e30619538b04476a063e63",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0",
+                "php": "^7.2 || ^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Gerencianet\\": "src/Gerencianet"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cecília Deveza"
+                },
+                {
+                    "name": "Danniel Hugo"
+                },
+                {
+                    "name": "Francisco Thiene"
+                },
+                {
+                    "name": "Talita Campos"
+                },
+                {
+                    "name": "Thomaz Feitoza"
+                },
+                {
+                    "name": "Filipe Mata"
+                },
+                {
+                    "name": "Thiago Resende"
+                },
+                {
+                    "name": "Jéssica Gava"
+                },
+                {
+                    "name": "Guilherme Cota"
+                },
+                {
+                    "name": "Sady Coimbra"
+                },
+                {
+                    "name": "Matheus Rodrigues"
+                },
+                {
+                    "name": "João Oliveira"
+                },
+                {
+                    "name": "Paloma Brito"
+                }
+            ],
+            "description": "GN APIs SDK PHP",
+            "homepage": "https://github.com/gerencianet/gn-api-sdk-php",
+            "support": {
+                "issues": "https://github.com/gerencianet/gn-api-sdk-php/issues",
+                "source": "https://github.com/gerencianet/gn-api-sdk-php/tree/5.1.1"
+            },
+            "time": "2023-02-14T17:17:25+00:00"
         },
         {
             "name": "graham-campbell/guzzle-factory",
@@ -11908,5 +11985,5 @@
         "php": "^7.3|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

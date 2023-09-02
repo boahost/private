@@ -23,9 +23,10 @@ class CreateIntegrationsTable extends Migration
             $table->string('password', 100)->default('');
             $table->string('integration', 100);
             $table->string('payee_code', 100)->nullable();
-            $table->string('key_pix', 100)->nullable();
             $table->string('key_client_id', 100)->nullable();
             $table->string('key_client_secret', 100)->nullable();
+            $table->string('pix_key', 100)->nullable();
+            $table->string('pix_split_plan', 100)->nullable();
 
             $table->timestamps();
         });

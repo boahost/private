@@ -36,12 +36,6 @@ class PaymentController extends Controller
             return redirect()->route('business.getBusinessSettings')->with('status', $output);
         }
     }
-
-    public function paymentPixEfi(Request $request)
-    {
-
-    }
-
     public function paymentPix(Request $request)
     {
         \MercadoPago\SDK::setAccessToken(getenv("MERCADOPAGO_ACCESS_TOKEN"));
@@ -170,20 +164,20 @@ class PaymentController extends Controller
         return view('payment/finish', compact('paymentPlan'));
     }
 
-    public function consultaPixEfi(Request $request, $transacao_id)
+    public function consultaPixEfi(Request $request, $txid)
     {
         $business_id = auth()->user()->business_id;
 
         try {
             $pix = new PixHelper($business_id);
 
-            $pix->setDevedor('Cliente Teste', '12345678901');
-            $pix->setSolicitacao('Pagamento de teste');
-            $pix->setValor(15.00);
-            // $pix->gerarChave();
-            $pix->gerar();
+            $pix = $pix->detailByTxID($txid);
 
-            // $data = [
+            // $pix->status = "pago";
+
+            return response()->json($pix);
+
+            // $input = [
             //     'payerFirstName'  => $request->payerFirstName,
             //     'payerLastName'   => $request->payerLastName,
             //     'payerEmail'      => $request->payerEmail,
@@ -200,13 +194,70 @@ class PaymentController extends Controller
             //     'business_id'     => $business_id
             // ];
 
-            // PaymentPlan::create($data);
+            // PaymentPlan::create($input);
 
         } catch (\Exception $e) {
-            return response()->json($e->getMessage(), 400);
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function webhookPixEfi(Request $request, $transacao_id)
+    {
+        \Log::info($request->all());
+    }
+
+    public function paymentPixEfi(Request $request)
+    {
+        $business_id = auth()->user()->business_id;
+
+        $input    = $request->only('cpf', 'amount', 'customer_name');
+        $business = Business::findorfail($business_id);
+
+        if (!isset($input['cpf'], $input['amount'], $input['customer_name'])) {
+            return response()->json('Dados inválidos', 400);
         }
 
-        dd('PixHelper - Seguiu a vida');
+        try {
+            $pix = new PixHelper($business_id);
+
+            $pix->setDevedor(
+                $input['customer_name'],
+                $input['cpf']
+            );
+
+            $pix->setDescription("Pagamento realizado na $business->name");
+            $pix->setAmount((float) $input['amount']);
+
+            $pix = $pix->create();
+
+            // $paymentPlan = [
+            //     'payerFirstName'  => $request->payerFirstName,
+            //     'payerLastName'   => $request->payerLastName,
+            //     'payerEmail'      => $request->payerEmail,
+            //     'docNumber'       => $doc,
+            //     'valor'           => (float) $plano->price,
+            //     'transacao_id'    => (string) $payment->id,
+            //     'status'          => $payment->status,
+            //     'forma_pagamento' => 'pix',
+            //     'qr_code_base64'  => $payment->point_of_interaction->transaction_data->qr_code_base64,
+            //     'qr_code'         => $payment->point_of_interaction->transaction_data->qr_code,
+            //     'link_boleto'     => '',
+            //     'numero_cartao'   => '',
+            //     'package_id'      => $plano->id,
+            //     'business_id'     => $business_id
+            // ];
+
+            // PaymentPlan::create($paymentPlan);
+
+            return response()->json($pix);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function consultaPix($transacao_id)

@@ -16,7 +16,7 @@ $backHome = $images[rand(0, sizeof($images)-1)];
 
 <style type="text/css">
 	.left-col {
-		background: linear-gradient(0deg,rgba(0, 0, 0, 0.76),rgba(51, 51, 51, 0.32)),url(../img/{{$backHome}}); 
+		background: linear-gradient(0deg,rgba(0, 0, 0, 0.76),rgba(51, 51, 51, 0.32)),url(../img/{{$backHome}});
 		text-align: center;
 		background-size: cover;
 		background-position: center;

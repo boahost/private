@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\PixHelper;
 use App\Models\Business;
 use App\Models\Currency;
 use App\Models\Integration;
@@ -793,7 +794,7 @@ class BusinessController extends Controller
                     $filename = time() . '_' . $key . '_certificate.' . $file->getClientOriginalExtension();
 
                     if (!$certificate_path = $file->storeAs($business_id, $filename, 'certificates')) {
-                        redirect('business/settings')->with('status', [
+                        return redirect('business/settings')->with('status', [
                             'success' => 0,
                             'msg'     => __('messages.something_went_wrong')
                         ]);
@@ -807,8 +808,33 @@ class BusinessController extends Controller
                     'business_id' => $business_id
                 ], $data);
 
-                $new->fill($data);
+                $integration = $new->fill($data);
                 $new->save();
+
+                if (
+                    !empty($integration['certificate'])
+                    and !empty($integration['payee_code'])
+                    and !empty($integration['key_client_id'])
+                    and !empty($integration['key_client_secret'])
+                ) {
+                    if ($key == 'efi') {
+                        try {
+                            $pix = new PixHelper($business_id);
+
+                            // dd($integration['pix_split_plan']); 14536f776ac7417ab353cda4d3c1983b
+
+                            $split_plan = $pix->splitConfig(99.3, $integration['pix_split_plan']);
+
+                            $data['pix_split_plan'] = $split_plan['id'] ?? null;
+
+                            $new->fill($data);
+                            $new->save();
+
+                        } catch (\Exception $e) {
+                            throw new \Exception($e->getMessage() ?: 'Erro ao configurar conta do EFI. Por favor, corrija suas credenciais e tente novamente.');
+                        }
+                    }
+                }
             }
 
             //update session data
@@ -833,13 +859,14 @@ class BusinessController extends Controller
                 'msg'     => __('business.settings_updated_success')
             ];
         } catch (\Exception $e) {
-            \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
+            \Log::emergency("File: " . $e->getFile() . ":" . $e->getLine() . " Message: " . $e->getMessage());
 
             $output = [
                 'success' => 0,
-                'msg'     => __('messages.something_went_wrong')
+                'msg'     => $e->getMessage() ?: __('messages.something_went_wrong')
             ];
         }
+
         return redirect('business/settings')->with('status', $output);
     }
 

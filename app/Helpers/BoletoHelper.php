@@ -10,7 +10,7 @@ use App\Models\RemessaBoleto;
 use Illuminate\Support\Str;
 
 class BoletoHelper {
-	
+
 	public function gerar($boleto){
 
 		$revenue = $boleto->revenue;
@@ -21,7 +21,7 @@ class BoletoHelper {
 		$boletoAux = $boleto;
 
 		$config = Business::findOrFail($boleto->bank->business_id);
-		
+
 		if($boletoAux->logo){
 
 			if($config->logo){
@@ -44,9 +44,9 @@ class BoletoHelper {
 			'carteira' => $boleto->carteira,
 			'agencia' => $boleto->bank->agencia,
 			'convenio' => $boleto->convenio,
-			'conta' => $boleto->bank->conta,
-			'multa' => $boleto->multa, 
-			'juros' => $boleto->juros, 
+			'conta' => $boleto->bank->integration,
+			'multa' => $boleto->multa,
+			'juros' => $boleto->juros,
 			'jurosApos' => $boleto->juros_apos,
 			'descricaoDemonstrativo' => [],
 			'instrucoes' => [$boleto->instrucoes],
@@ -95,7 +95,7 @@ class BoletoHelper {
 	}
 
 	private function getPagador($revenue){
-		
+
 		$client = $revenue->contact;
 
 		$pagador = new \Eduardokum\LaravelBoleto\Pessoa([
@@ -175,9 +175,9 @@ class BoletoHelper {
 				'carteira' => $b['carteira'],
 				'agencia' => $banco->agencia,
 				'convenio' => $b['convenio'],
-				'conta' => $banco->conta,
-				'multa' => $b['multa'], 
-				'juros' => $b['juros'], 
+				'conta' => $banco->integration,
+				'multa' => $b['multa'],
+				'juros' => $b['juros'],
 				'jurosApos' => $b['juros_apos'],
 				'descricaoDemonstrativo' => [],
 				'instrucoes' => [],
@@ -196,7 +196,7 @@ class BoletoHelper {
 					'mensagem' => $e->getMessage()
 				];
 			}
-			
+
 		}
 
 		return true;
@@ -278,9 +278,9 @@ class BoletoHelper {
 				'carteira' => $b['carteira'],
 				'agencia' => $banco->agencia,
 				'convenio' => $b['convenio'],
-				'conta' => $banco->conta,
-				'multa' => $b['multa'], 
-				'juros' => $b['juros'], 
+				'conta' => $banco->integration,
+				'multa' => $b['multa'],
+				'juros' => $b['juros'],
 				'jurosApos' => $b['juros_apos'],
 				'descricaoDemonstrativo' => [],
 				'instrucoes' => [],
@@ -294,14 +294,14 @@ class BoletoHelper {
 					'mensagem' => $e->getMessage()
 				];
 			}
-			
+
 		}
 
 		return true;
 	}
 
 	public function gerarRemessa($boleto){
-		
+
 		$boletoRemessa = $boleto->itemRemessa;
 
 		if($boletoRemessa != null){
@@ -322,7 +322,7 @@ class BoletoHelper {
 		}
 
 		$config = Business::findOrFail($boleto->bank->business_id);
-		
+
 		if($config->logo){
 			$logo = public_path('uploads/business_logos/' . $config->logo);
 		}else{
@@ -344,9 +344,9 @@ class BoletoHelper {
 			'carteira' => $boleto->carteira,
 			'agencia' => $boleto->bank->agencia,
 			'convenio' => $boleto->convenio,
-			'conta' => $boleto->bank->conta,
-			'multa' => $boleto->multa, 
-			'juros' => $boleto->juros, 
+			'conta' => $boleto->bank->integration,
+			'multa' => $boleto->multa,
+			'juros' => $boleto->juros,
 			'jurosApos' => $boleto->juros_apos,
 			'descricaoDemonstrativo' => [],
 			'instrucoes' => [$boleto->instrucoes],
@@ -360,7 +360,7 @@ class BoletoHelper {
 			'agencia' => $boleto->bank->agencia,
 			'convenio' => $boleto->convenio,
 			'variacaoCarteira' => $boleto->carteira,
-			'conta' => $boleto->bank->conta
+			'conta' => $boleto->bank->integration
 		];
 
 		if($boleto->bank->banco == '237' || $boleto->bank->banco == '748'){
@@ -403,46 +403,46 @@ class BoletoHelper {
 		$remessa = null;
 		$tipo = $boleto->tipo;
 		if($boleto->bank->banco == '001'){
-			if($tipo == 'Cnab400'){	
+			if($tipo == 'Cnab400'){
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab400\Banco\Bb($sendArray);
 			}else{
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab240\Banco\Bb($sendArray);
 			}
 		}else if($boleto->bank->banco == '341'){
-			if($tipo == 'Cnab400'){	
+			if($tipo == 'Cnab400'){
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab400\Banco\Itau($sendArray);
 			}else{
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab240\Banco\Itau($sendArray);
 			}
 		}else if($boleto->bank->banco == '237'){
-			if($tipo == 'Cnab400'){	
+			if($tipo == 'Cnab400'){
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab400\Banco\Bradesco($sendArray);
 			}else{
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab240\Banco\Bradesco($sendArray);
 			}
 		}else if($boleto->bank->banco == '748'){
-			if($tipo == 'Cnab400'){	
+			if($tipo == 'Cnab400'){
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab400\Banco\Sicredi($sendArray);
 			}else{
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab240\Banco\Sicredi($sendArray);
 			}
 		}
 		else if($boleto->bank->banco == '104'){
-			if($tipo == 'Cnab400'){	
+			if($tipo == 'Cnab400'){
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab400\Banco\Caixa($sendArray);
 			}else{
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab240\Banco\Caixa($sendArray);
 			}
 		}
 		else if($boleto->bank->banco == '033'){
-			if($tipo == 'Cnab400'){	
+			if($tipo == 'Cnab400'){
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab400\Banco\Santander($sendArray);
 			}else{
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab240\Banco\Santander($sendArray);
 			}
 		}
 		else if($boleto->bank->banco == '756'){
-			if($tipo == 'Cnab400'){	
+			if($tipo == 'Cnab400'){
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab400\Banco\Bancoob($sendArray);
 			}else{
 				$remessa = new \Eduardokum\LaravelBoleto\Cnab\Remessa\Cnab240\Banco\Bancoob($sendArray);
@@ -486,9 +486,9 @@ class BoletoHelper {
 				'carteira' => $boleto->carteira,
 				'agencia' => $boleto->bank->agencia,
 				'convenio' => $boleto->convenio,
-				'conta' => $boleto->bank->conta,
-				'multa' => $boleto->multa, 
-				'juros' => $boleto->juros, 
+				'conta' => $boleto->bank->integration,
+				'multa' => $boleto->multa,
+				'juros' => $boleto->juros,
 				'jurosApos' => $boleto->juros_apos,
 				'descricaoDemonstrativo' => [],
 				'instrucoes' => [$boleto->instrucoes],
@@ -505,7 +505,7 @@ class BoletoHelper {
 			'agencia' => $boleto->bank->agencia,
 			'convenio' => $boleto->convenio,
 			'variacaoCarteira' => $boleto->carteira,
-			'conta' => $boleto->bank->conta
+			'conta' => $boleto->bank->integration
 		];
 
 		// if($boletos[0]->banco->banco == 'Bradesco'){
