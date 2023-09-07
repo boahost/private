@@ -125,6 +125,24 @@
                             </div>
                             <!-- /.box-body -->
                         </div>
+
+                        <div class="box box-solid bg-white">
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-lg-12 flex items-center justfy-between mb-10">
+                                        Pagamentos PIX
+                                        <button trigger="pixlist_refresh" type="button"
+                                            class="btn btn-flat btn-secondary">
+                                            <i class="fa fa-redo-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <ul id="pixlist" class="list-group" style="max-height: 200px; overflow-y: auto;">
+                                    <li class="list-group-item">
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,7 +166,6 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
-
                         <div class="col-md-6">
                             <div class="form-group">
                                 {!! Form::label('card_number', __('lang_v1.card_no')) !!}
@@ -216,7 +233,6 @@
                                 {!! Form::text('', null, ['class' => 'form-control', 'placeholder' => __('lang_v1.year'), 'id' => 'card_year']) !!}
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -231,18 +247,95 @@
 
 <script>
     window.addEventListener('load', function() {
-
         $(() => {
-            $('body').on('click', '[trigger="gen_efi_qr_code"]', (e) => {
+            const keys = [
+                'd',
+                'f',
+                'g',
+                'h',
+                'j',
+                'k',
+                'l',
+                'ç',
+            ]
+
+            $('.payment_types_dropdown .radio-button').each((index, el) => {
+                const key = keys[index]
+
+                if (!key)
+                    return
+
+                const label = $(el).find('label')
+
+                label.attr('title', `Atalho: shift+${key}`).find('small').text(`(${key})`)
+
+                Mousetrap.bind(`shift+${key}`, function(e) {
+                    e.preventDefault();
+                    $(el).find('input').prop('checked', true).trigger('change')
+                });
+            })
+
+
+            $('body').on('change', '.payment_types_dropdown input', (e) => {
+                const el = $(e.currentTarget)
+
+                const payment_type_id = el.val()
+
+                if (payment_type_id == 'pix_efi') {
+                    return showModal(e)
+                }
+            })
+
+            function showModal(e) {
                 const el = $(e.currentTarget)
                 const row = el.closest('.payment_row')
                 const row_index = row.find('.payment_row_index').val()
                 const modal = $(`#modal_efi_${row_index}`)
 
-                const cpf = $(`[name="payment[${row_index}][cpf]"]`).val()
-                const amount = parseFloat($(`[name="payment[${row_index}][amount]"]`).val()
-                    .replace(',', '.'))
+                // $(`[name="payment[${row_index}][cpf]"]`).val()
+
+                let amount = $(`[name="payment[${row_index}][amount]"]`).val().replace(',', '.')
+                amount = parseFloat(amount)
+
                 const customer_name = $('#default_customer_name').val()
+                const whatsapp_number = row.find(`#payment_whatsapp_${row_index}`)
+
+                whatsapp_number[0].addEventListener('keydown', () => {
+                    //   verifica se a tela é enter e clicka no botão whatsapp
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+
+                whatsapp_number.on('input', function(e) {
+                    const value = $(this).val()
+                    const number = value.replace(/\D/g, '')
+
+                    console.log(e);
+
+                    if (number.length < 11 || number.length > 11)
+                        return modal_els.triggers.whatsapp.removeAttr('target').removeAttr(
+                            'href')
+
+                    const data = modal.data('pix')
+
+                    if (!data)
+                        return;
+
+                    const params = new URLSearchParams()
+
+                    // Copie o código e cole no aplicativo do seu banco:\n\n'${data.qrcode.qrcode}\n\n
+
+                    const text =
+                        `Olá, ${customer_name}!\n\nSeu pedido foi confirmado e está aguardando o pagamento.\n\nClique no link abaixo para efetuar o pagamento seguro via PIX:\n\n${data.qrcode.linkVisualizacao}\n\nAo abrir o link, clique em "Copiar" e cole no aplicativo do seu banco ou escaneie o QRCode.\n\nMuito Obrigado!`
+
+                    params.append('phone', `55${number}`)
+                    params.append('text', text)
+
+                    modal_els.triggers.whatsapp.attr('target', '_blank').attr('href',
+                        `https://api.whatsapp.com/send?${params.toString()}`
+                    )
+                })
 
                 if (amount < 0.01) {
                     return swal(
@@ -252,15 +345,18 @@
                     )
                 }
 
-                if (!cpf) {
-                    return swal('CPF não informado',
-                        'Informe o CPF para gerar o QRCode',
-                        'warning')
-                }
+                // const cpf = ''
+                // if (!cpf) {
+                //     return swal('CPF não informado',
+                //         'Informe o CPF para gerar o QRCode',
+                //         'warning')
+                // }
 
                 const modal_els = {
                     qr_code: modal.find('[name="efi_qr_code_img"]'),
                     triggers: {
+                        print: modal.find('[trigger="print"]'),
+                        whatsapp: modal.find('[trigger="whatsapp"]'),
                         close: modal.find('[trigger="close"]'),
                         cancel: modal.find('[trigger="cancel"]'),
                         update: modal.find('[trigger="update"]'),
@@ -309,17 +405,18 @@
                                     'https://placehold.co/228x228/4caf50/fff?text=Pago!'
                                 );
 
-                                modal_els.triggers.close.removeClass('hidden')
-                                modal_els.triggers.cancel.addClass('hidden')
-                                modal_els.triggers.update.addClass('hidden')
+                                row.find('[name="tools"]').addClass('hidden')
+                                row.find('[name="done"]').removeClass('hidden')
 
                                 row.find(':input:not([trigger="close"])').attr(
                                     'disabled', 'disabled')
+
+                                reloadPixList()
                             }
                         },
                         error: function(error) {
                             buttonDisables(false)
-
+                            reloadPixList()
                             console.log(error);
                         }
                     });
@@ -327,37 +424,8 @@
 
                 function setTimer() {
                     timer = setInterval(() => {
-                        // refresh()
-                    }, 10000);
-                }
-
-                function success(responseJSON) {
-                    console.log(responseJSON);
-
-                    buttonDisables(false)
-
-                    modal.data({
-                        pix: responseJSON
-                    })
-
-                    modal_els.qr_code.attr('src', responseJSON.qrcode.imagemQrcode);
-
-                    setTimer();
-                }
-
-                function error(response) {
-                    console.log(response);
-                    const responseJSON = response.responseJSON
-
-                    buttonDisables(false)
-                    modal_els.qr_code.attr('src',
-                        'https://placehold.co/228x228/fff/222?text=Tente%20Novamente');
-
-                    if (responseJSON && responseJSON.error) {
-                        return swal('Erro ao erar PIX', responseJSON.error, 'error')
-                    }
-
-                    return swal('Erro ao erar PIX', 'Por favor, tente novamente', 'error')
+                        refresh()
+                    }, 8000);
                 }
 
                 if (modal.data('pix'))
@@ -369,21 +437,76 @@
                     data: {
                         customer_name,
                         amount,
-                        cpf,
+                        // cpf,
                     },
                     dataType: 'json',
-                    success: success,
-                    error: error
+                    success: (response) => {
+                        buttonDisables(false)
+
+                        modal.data({
+                            pix: response
+                        })
+
+                        modal_els.qr_code.attr('src', response.qrcode.imagemQrcode);
+
+                        setTimer();
+                        reloadPixList()
+                    },
+                    error: (error) => {
+                        console.log(error);
+                        const responseJSON = error.responseJSON
+
+                        buttonDisables(false)
+                        modal_els.qr_code.attr('src',
+                            'https://placehold.co/228x228/fff/222?text=Tente%20Novamente'
+                        );
+
+                        if (responseJSON && responseJSON.error) {
+                            return swal('Erro ao erar PIX', responseJSON.error, 'error')
+                        }
+
+                        return swal('Erro ao erar PIX', 'Por favor, tente novamente',
+                            'error')
+                        reloadPixList()
+                    }
                 });
 
                 buttonDisables(true)
 
                 modal.removeClass('hidden');
 
+                modal_els.triggers.whatsapp.on('click', function() {
+                    const value = whatsapp_number.val()
+                    const number = value.replace(/\D/g, '')
+
+                    if (number.length < 11 || number.length > 11) {
+                        return swal(
+                            'Número inválido',
+                            'Informe o número de celular com DDD',
+                            'warning'
+                        )
+                    }
+
+                    document.dispatchEvent(e)
+                })
+
                 modal_els.triggers.cancel.on('click', function() {
                     modal.addClass('hidden');
                     modal.removeData('pix')
+                    $(`[name="payment[0][method]"]:checked`).prop('checked', false)
+
+                    row.find('[name="tools"]').removeClass('hidden')
+                    row.find('[name="done"]').addClass('hidden')
+
                     clearInterval(timer);
+                })
+
+                modal_els.triggers.print.on('click', function() {
+                    $('#receipt_section').html(
+                        `${modal_els.qr_code.parent().html()}<br/><br/>${customer_name}<br/>${amount}`
+                    );
+
+                    __print_receipt('receipt_section')
                 })
 
                 modal_els.triggers.close.on('click', function() {
@@ -393,7 +516,73 @@
                 modal_els.triggers.update.on('click', function() {
                     refresh();
                 })
+            }
+
+            const ul_pixlist = $('#pixlist')
+            const btn_pixlist_refresh = $('[trigger="pixlist_refresh"]')
+
+            reloadPixList()
+
+            btn_pixlist_refresh.on('click', function(e) {
+                e.preventDefault();
+                $(this).attr('disabled', 'disabled')
+                reloadPixList()
             })
+
+            var options_date = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            };
+
+            function reloadPixList() {
+                $.ajax({
+                    method: 'GET',
+                    url: '/efi/pix/list',
+                    dataType: 'json',
+                    success: (response) => {
+                        ul_pixlist.html('')
+                        const cobs = response.cobs
+
+                        cobs.forEach((cob) => {
+                            const li = document.createElement('li')
+                            li.classList.add('list-group-item')
+
+                            if (cob.status == 'CONCLUIDA')
+                                li.classList.add('list-group-item-success')
+
+                            const div = document.createElement('div')
+                            div.classList.add('flex')
+                            div.classList.add('justfy-between')
+
+                            const span = document.createElement('span')
+                            const data_original = new Date(cob.calendario.criacao);
+                            span.innerText = data_original.toLocaleDateString(
+                                'pt-BR', options_date);
+
+                            const span2 = document.createElement('span')
+                            span2.innerText = cob.valor.original
+
+                            div.appendChild(span)
+                            div.appendChild(span2)
+
+                            li.appendChild(div)
+
+                            ul_pixlist.append(li)
+
+                            btn_pixlist_refresh.removeAttr('disabled')
+                        })
+                    },
+                    error: (error) => {
+                        console.log(error);
+                        btn_pixlist_refresh.removeAttr('disabled')
+                    }
+                });
+            }
         })
     })
 </script>
+{{-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+    integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous" /> --}}

@@ -41,6 +41,7 @@ Route::post('/paymentCartao', 'PaymentController@paymentCartao')->name('payment.
 Route::get('/payment/finish/{transaction_id}', 'PaymentController@finish')->name('payment.finish');
 
 Route::post('/efi/pix/', 'PaymentController@paymentPixEfi');
+Route::get('/efi/pix/list', 'PaymentController@listPixEfi');
 Route::get('/efi/pix/{txid}', 'PaymentController@consultaPixEfi');
 Route::get('/efi/pix/webhook', 'PaymentController@webhookPixEfi')->name('pix.efi.webhook');
 

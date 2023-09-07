@@ -348,6 +348,9 @@ class SellPosController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
+
+        \Log::debug("request: ", $request->all());
 
         if (!auth()->user()->can('sell.create') && !auth()->user()->can('direct_sell.access')) {
             abort(403, 'Unauthorized action.');

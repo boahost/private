@@ -69,8 +69,8 @@ class PixHelper
         if (empty($body['solicitacaoPagador']))
             throw new Exception('Defina a solicitação');
 
-        if (empty($body['devedor']))
-            throw new Exception('Nenhum cliente definido');
+        // if (empty($body['devedor']))
+        //     throw new Exception('Nenhum cliente definido');
 
         if (!$integration->pix_key ?? null)
             $this->getKey();
@@ -290,6 +290,28 @@ class PixHelper
         ];
 
         return $body;
+    }
+
+    public function getPixList(string $fromDate = 'now -1 day', string $toData = 'now')
+    {
+        $params = [
+            "inicio" => date(DATE_RFC3339, strtotime($fromDate)),
+            "fim"    => date(DATE_RFC3339, strtotime($toData)),
+            // "status" => "CONCLUIDA", // "ATIVA","CONCLUIDA", "REMOVIDA_PELO_USUARIO_RECEBEDOR", "REMOVIDA_PELO_PSP"
+            // "cpf" => "12345678909", // Filter by payer's CPF. It cannot be used at the same time as the CNPJ.
+            // "cnpj" => "12345678909", // Filter by payer's CNPJ. It cannot be used at the same time as the CPF.
+            // "paginacao.paginaAtual" => 1,
+            // "paginacao.itensPorPagina" => 10
+        ];
+
+        try {
+            $api      = $this->getApi();
+            $response = $api->pixListCharges($params);
+
+            return $response;
+        } catch (GerencianetException $e) {
+            throw new Exception($e->error);
+        }
     }
 
     public function splitLink(string $txid, string $splitConfigId)

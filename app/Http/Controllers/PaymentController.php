@@ -164,6 +164,23 @@ class PaymentController extends Controller
         return view('payment/finish', compact('paymentPlan'));
     }
 
+    public function listPixEfi(Request $request)
+    {
+        $business_id = auth()->user()->business_id;
+
+        try {
+            $pix = new PixHelper($business_id);
+
+            $pix = $pix->getPixList();
+
+            return response()->json($pix);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
     public function consultaPixEfi(Request $request, $txid)
     {
         $business_id = auth()->user()->business_id;
@@ -173,29 +190,9 @@ class PaymentController extends Controller
 
             $pix = $pix->detailByTxID($txid);
 
-            // $pix->status = "pago";
+            // $pix->status = 'CONCLUIDA';
 
             return response()->json($pix);
-
-            // $input = [
-            //     'payerFirstName'  => $request->payerFirstName,
-            //     'payerLastName'   => $request->payerLastName,
-            //     'payerEmail'      => $request->payerEmail,
-            //     'docNumber'       => $doc,
-            //     'valor'           => (float) $plano->price,
-            //     'transacao_id'    => (string) $payment->id,
-            //     'status'          => $payment->status,
-            //     'forma_pagamento' => 'pix',
-            //     'qr_code_base64'  => $payment->point_of_interaction->transaction_data->qr_code_base64,
-            //     'qr_code'         => $payment->point_of_interaction->transaction_data->qr_code,
-            //     'link_boleto'     => '',
-            //     'numero_cartao'   => '',
-            //     'package_id'      => $plano->id,
-            //     'business_id'     => $business_id
-            // ];
-
-            // PaymentPlan::create($input);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()
@@ -212,21 +209,19 @@ class PaymentController extends Controller
     {
         $business_id = auth()->user()->business_id;
 
-        $input    = $request->only('cpf', 'amount', 'customer_name');
+        $input    = $request->only('amount', 'customer_name');
         $business = Business::findorfail($business_id);
 
-        if (!isset($input['cpf'], $input['amount'], $input['customer_name'])) {
+        // $cnpj = preg_replace('/[^0-9]+/', '', $business['cnpj']);
+
+        if (!isset($input['amount'], $input['customer_name'])) {
             return response()->json('Dados inválidos', 400);
         }
 
         try {
             $pix = new PixHelper($business_id);
 
-            $pix->setDevedor(
-                $input['customer_name'],
-                $input['cpf']
-            );
-
+            // $pix->setDevedor($input['customer_name']);
             $pix->setDescription("Pagamento realizado na $business->name");
             $pix->setAmount((float) $input['amount']);
 

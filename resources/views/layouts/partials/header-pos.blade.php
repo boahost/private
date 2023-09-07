@@ -47,7 +47,7 @@
             <button type="button" id="close_register" title="{{ __('cash_register.close_register') }}"
                 class="btn m-4 btn-danger btn-flat btn-modal pull-right" data-container=".close_register_modal"
                 data-href="{{ action('CashRegisterController@getCloseRegister') }}">
-                <strong><i class="fa fa-file-download fa-lg"></i></strong>
+                <strong><i class="fa fa-lg fa-times"></i></strong>
             </button>
             <button type="button" id="register_details" title="{{ __('cash_register.register_details') }}"
                 class="btn m-4 btn-success btn-flat btn-modal pull-right" data-container=".register_details_modal"

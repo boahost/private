@@ -229,22 +229,26 @@ class Util
     {
         $payment_types = [
             'cash'          => 'Dinheiro',
-            'card'          => 'Cartão de Crédito',
+            'card'          => 'Crédito',
             //'cd' => 'Cartão de Débito',
             //'pix' => 'PIX',
-            'bank_transfer' => "Transferência Bancária",
+            'bank_transfer' => "Transferência",
             //'boleto' => 'Boleto',
 
-            'other'         => __('Cheque')
+            // 'other'         => __('Cheque')
         ];
 
         $custom_labels = !empty(session('business.custom_labels')) ? json_decode(session('business.custom_labels'), true) : [];
 
         // \Log::debug('$custom_labels', $custom_labels);
 
-        $payment_types['custom_pay_1'] = !empty($custom_labels['payments']['custom_pay_1']) ? $custom_labels['payments']['custom_pay_1'] : __('Cartão de DÉBITO');
+        $payment_types['custom_pay_1'] = !empty($custom_labels['payments']['custom_pay_1']) ? $custom_labels['payments']['custom_pay_1'] : __('Débito');
         $payment_types['custom_pay_2'] = !empty($custom_labels['payments']['custom_pay_2']) ? $custom_labels['payments']['custom_pay_2'] : __('PIX');
-        $payment_types['custom_pay_3'] = !empty($custom_labels['payments']['custom_pay_3']) ? $custom_labels['payments']['custom_pay_3'] : __('lang_v1.custom_payment_3');
+
+        $payment_types['custom_pay_1'] = __('Débito');
+        $payment_types['custom_pay_2'] = __('PIX');
+
+        // $payment_types['custom_pay_3'] = !empty($custom_labels['payments']['custom_pay_3']) ? $custom_labels['payments']['custom_pay_3'] : __('lang_v1.custom_payment_3');
 
         //Unset payment types if not enabled in business location
         if (!empty($location)) {
@@ -268,7 +272,7 @@ class Util
 
             foreach ($integrations as $key => $integration) {
                 if ($integration['integration'] == 'efi') {
-                    $payment_types['pix_efi'] = 'PIX - Banco EFI';
+                    $payment_types['pix_efi'] = 'PIX - Efi';
                 }
             }
         }

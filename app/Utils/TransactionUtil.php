@@ -649,6 +649,8 @@ class TransactionUtil extends Util
                         $payment['account_id'] = !empty($payments[0]['account_id']) ? $payments[0]['account_id'] : null;
                     }
 
+                    $payment['method'] = $payment['method'] ?? '';
+
                     if ($payment['method'] == 'boleto' && sizeof($boletoData) > 0) {
                         foreach ($boletoData as $b) {
 
