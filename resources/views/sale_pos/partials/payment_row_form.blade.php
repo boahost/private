@@ -24,7 +24,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-12">
+            <div class="col-md-12">
                 <div class="form-group">
                     {!! Form::label("method_$row_index", 'Forma de pagamento' . ':*') !!}
                     <div class="flex gap-1 payment_types_dropdown" style="overflow-x: scroll;">
@@ -58,7 +58,7 @@
                         @php
                             $inputDate = '';
                             try {
-                                $inputDate = \Carbon::createFromFormat('d/m/Y', $payment_line['vencimento'] ?? '')->format('Y-m-d');
+                                $inputDate = \Carbon::createFromFormat('d/m/y', $payment_line['vencimento'] ?? '')->format('Y-m-d');
                             } catch (\Throwable $th) {
                                 //throw $th;
                             }
