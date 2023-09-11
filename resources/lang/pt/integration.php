@@ -8,4 +8,5 @@ return [
     'key_client_id'     => 'Chave Client ID',
     'key_client_secret' => 'Chave Client Secret',
     'certificate'       => 'Certificado',
+    'pix_efi'           => 'Pix - Efi'
 ];

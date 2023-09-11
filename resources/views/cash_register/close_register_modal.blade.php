@@ -86,7 +86,7 @@
                                 </td>
                                 <td>
                                     <span class="display_currency"
-                                        data-currency_symbol="true">{{ $register_details->total_pix_efi ?? '999' }}
+                                        data-currency_symbol="true">{{ $register_details->total_pix_efi }}
                                     </span>
                                 </td>
                             </tr>
@@ -103,7 +103,7 @@
                                 </td>
                             </tr>
                         @endif
-                        <tr>
+                        {{-- <tr>
                             <td>
                                 @lang('Pagamento em CHEQUE'):
                             </td>
@@ -112,7 +112,7 @@
                                     data-currency_symbol="true">{{ $register_details->total_other }}
                                 </span>
                             </td>
-                        </tr>
+                        </tr> --}}
 
                         <tr>
                             <td>

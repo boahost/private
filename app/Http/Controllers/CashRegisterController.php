@@ -157,7 +157,7 @@ class CashRegisterController extends Controller
     {
         $register_details = $this->cashRegisterUtil->getRegisterDetails();
 
-        \Log::debug("register_details: " . print_r($register_details->toArray(), true));
+        // \Log::debug("register_details: " . print_r($register_details->toArray(), true));
 
         $user_id    = auth()->user()->id;
         $open_time  = $register_details['open_time'];

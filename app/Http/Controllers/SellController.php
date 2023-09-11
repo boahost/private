@@ -103,7 +103,7 @@ class SellController extends Controller
 
         if (request()->ajax()) {
 
-            $payment_types     = $this->transactionUtil->payment_types();
+            $payment_types     = $this->transactionUtil->payment_types(null, $business_id);
             $with              = [];
             $shipping_statuses = $this->transactionUtil->shipping_statuses();
             $sells             = $this->transactionUtil->getListSells($business_id);
@@ -433,6 +433,11 @@ class SellController extends Controller
                     }
                 )
                 ->addColumn('payment_methods', function ($row) use ($payment_types) {
+
+                    //  \Log::debug($row->toArray());
+
+                    // \Log::debug($row->payment_lines);
+
                     $methods = array_unique($row->payment_lines->pluck('method')->toArray());
 
                     $count          = count($methods);

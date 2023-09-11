@@ -408,8 +408,8 @@
                                 row.find('[name="tools"]').addClass('hidden')
                                 row.find('[name="done"]').removeClass('hidden')
 
-                                row.find(':input:not([trigger="close"])').attr(
-                                    'disabled', 'disabled')
+                                // row.find(':input:not([trigger="close"])').attr(
+                                //     'disabled', 'disabled')
 
                                 reloadPixList()
                             }
@@ -493,7 +493,7 @@
                 modal_els.triggers.cancel.on('click', function() {
                     modal.addClass('hidden');
                     modal.removeData('pix')
-                    $(`[name="payment[0][method]"]:checked`).prop('checked', false)
+                    $(`[name="payment[0][method]"]:eq(0)`).prop('checked', true)
 
                     row.find('[name="tools"]').removeClass('hidden')
                     row.find('[name="done"]').addClass('hidden')

@@ -13,9 +13,8 @@ class TransactionsPaymentsEfi extends Migration
      */
     public function up()
     {
-        Schema::table('transaction_payments', function (Blueprint $table) {
-            $table->enum('status', ['cash', 'card', 'cheque', 'bank_transfer', 'custom_pay_1', 'custom_pay_2', 'custom_pay_3', 'other', 'boleto', 'pix_efi'])->change();
-        });
+        DB::statement("ALTER TABLE transaction_payments MODIFY COLUMN method ENUM('cash', 'card', 'cheque', 'bank_transfer', 'custom_pay_1', 'custom_pay_2', 'custom_pay_3', 'other', 'boleto', 'pix', 'debit', 'pix_efi')");
+        DB::statement("ALTER TABLE cash_register_transactions MODIFY COLUMN pay_method ENUM('cash', 'card', 'cheque', 'bank_transfer', 'custom_pay_1', 'custom_pay_2', 'custom_pay_3', 'other', 'boleto', 'pix', 'debit', 'pix_efi')");
     }
 
     /**
@@ -25,7 +24,7 @@ class TransactionsPaymentsEfi extends Migration
      */
     public function down()
     {
-        Schema::table('transaction_payments', function (Blueprint $table) {
+        Schema::table('cash_register_transactions', function (Blueprint $table) {
             //
         });
     }

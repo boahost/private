@@ -225,10 +225,11 @@ class Util
     // }
 
 
-    public function payment_types($location = null)
+    public function payment_types($location = null, $business_id = null)
     {
         $payment_types = [
             'cash'          => 'Dinheiro',
+            // 'pix_efi'       => 'pix_efi',
             'card'          => 'Crédito',
             //'cd' => 'Cartão de Débito',
             //'pix' => 'PIX',
@@ -267,8 +268,11 @@ class Util
             // }
         }
 
-        if (isset($location->business_id)) {
-            $integrations = Integration::where('business_id', $location->business_id)->get()->toArray();
+        if (isset($location->business_id) and !$business_id)
+            $business_id = $location->business_id;
+
+        if ($business_id) {
+            $integrations = Integration::where('business_id', $business_id)->get()->toArray();
 
             foreach ($integrations as $key => $integration) {
                 if ($integration['integration'] == 'efi') {

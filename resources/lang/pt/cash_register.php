@@ -11,7 +11,7 @@ return [
     "cash_payment"              => "Pagamento em dinheiro",
     "checque_payment"           => "Verificar pagamento",
     "card_payment"              => "Pagamento por cartão",
-    "bank_transfer"             => "Transferência bancária",
+    "bank_transfer"             => "Transferência Bancária",
     "other_payments"            => "Outros pagamentos",
     "total_sales"               => "Total de vendas",
     "total_cash"                => "Total Em Dinheiro",
