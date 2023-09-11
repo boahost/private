@@ -248,7 +248,7 @@
 <script>
     window.addEventListener('load', function() {
         $(() => {
-            $('#modal_payment').modal('show')
+            // $('#modal_payment').modal('show')
 
             const keys = [
                 'd',
