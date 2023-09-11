@@ -1,4 +1,4 @@
-<div class="flex flex-col md:flex-row gap-3">
+<div class="flex flex-col gap-2 md:flex-row">
     <div class="flex-auto flex-grow">
         <div class="row">
             <input type="hidden" class="payment_row_index" value="{{ $row_index }}">
@@ -107,105 +107,53 @@
                     {!! Form::label("note_$row_index", 'Observação de pagamento:') !!}
                     {!! Form::textarea("payment[$row_index][note]", $payment_line['note'], [
                         'class' => 'form-control',
-                        'rows' => 3,
+                        'rows' => 4,
                         'id' => "note_$row_index",
                     ]) !!}
                 </div>
             </div>
         </div>
     </div>
-    <style>
-        .flex {
-            display: flex
-        }
-
-        .w-auto {
-            width: auto
-        }
-
-        .flex-auto {
-            flex: 1 1 auto
-        }
-
-        .flex-grow {
-            flex-grow: 1
-        }
-
-        .flex-col {
-            flex-direction: column
-        }
-
-        .bg-red-300 {
-            --tw-bg-opacity: 1;
-            background-color: rgb(252 165 165 / var(--tw-bg-opacity))
-        }
-
-        .bg-slate-300 {
-            --tw-bg-opacity: 1;
-            background-color: rgb(203 213 225 / var(--tw-bg-opacity))
-        }
-
-        .w-full {
-            width: 100%
-        }
-
-        @media (min-width: 768px) {
-            .md\:max-w-\[30rem\] {
-                max-width: 30rem
-            }
-
-            .md\:flex-row {
-                flex-direction: row
-            }
-        }
-    </style>
-    <div class="w-full md:max-w-[30rem] hidden" id="modal_efi_{{ $row_index }}">
-        <div class="row">
-            <div class="col-xs-12">
-                <img src="https://placehold.co/228x228/fff/222?text=Aguarde..." style="width: 100%;height: 100%;"
-                    name="efi_qr_code_img" alt="Aguardando Gerar">
+    <div class="hidden w-full space-y-6 md:max-w-sm" id="modal_efi_{{ $row_index }}">
+        <div class="w-full">
+            <img name="efi_qr_code_img" alt="Aguardando Gerar"
+                src="https://placehold.co/228x228/fff/222?text=Aguarde..." class="w-full h-full">
+        </div>
+        <div class="w-full space-y-2">
+            <div name="tools" class="">
+                <div class="w-full text-right">
+                    <div class="input-group">
+                        <input class="form-control" id="payment_whatsapp_{{ $row_index }}" placeholder="Nº WhatsApp"
+                            value="" autocomplete="off" type="text">
+                        <span class="input-group-btn">
+                            <a trigger="whatsapp" title="Enviar por WhatsApp"
+                                class="text-white btn btn-flat btn-whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <button trigger="print" title="Imprimir" type="button" class="btn btn-flat btn-secondary">
+                                <i class="m-2 fa fa-print"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div class="col-xs-12">
-                <span name="tools" class="row">
-                    <div class="col-xs-12 text-right">
-                        <div class="input-group">
-                            <input class="form-control" id="payment_whatsapp_{{ $row_index }}"
-                                placeholder="Nº WhatsApp" value="" autocomplete="off" type="text">
-                            <span class="input-group-btn">
-                                <a trigger="whatsapp" title="Enviar por WhatsApp"
-                                    class="btn btn-flat btn-whatsapp text-white">
-                                    <i class="fab fa-whatsapp"></i>
-                                </a>
-                                <button trigger="print" title="Imprimir" type="button"
-                                    class="btn btn-flat btn-secondary">
-                                    <i class="fa fa-print m-2"></i>
-                                </button>
-                            </span>
-                        </div>
-                    </div>
-                </span>
-                <span name="tools" class="row">
-                    <div class="col-xs-6">
-                        <button trigger="cancel" type="button" class="btn btn-flat btn-secondary btn-block">
-                            <i class="fa fa-chevron-left mr-8"></i>
-                            Cancelar
-                        </button>
-                    </div>
-                    <div class="col-xs-6">
-                        <button trigger="update" type="button" class="btn btn-flat btn-primary btn-block">
-                            <i class="fa fa-redo-alt mr-8"></i>
-                            Atualizar
-                        </button>
-                    </div>
-                </span>
-                <span name="done" class="row hidden">
-                    <div class="col-xs-12">
-                        <button trigger="close" type="button" class="btn btn-flat btn-primary btn-block">
-                            <i class="fa fa-redo-alt mr-8"></i>
-                            OK
-                        </button>
-                    </div>
-                </span>
+            <div name="tools" class="flex gap-2">
+                <button trigger="cancel" type="button" class="w-full btn btn-flat btn-secondary">
+                    <i class="mr-8 fa fa-chevron-left"></i>
+                    Cancelar
+                </button>
+                <button trigger="update" type="button" class="w-full btn btn-flat btn-primary">
+                    <i class="mr-8 fa fa-redo-alt"></i>
+                    Atualizar
+                </button>
+            </div>
+            <div name="done" class="hidden">
+                <div class="w-full">
+                    <button trigger="close" type="button" class="w-full btn btn-flat btn-primary">
+                        <i class="mr-8 fa fa-redo-alt"></i>
+                        OK
+                    </button>
+                </div>
             </div>
         </div>
     </div>

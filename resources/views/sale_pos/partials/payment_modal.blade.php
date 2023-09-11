@@ -126,10 +126,10 @@
                             <!-- /.box-body -->
                         </div>
 
-                        <div class="box box-solid bg-white">
+                        <div class="bg-white box box-solid">
                             <div class="box-body">
                                 <div class="row">
-                                    <div class="col-lg-12 flex items-center justfy-between mb-10">
+                                    <div class="flex items-center mb-10 col-lg-12 justfy-between">
                                         Pagamentos PIX
                                         <button trigger="pixlist_refresh" type="button"
                                             class="btn btn-flat btn-secondary">
@@ -248,6 +248,8 @@
 <script>
     window.addEventListener('load', function() {
         $(() => {
+            $('#modal_payment').modal('show')
+
             const keys = [
                 'd',
                 'f',
@@ -282,15 +284,28 @@
                 const payment_type_id = el.val()
 
                 if (payment_type_id == 'pix_efi') {
-                    return showModal(e)
+                    return showPixForm(e)
                 }
             })
 
-            function showModal(e) {
+            function showPixForm(e) {
                 const el = $(e.currentTarget)
                 const row = el.closest('.payment_row')
                 const row_index = row.find('.payment_row_index').val()
                 const modal = $(`#modal_efi_${row_index}`)
+
+                const modal_els = {
+                    qr_code: modal.find('[name="efi_qr_code_img"]'),
+                    triggers: {
+                        print: modal.find('[trigger="print"]'),
+                        whatsapp: modal.find('[trigger="whatsapp"]'),
+                        close: modal.find('[trigger="close"]'),
+                        cancel: modal.find('[trigger="cancel"]'),
+                        update: modal.find('[trigger="update"]'),
+                    }
+                }
+
+                console.log(row_index);
 
                 // $(`[name="payment[${row_index}][cpf]"]`).val()
 
@@ -299,6 +314,8 @@
 
                 const customer_name = $('#default_customer_name').val()
                 const whatsapp_number = row.find(`#payment_whatsapp_${row_index}`)
+
+                console.log(row);
 
                 whatsapp_number[0].addEventListener('keydown', () => {
                     //   verifica se a tela é enter e clicka no botão whatsapp
@@ -311,9 +328,7 @@
                     const value = $(this).val()
                     const number = value.replace(/\D/g, '')
 
-                    console.log(e);
-
-                    if (number.length < 11 || number.length > 11)
+                    if (number.length != 11 && number.length != 10)
                         return modal_els.triggers.whatsapp.removeAttr('target').removeAttr(
                             'href')
 
@@ -342,25 +357,11 @@
                         'Valor não informado',
                         'Primeiro, informe o valor para gerar o QRCode',
                         'warning'
-                    )
-                }
-
-                // const cpf = ''
-                // if (!cpf) {
-                //     return swal('CPF não informado',
-                //         'Informe o CPF para gerar o QRCode',
-                //         'warning')
-                // }
-
-                const modal_els = {
-                    qr_code: modal.find('[name="efi_qr_code_img"]'),
-                    triggers: {
-                        print: modal.find('[trigger="print"]'),
-                        whatsapp: modal.find('[trigger="whatsapp"]'),
-                        close: modal.find('[trigger="close"]'),
-                        cancel: modal.find('[trigger="cancel"]'),
-                        update: modal.find('[trigger="update"]'),
-                    }
+                    ).then(() => {
+                        row.find('.payment_types_dropdown input:eq(0)')
+                            .prop('checked', true)
+                            .trigger('change')
+                    })
                 }
 
                 modal_els.qr_code.attr('src',
@@ -475,26 +476,12 @@
 
                 modal.removeClass('hidden');
 
-                modal_els.triggers.whatsapp.on('click', function() {
-                    const value = whatsapp_number.val()
-                    const number = value.replace(/\D/g, '')
-
-                    if (number.length < 11 || number.length > 11) {
-                        return swal(
-                            'Número inválido',
-                            'Informe o número de celular com DDD',
-                            'warning'
-                        )
-                    }
-
-                    document.dispatchEvent(e)
-                })
-
                 modal_els.triggers.cancel.on('click', function() {
                     modal.addClass('hidden');
                     modal.removeData('pix')
-                    $(`[name="payment[0][method]"]:eq(0)`).prop('checked', true)
-
+                    row.find('.payment_types_dropdown input:eq(0)')
+                        .prop('checked', true)
+                        .trigger('change')
                     row.find('[name="tools"]').removeClass('hidden')
                     row.find('[name="done"]').addClass('hidden')
 
