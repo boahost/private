@@ -31,7 +31,7 @@ class SuperadminTaxesController extends BaseController
         $pix = new PixHelper($business_id);
 
         $integration = Integration::where('business_id', $business_id)
-            // ->where('integration', 'efi')
+            ->where('integration', 'efi')
             ->first();
 
         if (!empty($integration['pix_split_plan'])) {
