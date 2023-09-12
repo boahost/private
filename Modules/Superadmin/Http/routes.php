@@ -9,7 +9,10 @@ Route::group(['middleware' => ['web', 'auth', 'language', 'AdminSidebarMenu', 's
 
     Route::get('/', 'SuperadminController@index');
     Route::get('/stats', 'SuperadminController@stats');
-    
+
+    Route::get('/taxes/{business_id}', 'SuperadminTaxesController@index');
+    Route::post('/taxes/{business_id}', 'SuperadminTaxesController@store');
+
     Route::get('/{business_id}/toggle-active/{is_active}', 'BusinessController@toggleActive');
 
     Route::get('/users/{business_id}', 'BusinessController@usersList');

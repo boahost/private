@@ -821,9 +821,7 @@ class BusinessController extends Controller
                         try {
                             $pix = new PixHelper($business_id);
 
-                            // dd($integration['pix_split_plan']); 14536f776ac7417ab353cda4d3c1983b
-
-                            $split_plan = $pix->splitConfig(99.3, $integration['pix_split_plan']);
+                            $split_plan = $pix->splitConfig($business->pix_split, $integration['pix_split_plan']);
 
                             $data['pix_split_plan'] = $split_plan['id'] ?? null;
 
