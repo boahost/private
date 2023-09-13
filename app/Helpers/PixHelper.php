@@ -281,7 +281,7 @@ class PixHelper
             'calendario'         => [
                 'expiracao' => 3600 * 24 * 30
             ],
-            'chave'              => &$integration->pix_key,
+            'chave'              => $integration->pix_key,
             'valor'              => [
                 'original' => null
             ],
