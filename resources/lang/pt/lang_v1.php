@@ -329,7 +329,7 @@ return [
     'backup_doesnt_exist'                        => 'O backup não existe',
     'lot_report'                                 => 'Relatório em lote',
     'purchase_payment_report'                    => 'Relatório de pagamento de compra',
-    'paid_on'                                    => 'Vencimento',
+    'paid_on'                                    => 'Pago em',
     'purchase'                                   => 'Compra',
     'cheque_no'                                  => 'Cheque Nº.',
     'bank_account_no'                            => 'Número da conta bancária',

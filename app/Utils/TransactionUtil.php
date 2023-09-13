@@ -2422,7 +2422,8 @@ class TransactionUtil extends Util
     public function getTotalPaid($transaction_id)
     {
         $total_paid = TransactionPayment::where('transaction_id', $transaction_id)
-            ->select(DB::raw('SUM(IF( is_return = 0, amount, amount*-1))as total_paid'))
+            ->whereNotNull('paid_on')
+            ->select(DB::raw('SUM(IF( is_return = 0, amount, amount*-1)) as total_paid'))
             ->first()
             ->total_paid;
 

@@ -527,7 +527,7 @@
             function reloadPixList() {
                 $.ajax({
                     method: 'GET',
-                    url: '/efi/pix/list',
+                    url: '/efi/pix/',
                     dataType: 'json',
                     success: (response) => {
                         ul_pixlist.html('')

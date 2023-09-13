@@ -21,7 +21,7 @@
                         <div class="box-tools">
                             @if (auth()->user()->can('job_sheet.edit'))
                                 <a href="{{ action('\Modules\Repair\Http\Controllers\JobSheetController@edit', [$job_sheet->id]) }}"
-                                    class="btn btn-info cursor-pointer">
+                                    class="cursor-pointer btn btn-info">
                                     <i class="fa fa-edit">
 
                                     </i>
@@ -62,13 +62,13 @@
                             {{-- <h3 class="text-center" style="margin-bottom: 30px;">
                                 {{ $job_sheet->customer->business->name }}
                                 <br />
-                                <small class="text-center text-sm">
+                                <small class="text-sm text-center">
                                     {{ $job_sheet->businessLocation->website }}
                                 </small>
                             </h3> --}}
                             <header style="margin-top: 30px;">
                                 <div class="row align-items-center" style="margin-bottom: 30px;">
-                                    <div class="col-xs-7 text-left text-xs-start mb-3 mb-xs-0">
+                                    <div class="mb-3 text-left col-xs-7 text-xs-start mb-xs-0">
                                         <div class="row">
                                             <div class="col-xs-3">
                                                 @if (!empty(Session::get('business.logo')))
@@ -114,7 +114,7 @@
                                                             @lang('business.email'):
                                                         </strong>
                                                         <span>
-                                                            {{ $job_sheet->businessLocation->email ?? 'exemplo@email.com.br' }}
+                                                            {{ $job_sheet->businessLocation->email }}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -122,7 +122,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-xs-5 text-right">
+                                    <div class="text-right col-xs-5">
                                         <h4 class="m-0">
                                             @lang('repair::lang.repair')
                                         </h4>
@@ -132,7 +132,7 @@
                                         </p>
                                         <h5 class="mb-0">
                                             {{-- @lang('sale.status'): --}}
-                                            {{ $job_sheet->status ?? 'Aguardando' }}
+                                            {{ $job_sheet->status->name ?? 'Aguardando' }}
                                         </h5>
                                     </div>
                                 </div>
@@ -141,7 +141,7 @@
                             <!-- Main Content -->
                             <main>
                                 {{-- cliente --}}
-                                <div class="row mt-10">
+                                <div class="mt-10 row">
                                     {{-- <div class="col-xs-12">
                                         <div class="fw-600 text-4">
                                             @lang('role.customer'):
@@ -171,7 +171,7 @@
                                             {{ $job_sheet->customer->mobile }} - {{ $job_sheet->customer->tax_number }}
                                         </span>
                                     </div>
-                                    <div class="col-xs-6 text-right">
+                                    <div class="text-right col-xs-6">
                                         <strong>
                                             @lang('business.email'):
                                         </strong>
@@ -182,7 +182,18 @@
                                 </div>
                                 {{-- cliente --}}
                                 {{-- O.S --}}
-                                <div class="row mt-10">
+                                @if (!empty($job_sheet->pick_up_on_site_addr))
+                                    <div class="mt-10 row">
+                                        <div class="col-xs-12">
+                                            <strong>
+                                                @lang('repair::lang.pick_up_on_site_addr')
+                                            </strong>
+                                            <br />
+                                            {{ $job_sheet->pick_up_on_site_addr }}
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="mt-10 row">
                                     {{-- <div class="col-xs-12">
                                         <div class="fw-600 text-4">
                                             @lang('repair::lang.repair')
@@ -197,7 +208,7 @@
                                             @lang('repair::lang.' . $job_sheet->service_type)
                                         </span>
                                     </div>
-                                    <div class="col-xs-4 text-right">
+                                    <div class="text-right col-xs-4">
                                         <strong>
                                             @lang('receipt.date')
                                         </strong>
@@ -206,7 +217,7 @@
                                             {{ @format_datetime($job_sheet->created_at) }}
                                         </span>
                                     </div>
-                                    <div class="col-xs-4 text-right">
+                                    <div class="text-right col-xs-4">
                                         <strong>
                                             @lang('repair::lang.expected_delivery_date'):
                                         </strong>
@@ -216,37 +227,37 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="row mt-10">
+                                <div class="mt-10 row">
                                     <div class="col-xs-3">
                                         <strong>
                                             @lang('product.brand')
                                         </strong>
                                         <br>
                                         <span>
-                                            {{ optional($job_sheet->brand)->name }}
+                                            {{ $job_sheet->brand->name ?? 'N/A' }}
                                         </span>
                                         <br>
                                     </div>
-                                    <div class="col-xs-3 text-center">
+                                    <div class="text-center col-xs-3">
                                         <strong>
                                             @lang('repair::lang.device')
                                         </strong>
                                         <br>
                                         <span>
-                                            {{ optional($job_sheet->device)->name }}
+                                            {{ $job_sheet->device->name ?? 'N/A' }}
                                         </span>
                                         <br>
                                     </div>
-                                    <div class="col-xs-3 text-center">
+                                    <div class="text-center col-xs-3">
                                         <strong>
                                             @lang('repair::lang.device_model')
                                         </strong>
                                         <br>
                                         <span>
-                                            {{ optional($job_sheet->deviceModel)->name }}
+                                            {{ $job_sheet->deviceModel->name ?? 'N/A' }}
                                         </span>
                                     </div>
-                                    <div class="col-xs-3 text-right">
+                                    <div class="text-right col-xs-3">
                                         <strong>
                                             @lang('repair::lang.serial_no_abreviated')
                                         </strong>
@@ -256,23 +267,89 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="row mt-10">
-                                    <div class="col-xs-12">
+                                <div class="mt-10 row">
+                                    <div class="col-xs-6">
                                         <strong>
-                                            @lang('repair::lang.' . $job_sheet->service_type)
+                                            @lang('repair::lang.product_configuration'):
                                         </strong>
                                         <br />
-                                        {{ $job_sheet->pick_up_on_site_addr }}
+                                        {{ $job_sheet->product_configuration ?? 'Nada Consta' }}
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <strong>
+                                            @lang('repair::lang.problem_reported_by_customer'):
+                                        </strong>
+                                        <br />
+                                        {{ $job_sheet->defects ?? 'Nada Consta' }}
                                     </div>
                                 </div>
-                                <div class="row mt-10">
-                                    <div class="col-xs-12">
+                                <div class="mt-10 row">
+                                    <div class="col-xs-6">
                                         <strong>
                                             @lang('repair::lang.services_performed'):
                                         </strong>
                                         <br />
                                         {{ $job_sheet->custom_field_1 ?? 'Nada Consta' }}
                                     </div>
+                                    <div class="col-xs-6">
+                                        <strong>
+                                            @lang('repair::lang.condition_of_product'):
+                                        </strong>
+                                        <br />
+                                        {{ $job_sheet->product_condition ?? 'Nada Consta' }}
+                                    </div>
+                                </div>
+                                <div class="mt-10 row">
+                                    <div class="col-xs-8">
+                                        <strong>
+                                            @lang('repair::lang.comment_by_ss'):
+                                        </strong>
+                                        <br />
+                                        {{ $job_sheet->comment_by_ss ?? 'Nada Consta' }}
+                                    </div>
+                                    <div class="text-right @empty($job_sheet->security_pattern) col-xs-4 @else col-xs-2 @endif">
+                                        <strong>
+                                            Pin
+                                        </strong>
+                                        <br>
+                                        <span>
+                                            {{ $job_sheet->security_pwd }}
+                                        </span>
+                                    </div>
+                                    @if (!empty($job_sheet->security_pattern))
+                                        <div class="text-right col-xs-2">
+                                            <strong>
+                                                Padrão
+                                            </strong>
+                                            <br>
+                                            <div
+                                                style="line-height: 15px;letter-spacing: 4px;font-size: 2em; margin-top: 7px;">
+                                                <?php
+                                                $padrao = '';
+                                                $password = str_split($job_sheet->security_pattern ?? '');
+                                                $first = $password[0] ?? '';
+
+                                                for ($linha = 1; $linha <= 3; $linha++) {
+                                                    for ($coluna = 1; $coluna <= 3; $coluna++) {
+                                                        $posicao = ($linha - 1) * 3 + $coluna;
+                                                        if (in_array($posicao, $password)) {
+                                                            if ($posicao == $first) {
+                                                                $padrao .= "<span class=\"text-primary\">*</span>";
+                                                            } else {
+                                                                $padrao .= "<span class=\"text-success\">*</span>";
+                                                            }
+                                                        } else {
+                                                            $padrao .= "<span class=\"text-muted\">*</span>";
+                                                        }
+                                                    }
+                                                    $padrao .= "\n";
+                                                }
+
+                                                echo nl2br($padrao);
+                                                ?>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                                 {{-- O.S --}}
                                 <br>
@@ -283,7 +360,7 @@
                                                 @lang('report.products')
                                             </span>
                                         </div>
-                                        <div class="card-body p-0">
+                                        <div class="p-0 card-body">
                                             <div class="table-responsive table-bordered">
                                                 <table class="table mb-0">
                                                     <thead>
@@ -355,37 +432,37 @@
                                 @endif
                             </main>
                             <div style="margin-top: 30px;">
-                                <div class="row mt-10">
-                                    <div class="col-xs-9 text-right">
+                                <div class="mt-10 row">
+                                    <div class="text-right col-xs-9">
                                         <strong>
                                             @lang('repair::lang.estimated_cost'):
                                         </strong>
                                     </div>
-                                    <div class="col-xs-3 text-right">
+                                    <div class="text-right col-xs-3">
                                         <span class="display_currency" data-currency_symbol="true">
                                             {{ $job_sheet->estimated_cost }}
                                         </span>
                                     </div>
                                 </div>
-                                <div class="row mt-10">
-                                    <div class="col-xs-9 text-right">
+                                <div class="mt-10 row">
+                                    <div class="text-right col-xs-9">
                                         <strong>
                                             @lang('repair::lang.service_costs'):
                                         </strong>
                                     </div>
-                                    <div class="col-xs-3 text-right">
+                                    <div class="text-right col-xs-3">
                                         <span class="display_currency" data-currency_symbol="true">
                                             {{ $job_sheet->service_costs }}
                                         </span>
                                     </div>
                                 </div>
-                                <div class="row mt-10">
-                                    <div class="col-xs-9 text-right">
+                                <div class="mt-10 row">
+                                    <div class="text-right col-xs-9">
                                         <strong>
                                             @lang('sale.total_amount'):
                                         </strong>
                                     </div>
-                                    <div class="col-xs-3 text-right">
+                                    <div class="text-right col-xs-3">
                                         <span class="display_currency" data-currency_symbol="true">
                                             {{ $job_sheet->total_costs }}
                                         </span>
@@ -399,7 +476,7 @@
                 </div>
             </div>
         </div>
-        <div class="row mx-auto">
+        <div class="mx-auto row">
             @if ($job_sheet->media->count() > 0)
                 <div class="col-md-6">
                     <div class="box box-solid no-print">
@@ -417,7 +494,7 @@
                 </div>
             @endif
             <div class="col-md-6">
-                <div class="box box-solid box-solid no-print">
+                <div class="box box-solid no-print">
                     <div class="box-header with-border">
                         <h3 class="box-title">{{ __('repair::lang.activities') }}:</h3>
                     </div>
@@ -454,7 +531,7 @@
 
         /* =================================== */
         /*  Helpers Classes
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* =================================== */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* =================================== */
         /* Border Radius */
         .rounded-top-0 {
             border-top-left-radius: 0px !important;
@@ -516,7 +593,7 @@
 
         /* =================================== */
         /*  Layouts
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* =================================== */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* =================================== */
         .invoice-container {
             margin: 15px auto;
             padding: 25px 50px;

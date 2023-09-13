@@ -40,10 +40,13 @@ Route::post('/paymentCartao', 'PaymentController@paymentCartao')->name('payment.
 
 Route::get('/payment/finish/{transaction_id}', 'PaymentController@finish')->name('payment.finish');
 
+Route::get('/efi/pix/webhook', 'PaymentController@listWebhookPixEfi');
+Route::post('/efi/pix/webhook', 'PaymentController@webhookPixEfi');
+
+Route::get('/efi/pix/', 'PaymentController@listPixEfi');
 Route::post('/efi/pix/', 'PaymentController@paymentPixEfi');
-Route::get('/efi/pix/list', 'PaymentController@listPixEfi');
+
 Route::get('/efi/pix/{txid}', 'PaymentController@consultaPixEfi');
-Route::get('/efi/pix/webhook', 'PaymentController@webhookPixEfi')->name('pix.efi.webhook');
 
 //Routes for authenticated users only
 Route::middleware(['authh', 'auth', 'SetSessionData', 'language', 'timezone', 'AdminSidebarMenu', 'CheckUserLogin', 'CheckPayment'])->group(function () {

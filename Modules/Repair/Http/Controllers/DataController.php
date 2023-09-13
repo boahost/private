@@ -201,6 +201,36 @@ class DataController extends Controller
                                     'style'  => 'background-color:' . $background_color
                                 ]
                             );
+
+                            $sub->url(
+                                action('\Modules\Repair\Http\Controllers\RepairController@index'),
+                                __('repair::lang.list_invoices'),
+                                [
+                                    'icon'   => 'fa fas fa-wrench',
+                                    'active' => request()->segment(2) == 'repair' && empty(request()->segment(3)),
+                                    'style'  => 'background-color:' . $background_color
+                                ]
+                            );
+
+                            $sub->url(
+                                action('SellPosController@create'). '?sub_type=repair',
+                                __('repair::lang.add_invoice'),
+                                [
+                                    'icon'   => 'fa fas fa-wrench',
+                                    'active' => request()->segment(2) == 'repair' && request()->segment(3) == 'create',
+                                    'style'  => 'background-color:' . $background_color
+                                ]
+                            );
+
+                            $sub->url(
+                                action('\Modules\Repair\Http\Controllers\RepairSettingsController@index'),
+                                __('messages.settings'),
+                                [
+                                    'icon'   => 'fa fas fa-wrench',
+                                    'active' => request()->segment(1) == 'repair' && request()->segment(2) == 'repair-settings',
+                                    'style'  => 'background-color:' . $background_color
+                                ]
+                            );
                         }
                     },
                     ['icon' => 'fa fas fa-wrench']

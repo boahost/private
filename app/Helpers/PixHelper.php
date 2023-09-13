@@ -22,7 +22,7 @@ class PixHelper
     private array $body = [];
     private string $webhook_url;
 
-    private object $integration;
+    private ?Integration $integration;
 
     private ?Endpoints $gerencianet;
 
@@ -31,13 +31,12 @@ class PixHelper
         $this->business_id = $business_id;
     }
 
-    public function &getIntegration()
+    public function getIntegration()
     {
         if (!isset($this->integration)) {
-            $this->integration = (object) Integration::where('business_id', $this->business_id)
+            $this->integration = Integration::where('business_id', $this->business_id)
                 ->where('integration', 'efi')
-                ->firstOrFail()
-                ->toArray();
+                ->firstOrFail();
         }
 
         return $this->integration;
@@ -68,9 +67,6 @@ class PixHelper
 
         if (empty($body['solicitacaoPagador']))
             throw new Exception('Defina a solicitação');
-
-        // if (empty($body['devedor']))
-        //     throw new Exception('Nenhum cliente definido');
 
         if (!$integration->pix_key ?? null)
             $this->getKey();
@@ -178,8 +174,6 @@ class PixHelper
 
         $this->setKey($chave);
 
-        // $this->configWebhook();
-
         return $chave;
     }
 
@@ -213,6 +207,11 @@ class PixHelper
     {
         $integration          = &$this->getIntegration();
         $integration->pix_key = $key;
+        $integration->save();
+
+        $this->setWebhookUrl(url('/efi/pix/webhook'));
+        $this->configWebhookURL();
+
         return $key;
     }
 
@@ -254,8 +253,8 @@ class PixHelper
             "debug"         => false,
             'sandbox'       => $this->sandbox,
             "timeout"       => 30,
-            'client_id'     => &$integration->key_client_id,
-            'client_secret' => &$integration->key_client_secret,
+            'client_id'     => $integration->key_client_id,
+            'client_secret' => $integration->key_client_secret,
             'pix_cert'      => realpath(storage_path('app/certificates') . '/' . $integration->certificate),
             'headers'       => [
                 'x-skip-mtls-checking' => 'true' // IMPORTANTE PRA GERAR NOTIFICAÇÃO

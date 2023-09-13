@@ -60,7 +60,7 @@ class RepairStatusController extends Controller
                         </span>
                     @endif
                 ')
-                ->editColumn('color', '{{$color}} <b><span style="color: {{$color}};" >&bull;</span></b>')
+                ->editColumn('color', '<b><span style="color: {{$color}};" ><i class="fa fas fa-circle"></i></span></b> {{$color}}')
                 ->addColumn(
                     'action',
                     '<button data-href="{{action(\'\Modules\Repair\Http\Controllers\RepairStatusController@edit\', [$id])}}" class="btn btn-xs btn-primary btn-modal" data-container=".view_modal"><i class="glyphicon glyphicon-edit"></i> @lang("messages.edit")</button>'
@@ -97,7 +97,7 @@ class RepairStatusController extends Controller
     public function store(Request $request)
     {
         $business_id = request()->session()->get('user.business_id');
-        
+
         if (!(auth()->user()->can('superadmin') || ($this->moduleUtil->hasThePermissionInSubscription($business_id, 'repair_module') && auth()->user()->can('repair_status.access')))) {
             abort(403, 'Unauthorized action.');
         }
@@ -115,7 +115,7 @@ class RepairStatusController extends Controller
                     ];
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). "Line:" . $e->getLine(). "Message:" . $e->getMessage());
-            
+
             $output = ['success' => false,
                             'msg' => __("messages.something_went_wrong")
                         ];
@@ -131,7 +131,7 @@ class RepairStatusController extends Controller
     public function edit($id)
     {
         $business_id = request()->session()->get('user.business_id');
-        
+
         if (!(auth()->user()->can('superadmin') || ($this->moduleUtil->hasThePermissionInSubscription($business_id, 'repair_module') && auth()->user()->can('repair_status.access')))) {
             abort(403, 'Unauthorized action.');
         }
@@ -153,7 +153,7 @@ class RepairStatusController extends Controller
     public function update(Request $request, $id)
     {
         $business_id = request()->session()->get('user.business_id');
-        
+
         if (!(auth()->user()->can('superadmin') || ($this->moduleUtil->hasThePermissionInSubscription($business_id, 'repair_module') && auth()->user()->can('repair_status.access')))) {
             abort(403, 'Unauthorized action.');
         }
@@ -171,7 +171,7 @@ class RepairStatusController extends Controller
                             ];
             } catch (\Exception $e) {
                 \Log::emergency("File:" . $e->getFile(). "Line:" . $e->getLine(). "Message:" . $e->getMessage());
-            
+
                 $output = ['success' => false,
                             'msg' => __("messages.something_went_wrong")
                         ];

@@ -1560,15 +1560,14 @@ class ProductUtil extends Util
 
                 if (in_array('sku', $search_fields)) {
                     $query->orWhere('sku', 'like', '%' . $search_term . '%');
+
+                    $query->orWhere('sub_sku', 'like', '%' . $search_term . '%');
                 }
 
                 if (in_array('codigo_barras', $search_fields)) {
                     $query->orWhere('codigo_barras', 'like', '%' . $search_term . '%');
                 }
 
-                if (in_array('sub_sku', $search_fields)) {
-                    $query->orWhere('sub_sku', 'like', '%' . $search_term . '%');
-                }
 
                 if (in_array('lot', $search_fields)) {
                     $query->orWhere('pl.lot_number', 'like', '%' . $search_term . '%');

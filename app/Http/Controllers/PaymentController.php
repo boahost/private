@@ -200,17 +200,68 @@ class PaymentController extends Controller
         }
     }
 
-    public function webhookPixEfi(Request $request, $transacao_id)
+    public function listWebhookPixEfi()
     {
-        \Log::info($request->all());
+        $business_id = auth()->user()->business_id;
+
+        $pixHelper = new PixHelper($business_id);
+        $api       = $pixHelper->getApi();
+
+        $params = [
+            "inicio" => date('Y-m-d\TH:i:s\Z', strtotime('-1 year')),
+            "fim"    => date('Y-m-d\TH:i:s\Z'),
+        ];
+
+        $result = $api->pixListWebhook($params);
+
+        return response()->json($result);
+    }
+
+    public function webhookPixEfi(Request $request)
+    {
+        $business_id = auth()->user()->business_id;
+        $data        = (object) $request->json()->all();
+
+        if (($data->evento ?? null) == 'teste_webhook')
+            return response()->json(['msg' => 'ok']);
+
+        if (empty($data->pix))
+            throw new \Exception('Notificação vazia', 400);
+
+        $hook      = reset($data->pix);
+        $pixHelper = new PixHelper($business_id);
+        $pix       = $pixHelper->detailByTxID($hook->txid);
+
+        $data_pagamento = $pix->status == 'CONCLUIDA' ? date('Y-m-d H:i:s', strtotime($hook->horario)) : null;
+
+        $binds = [
+            'PIX_SITUACAO'       => $pix->status,
+            'PIX_TRANSACAO'      => $hook->txid,
+            'PIX_DATA_PAGAMENTO' => $data_pagamento,
+            'PIX_INTEGRACAO'     => $hook->endToEndId,
+            'PIX_MENSAGEM'       => $pix->infoPagador ?? ''
+        ];
+
+        \Log::debug('PIX - Webhook', $binds);
+
+        $paymentPlan = PaymentPlan::where('transacao_id', $hook->txid)->first();
+
+        if ($paymentPlan) {
+            $paymentPlan->status = $pix->status;
+            $paymentPlan->save();
+
+            if ($pix->status == 'CONCLUIDA') {
+                $this->setaPlano($paymentPlan);
+            }
+        }
     }
 
     public function paymentPixEfi(Request $request)
     {
         $business_id = auth()->user()->business_id;
 
-        $input    = $request->only('amount', 'customer_name');
         $business = Business::findorfail($business_id);
+        $input    = $request->only('amount', 'customer_name');
 
         // $cnpj = preg_replace('/[^0-9]+/', '', $business['cnpj']);
 
@@ -219,13 +270,13 @@ class PaymentController extends Controller
         }
 
         try {
-            $pix = new PixHelper($business_id);
+            $pixHelper = new PixHelper($business_id);
 
             // $pix->setDevedor($input['customer_name']);
-            $pix->setDescription("Pagamento realizado na $business->name");
-            $pix->setAmount((float) $input['amount']);
+            $pixHelper->setDescription("Pagamento realizado na $business->name");
+            $pixHelper->setAmount((float) $input['amount']);
 
-            $pix = $pix->create();
+            $pixHelper = $pixHelper->create();
 
             // $paymentPlan = [
             //     'payerFirstName'  => $request->payerFirstName,
@@ -246,7 +297,7 @@ class PaymentController extends Controller
 
             // PaymentPlan::create($paymentPlan);
 
-            return response()->json($pix);
+            return response()->json($pixHelper);
 
         } catch (\Exception $e) {
             return response()->json([
