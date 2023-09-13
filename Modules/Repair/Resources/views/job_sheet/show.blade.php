@@ -307,7 +307,8 @@
                                         <br />
                                         {{ $job_sheet->comment_by_ss ?? 'Nada Consta' }}
                                     </div>
-                                    <div class="text-right @empty($job_sheet->security_pattern) col-xs-4 @else col-xs-2 @endif">
+                                    <div
+                                        class="text-right @empty($job_sheet->security_pattern) col-xs-4 @else col-xs-2 @endif">
                                         <strong>
                                             Pin
                                         </strong>
@@ -323,7 +324,7 @@
                                             </strong>
                                             <br>
                                             <div
-                                                style="line-height: 15px;letter-spacing: 4px;font-size: 2em; margin-top: 7px;">
+                                                style="line-height: 18px; letter-spacing: 6px; font-size: 1.3em; font-family: monospace; font-weight: 600;">
                                                 <?php
                                                 $padrao = '';
                                                 $password = str_split($job_sheet->security_pattern ?? '');
@@ -332,14 +333,11 @@
                                                 for ($linha = 1; $linha <= 3; $linha++) {
                                                     for ($coluna = 1; $coluna <= 3; $coluna++) {
                                                         $posicao = ($linha - 1) * 3 + $coluna;
+                                                        $sequencia = array_search($posicao, $password) + 1;
                                                         if (in_array($posicao, $password)) {
-                                                            if ($posicao == $first) {
-                                                                $padrao .= "<span class=\"text-primary\">*</span>";
-                                                            } else {
-                                                                $padrao .= "<span class=\"text-success\">*</span>";
-                                                            }
+                                                            $padrao .= "<span class=\"text-success\">$sequencia</span>";
                                                         } else {
-                                                            $padrao .= "<span class=\"text-muted\">*</span>";
+                                                            $padrao .= "<span class=\"text-muted\">0</span>";
                                                         }
                                                     }
                                                     $padrao .= "\n";
@@ -494,15 +492,15 @@
                 </div>
             @endif
             <div class="col-md-6">
-                <div class="box box-solid no-print">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">{{ __('repair::lang.activities') }}:</h3>
-                    </div>
-                    <!-- /.box-header -->
-                    @include('repair::repair.partials.activities')
-                </div>
-            </div>
-        </div>
+                                        <div class="box box-solid no-print">
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title">{{ __('repair::lang.activities') }}:</h3>
+                                            </div>
+                                            <!-- /.box-header -->
+                                            @include('repair::repair.partials.activities')
+                                        </div>
+                                    </div>
+                                </div>
     </section>
     <!-- /.content -->
 @stop
@@ -531,7 +529,7 @@
 
         /* =================================== */
         /*  Helpers Classes
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* =================================== */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* =================================== */
         /* Border Radius */
         .rounded-top-0 {
             border-top-left-radius: 0px !important;
@@ -593,7 +591,7 @@
 
         /* =================================== */
         /*  Layouts
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* =================================== */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* =================================== */
         .invoice-container {
             margin: 15px auto;
             padding: 25px 50px;
