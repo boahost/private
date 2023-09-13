@@ -314,7 +314,7 @@
                                         </strong>
                                         <br>
                                         <span>
-                                            {{ $job_sheet->security_pwd }}
+                                            {{ $job_sheet->security_pwd ?? 'N/A'}}
                                         </span>
                                     </div>
                                     @if (!empty($job_sheet->security_pattern))
