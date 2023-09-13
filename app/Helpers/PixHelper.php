@@ -31,7 +31,7 @@ class PixHelper
         $this->business_id = $business_id;
     }
 
-    public function getIntegration()
+    public function &getIntegration()
     {
         if (!isset($this->integration)) {
             $this->integration = Integration::where('business_id', $this->business_id)
