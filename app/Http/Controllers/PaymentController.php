@@ -166,7 +166,7 @@ class PaymentController extends Controller
 
     public function listPixEfi(Request $request)
     {
-        $business_id = auth()->user()->business_id;
+        $business_id = request()->session()->get('user.business_id');
 
         try {
             $pix = new PixHelper($business_id);
@@ -183,7 +183,7 @@ class PaymentController extends Controller
 
     public function consultaPixEfi(Request $request, $txid)
     {
-        $business_id = auth()->user()->business_id;
+        $business_id = request()->session()->get('user.business_id');
 
         try {
             $pix = new PixHelper($business_id);
@@ -202,7 +202,7 @@ class PaymentController extends Controller
 
     public function listWebhookPixEfi()
     {
-        $business_id = auth()->user()->business_id;
+        $business_id = request()->session()->get('user.business_id');
 
         $pixHelper = new PixHelper($business_id);
         $api       = $pixHelper->getApi();
@@ -219,8 +219,8 @@ class PaymentController extends Controller
 
     public function webhookPixEfi(Request $request)
     {
-        $business_id = auth()->user()->business_id;
-        $data        = (object) $request->json()->all();
+        $business_id = request()->session()->get('user.business_id');
+        $data = (object) $request->json()->all();
 
         if (($data->evento ?? null) == 'teste_webhook')
             return response()->json(['msg' => 'ok']);
@@ -258,7 +258,7 @@ class PaymentController extends Controller
 
     public function paymentPixEfi(Request $request)
     {
-        $business_id = auth()->user()->business_id;
+        $business_id = request()->session()->get('user.business_id');
 
         $business = Business::findorfail($business_id);
         $input    = $request->only('amount', 'customer_name');

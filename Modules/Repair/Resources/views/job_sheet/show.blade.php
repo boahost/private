@@ -314,7 +314,7 @@
                                         </strong>
                                         <br>
                                         <span>
-                                            {{ $job_sheet->security_pwd ?? 'N/A'}}
+                                            {{ $job_sheet->security_pwd ?? 'N/A' }}
                                         </span>
                                     </div>
                                     @if (!empty($job_sheet->security_pattern))
@@ -467,6 +467,42 @@
                                     </div>
                                 </div>
                             </div>
+                            @if (!empty($repair_settings['repair_tc_condition']))
+                                <div style="margin-top: 30px;">
+                                    <div class="row">
+                                        <div class="text-sm text-justify col-xs-12 text-muted">
+                                            <strong>@lang('lang_v1.terms_conditions'):</strong>
+                                            {!! $repair_settings['repair_tc_condition'] !!}
+                                        </div>
+                                        <div class="text-justify col-xs-12 text-muted">
+                                            <table class="table-pdf">
+                                                <tr>
+                                                    <td class="px-2" width="33%">
+                                                          <hr class="mt-16"/>
+                                                    </td>
+                                                    <td class="px-2" width="33%">
+                                                          <hr class="mt-16"/>
+                                                    </td>
+                                                    <td class="px-2" width="33%">
+                                                          <hr class="mt-16"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center">
+                                                        @lang('repair::lang.customer_signature'):
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @lang('repair::lang.authorized_signature'):
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @lang('repair::lang.technician'):
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
                         {{-- Job sheet details --}}
@@ -529,7 +565,7 @@
 
         /* =================================== */
         /*  Helpers Classes
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* =================================== */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* =================================== */
         /* Border Radius */
         .rounded-top-0 {
             border-top-left-radius: 0px !important;
@@ -591,7 +627,7 @@
 
         /* =================================== */
         /*  Layouts
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* =================================== */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* =================================== */
         .invoice-container {
             margin: 15px auto;
             padding: 25px 50px;

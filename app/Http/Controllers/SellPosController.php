@@ -1091,6 +1091,9 @@ class SellPosController extends Controller
         }
 
         $payment_lines = $this->transactionUtil->getPaymentDetails($id);
+
+        // dd($payment_lines);
+
         //If no payment lines found then add dummy payment line.
         if (empty($payment_lines)) {
             $payment_lines[] = $this->dummyPaymentLine;
@@ -1200,7 +1203,6 @@ class SellPosController extends Controller
                     'sub_type',
                     'pos_module_data',
                     'invoice_layouts',
-                    'payment_lines'
                 )
             );
     }
