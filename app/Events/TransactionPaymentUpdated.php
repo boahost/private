@@ -2,9 +2,8 @@
 
 namespace App\Events;
 
+use App\Models\TransactionPayment;
 use Illuminate\Queue\SerializesModels;
-
-use App\TransactionPayment;
 
 class TransactionPaymentUpdated
 {
@@ -22,6 +21,6 @@ class TransactionPaymentUpdated
     public function __construct(TransactionPayment $transactionPayment, $transactionType)
     {
         $this->transactionPayment = $transactionPayment;
-        $this->transactionType = $transactionType;
+        $this->transactionType    = $transactionType;
     }
 }

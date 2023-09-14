@@ -9,7 +9,7 @@ Route::group(['middleware' => ['web', 'authh', 'auth', 'SetSessionData', 'langua
     Route::get('print-repair/{transaction_id}/customer-copy', 'RepairController@printCustomerCopy')->name('repair.customerCopy');
     Route::resource('/repair', 'RepairController')->except(['create', 'edit']);
     Route::resource('/status', 'RepairStatusController', ['except' => ['show']]);
-    
+
     Route::resource('/repair-settings', 'RepairSettingsController', ['only' => ['index', 'store']]);
 
     Route::get('/install', 'InstallController@index');
@@ -26,6 +26,7 @@ Route::group(['middleware' => ['web', 'authh', 'auth', 'SetSessionData', 'langua
     Route::get('job-sheet/{id}/upload-docs', 'JobSheetController@getUploadDocs');
     Route::get('job-sheet/print/{id}', 'JobSheetController@print');
     Route::get('job-sheet/delete/{id}/image', 'JobSheetController@deleteJobSheetImage');
+    Route::get('job-sheet/{id}/bill', 'JobSheetController@convertToSell');
     Route::get('job-sheet/{id}/status', 'JobSheetController@editStatus');
     Route::put('job-sheet-update/{id}/status', 'JobSheetController@updateStatus');
     Route::get('job-sheet/add-parts/{id}', 'JobSheetController@addParts');

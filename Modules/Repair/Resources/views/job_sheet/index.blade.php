@@ -77,8 +77,8 @@
                 <div class="tab-content">
                     <div class="tab-pane active" id="pending_job_sheet_tab">
                         <div class="row">
-                            <div class="col-md-12 mb-12">
-                                <a type="button" class="btn btn-sm btn-primary pull-right m-5"
+                            <div class="mb-12 col-md-12">
+                                <a type="button" class="m-5 btn btn-sm btn-primary pull-right"
                                     href="{{ action('\Modules\Repair\Http\Controllers\JobSheetController@create') }}"
                                     id="add_job_sheet">
                                     <i class="fa fa-plus"></i> @lang('messages.add')
@@ -139,8 +139,8 @@
                     </div>
                     <div class="tab-pane" id="completed_job_sheet_tab">
                         <div class="row">
-                            <div class="col-md-12 mb-12">
-                                <a type="button" class="btn btn-sm btn-primary pull-right m-5"
+                            <div class="mb-12 col-md-12">
+                                <a type="button" class="m-5 btn btn-sm btn-primary pull-right"
                                     href="{{ action('\Modules\Repair\Http\Controllers\JobSheetController@create') }}"
                                     id="add_job_sheet">
                                     <i class="fa fa-plus"></i> @lang('messages.add')
@@ -517,6 +517,20 @@
 
             @if (auth()->user()->can('job_sheet.create') ||
                     auth()->user()->can('job_sheet.edit'))
+                $(document).on('click', '.edit_job_sheet_status', function() {
+                    var url = $(this).data('href');
+                    $.ajax({
+                        method: 'GET',
+                        url: url,
+                        dataType: 'html',
+                        success: function(result) {
+                            $('#status_modal').html(result).modal('show');
+                        }
+                    });
+                });
+            @endif
+
+            @if (auth()->user()->can('sell.create'))
                 $(document).on('click', '.edit_job_sheet_status', function() {
                     var url = $(this).data('href');
                     $.ajax({

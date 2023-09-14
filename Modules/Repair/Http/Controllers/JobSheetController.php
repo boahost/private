@@ -2,7 +2,9 @@
 
 namespace Modules\Repair\Http\Controllers;
 
+use App\Models\Transaction;
 use App\Models\Variation;
+use App\Utils\TransactionUtil;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -38,6 +40,7 @@ class JobSheetController extends Controller
     protected $repairUtil;
     protected $commonUtil;
     protected $cashRegisterUtil;
+    protected $transactionUtil;
     protected $moduleUtil;
     protected $contactUtil;
     protected $productUtil;
@@ -48,12 +51,18 @@ class JobSheetController extends Controller
      * @return void
      */
     public function __construct(
-        RepairUtil $repairUtil, Util $commonUtil, CashRegisterUtil $cashRegisterUtil, ModuleUtil $moduleUtil,
-        ContactUtil $contactUtil, ProductUtil $productUtil
+        RepairUtil $repairUtil,
+        Util $commonUtil,
+        CashRegisterUtil $cashRegisterUtil,
+        TransactionUtil $transactionUtil,
+        ModuleUtil $moduleUtil,
+        ContactUtil $contactUtil,
+        ProductUtil $productUtil
     ) {
         $this->repairUtil       = $repairUtil;
         $this->commonUtil       = $commonUtil;
         $this->cashRegisterUtil = $cashRegisterUtil;
+        $this->transactionUtil  = $transactionUtil;
         $this->moduleUtil       = $moduleUtil;
         $this->contactUtil      = $contactUtil;
         $this->productUtil      = $productUtil;
@@ -197,49 +206,53 @@ class JobSheetController extends Controller
 
                     if (auth()->user()->can("job_sheet.view_assigned") || auth()->user()->can("job_sheet.view_all") || auth()->user()->can("job_sheet.create")) {
                         $html .= '<li>
-                    <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@show', [$row->id]) . '" class="cursor-pointer"><i class="fa fa-eye"></i> ' . __("messages.view") . '
+                    <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@show', [$row->id]) . '" class="cursor-pointer"><i class="fa fa-eye"></i>' . __("messages.view") . '
                     </a>
                     </li>';
                     }
 
-                    if (auth()->user()->can("repair.create")) {
+                    if (auth()->user()->can("sell.create")) {
+                        // $html .= '<li>
+                        //             <a href="' . action('SellPosController@create') . '?sub_type=repair&job_sheet_id=' . $row->id . '" class="cursor-pointer">
+                        //                 <i class="fa fa-dollar-sign"></i>' . __('repair::lang.add_invoice') . '
+                        //             </a>
+                        //         </li>';
+
                         $html .= '<li>
-                    <a href="' . action('SellPosController@create') . '?sub_type=repair&job_sheet_id=' . $row->id . '" class="cursor-pointer"><i class="fas fa-plus-circle"></i> ' . __('repair::lang.add_invoice') . '
-                    </a>
-                    </li>';
+                                    <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@convertToSell', [$row->id]) . '" class="cursor-pointer">
+                                        <i class="fa fa-dollar-sign"></i>' . __('repair::lang.add_invoice') . '
+                                    </a>
+                                </li>';
                     }
 
                     if (auth()->user()->can("job_sheet.edit")) {
                         $html .= '<li>
-                    <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@edit', [$row->id]) . '" class="cursor-pointer edit_job_sheet"><i class="fa fa-edit"></i> ' . __("messages.edit") . '
+                    <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@edit', [$row->id]) . '" class="cursor-pointer edit_job_sheet"><i class="fa fa-edit"></i>' . __("messages.edit") . '
                     </a>
                     </li>';
 
                         $html .= '<li>
                     <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@addParts', [$row->id]) . '" class="cursor-pointer">
-                    <i class="fas fa-toolbox"></i>
-                    ' . __("repair::lang.add_parts") . '
+                    <i class="fas fa-toolbox"></i>' . __("repair::lang.add_parts") . '
                     </a>
                     </li>';
 
                         $html .= '<li>
                     <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@getUploadDocs', [$row->id]) . '" class="cursor-pointer">
-                    <i class="fas fa-file-alt"></i>
-                    ' . __("repair::lang.upload_docs") . '
+                    <i class="fas fa-file-alt"></i>' . __("repair::lang.upload_docs") . '
                     </a>
                     </li>';
                     }
 
                     $html .= '<li>
-                <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@print', [$row->id]) . '" target="_blank"><i class="fa fa-print"></i> ' . __("messages.print") . '
+                <a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@print', [$row->id]) . '" target="_blank"><i class="fa fa-print"></i>' . __("messages.print") . '
                 </a>
                 </li>';
 
                     if (auth()->user()->can("job_sheet.create") || auth()->user()->can("job_sheet.edit")) {
                         $html .= '<li>
                     <a data-href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@editStatus', [$row->id]) . '" class="cursor-pointer edit_job_sheet_status">
-                    <i class="fa fa-edit"></i>
-                    ' . __("repair::lang.change_status") . '
+                    <i class="fa fa-edit"></i>' . __("repair::lang.change_status") . '
                     </a>
                     </li>';
                     }
@@ -247,8 +260,7 @@ class JobSheetController extends Controller
                     if (auth()->user()->can("job_sheet.delete")) {
                         $html .= '<li>
                     <a data-href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@destroy', [$row->id]) . '"  id="delete_job_sheet" class="cursor-pointer">
-                    <i class="fas fa-trash"></i>
-                    ' . __("messages.delete") . '
+                    <i class="fas fa-trash"></i>' . __("messages.delete") . '
                     </a>
                     </li>';
                     }
@@ -267,9 +279,7 @@ class JobSheetController extends Controller
                 )
                 ->editColumn(
                     'created_at',
-                    '
-                {{@format_datetime($created_at)}}
-                '
+                    '{{@format_datetime($created_at)}}'
                 )
                 ->editColumn('service_type', function ($row) {
                     return __('repair::lang.' . $row->service_type);
@@ -291,6 +301,7 @@ class JobSheetController extends Controller
                 })
                 ->editColumn('repair_no', function ($row) {
                     $invoice_no = [];
+                    // dd($row->invoices);
                     if ($row->invoices->count() > 0) {
                         foreach ($row->invoices as $key => $invoice) {
                             $invoice_no[] = $invoice->invoice_no;
@@ -299,15 +310,14 @@ class JobSheetController extends Controller
 
                     $add_invoice = '';
                     if (auth()->user()->can("repair.create")) {
-                        $add_invoice = '<br><a href="' . action('SellPosController@create') . '?sub_type=repair&job_sheet_id=' . $row->id . '" class="cursor-pointer" data-toggle="tooltip" title="' . __('repair::lang.add_invoice') . '">
-                    <i class="fas fa-plus-circle"></i>
-                    </a>';
+                        $add_invoice = '<br><a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@convertToSell', [$row->id]) . '" class="cursor-pointer" data-toggle="tooltip" title="' . __('repair::lang.add_invoice') . '">
+                    <i class="fas fa-plus-circle"></i></a>';
                     }
 
                     return implode(', ', $invoice_no) . $add_invoice;
                 })
                 ->editColumn('status', function ($row) {
-                    $html = '<a data-href="' . action("\Modules\Repair\Http\Controllers\JobSheetController@editStatus", [$row->id]) . '" class="edit_job_sheet_status cursor-pointer" data-orig-value="' . $row->status . '" data-status-name="' . $row->status . '">
+                    $html = '<a data-href="' . action("\Modules\Repair\Http\Controllers\JobSheetController@editStatus", [$row->id]) . '" class="cursor-pointer edit_job_sheet_status" data-orig-value="' . $row->status . '" data-status-name="' . $row->status . '">
                 <span class="label " style="background-color:' . $row->status_color . ';" >
                 ' . $row->status . '
                 </span>
@@ -916,7 +926,7 @@ class JobSheetController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
+            \Log::emergency("File:" . $e->getFile() . ":" . $e->getLine() . "Message:" . $e->getMessage());
 
             return redirect()->back()
                 ->with('status', [
@@ -1196,7 +1206,7 @@ class JobSheetController extends Controller
                 $request->session()->forget('repair_status_update_data');
             }
         } catch (\Exception $e) {
-            \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
+            \Log::emergency("File:" . $e->getFile() . ":" . $e->getLine() . "Message:" . $e->getMessage());
         }
 
         return redirect()
@@ -1361,7 +1371,7 @@ class JobSheetController extends Controller
             ];
 
         } catch (\Exception $e) {
-            \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
+            \Log::emergency("File:" . $e->getFile() . ":" . $e->getLine() . "Message:" . $e->getMessage());
             $output = [
                 'success' => false,
                 'msg'     => __('messages.something_went_wrong')
@@ -1374,5 +1384,156 @@ class JobSheetController extends Controller
                 'success' => true,
                 'msg'     => __("lang_v1.success")
             ]);
+    }
+
+    public function convertToSell($id)
+    {
+        try {
+            $user_id     = request()->session()->get('user.id');
+            $business_id = request()->session()->get('user.business_id');
+
+            if (!auth()->user()->can('sell.create') && !auth()->user()->can('direct_sell.access')) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            if (!(auth()->user()->can('superadmin') || ($this->moduleUtil->hasThePermissionInSubscription($business_id, 'repair_module') && (auth()->user()->can('job_sheet.view_assigned') || auth()->user()->can('job_sheet.view_all') || auth()->user()->can('job_sheet.create'))))) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            $query = JobSheet::with(
+                [
+                    'sheet_lines.product' => function ($query) {
+                        $query->with('unit');
+                    },
+                    'customer',
+                    'customer.business',
+                    'technician',
+                    'status',
+                    'Brand',
+                    'Device',
+                    'deviceModel',
+                    'businessLocation',
+                    'invoices',
+                    'media'
+                ]
+            )->where('business_id', $business_id);
+
+            $job_sheet = $query->findOrFail($id);
+
+            // dd($job_sheet->toArray());
+
+            $products = array_map(function ($item) {
+                return [
+                    'product_type'         => $item['product']['type'],
+                    'unit_price'           => $item['unit_price'],
+                    'line_discount_type'   => 'fixed',
+                    'line_discount_amount' => '0',
+                    'item_tax'             => '0',
+                    'tax_id'               => null,
+                    'sell_line_note'       => null,
+                    'product_unit_id'      => $item['product']['unit_id'],
+                    'sub_unit_id'          => $item['product']['sub_unit_ids'],
+                    'product_id'           => $item['product_id'],
+                    'variation_id'         => $item['variation_id'],
+                    'enable_stock'         => '1',
+                    'quantity'             => $item['quantity'],
+                    'base_unit_multiplier' => '1',
+                    'res_service_staff_id' => null,
+                    'unit_price_inc_tax'   => $item['unit_price_inc_tax'],
+                ];
+            }, $job_sheet->sheet_lines->toArray());
+
+            // dd($produtos);
+
+            // if (empty($produtos)) {
+            //     return back()->with('status', [
+            //         'success' => 0,
+            //         'msg'     => trans("messages.something_went_wrong")
+            //     ]);
+            // }
+
+            $order_data = [
+                'invoice_no'              => $this->transactionUtil->getInvoiceNumber($business_id, 'final', $job_sheet->location_id, null),
+                'business_id'             => $business_id,
+                'location_id'             => $job_sheet->location_id,
+                'contact_id'              => $job_sheet->contact_id,
+                'final_total'             => $job_sheet->contact_id,
+                'created_by'              => $user_id,
+                'status'                  => 'final',
+                'type'                    => 'sell',
+                'sub_type'                => 'repair',
+                'payment'                 => [],
+                'payment_status'          => 'due',
+                'additional_notes'        => '',
+                'transaction_date'        => \Carbon::now(),
+                'customer_group_id'       => $job_sheet->customer->customer_group_id ?? null,
+                'tax_rate_id'             => null,
+                'sale_note'               => null,
+                'commission_agent'        => null,
+                'order_addresses'         => '',
+                'products'                => $products,
+                'is_created_from_api'     => 0,
+                'discount_type'           => 'fixed',
+                'discount_amount'         => 0,
+                'repair_brand_id'         => $job_sheet->brand_id,
+                'repair_status_id'        => $job_sheet->status->id ?? null,
+                'repair_model_id'         => $job_sheet->device_model_id,
+                'repair_job_sheet_id'     => $job_sheet->id,
+                'repair_defects'          => $job_sheet->defects,
+                'repair_serial_no'        => $job_sheet->serial_no,
+                'repair_security_pwd'     => $job_sheet->security_pwd,
+                'repair_security_pattern' => $job_sheet->security_pattern,
+                'repair_due_date'         => $job_sheet->nada,
+                'repair_device_id'        => $job_sheet->device_id,
+            ];
+
+            $invoice_total = [
+                'total_before_tax' => $job_sheet->total_costs ?? 0,
+                'tax'              => 0,
+            ];
+
+            // Check if subscribed or not, then check for users quota
+            if (!$this->moduleUtil->isSubscribed($business_id)) {
+                return $this->moduleUtil->expiredResponse();
+            } elseif (!$this->moduleUtil->isQuotaAvailable('invoices', $business_id)) {
+                return $this->moduleUtil->quotaExpiredResponse('invoices', $business_id, action('SellPosController@index'));
+            }
+
+            // dd($order_data);
+
+            DB::beginTransaction();
+
+            $transaction = Transaction::create($order_data);
+
+            $this->transactionUtil->createOrUpdateSellLines((object) $transaction, $products, $order_data['location_id']);
+
+            // dd($transaction->res_table_id);
+
+            DB::commit();
+
+            // $receipt = $this->receiptContent($business_id, $order_data['location_id'], $transaction->id, null, false, true, null);
+
+            return redirect(action('SellPosController@edit', [$transaction->id]) . '?sub_type=repair')
+                ->with('status', [
+                    'success' => 1,
+                    'msg'     => trans("sale.pos_sale_added")
+                ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            \Log::emergency("File:" . $e->getFile() . ":" . $e->getLine() . "Message:" . $e->getMessage());
+
+            $msg = trans("messages.something_went_wrong");
+
+            if (get_class($e) == \App\Exceptions\PurchaseSellMismatch::class) {
+                $msg = $e->getMessage();
+            }
+
+            $output = [
+                'success' => 0,
+                'msg'     => $e->getMessage() . " - " . $e->getFile()
+            ];
+        }
+
     }
 }

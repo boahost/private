@@ -35,7 +35,7 @@
 						{!! Form::text('price_group_text', $transaction->price_group->name, ['class' => 'form-control', 'readonly']); !!}
 						<span class="input-group-addon">
 							@show_tooltip(__('lang_v1.price_group_help_text'))
-						</span> 
+						</span>
 					</div>
 				</div>
 			</div>
@@ -54,7 +54,7 @@
 
 						<span class="input-group-addon">
 							@show_tooltip(__('lang_v1.types_of_service_help'))
-						</span> 
+						</span>
 					</div>
 					<small><p class="help-block @if(empty($transaction->selling_price_group_id)) hide @endif" id="price_group_text">@lang('lang_v1.price_group'): <span>@if(!empty($transaction->selling_price_group_id)){{$transaction->price_group->name}}@endif</span></p></small>
 				</div>
@@ -83,11 +83,11 @@
 						<span class="input-group-addon">
 							<i class="fa fa-user"></i>
 						</span>
-						<input type="hidden" id="default_customer_id" 
+						<input type="hidden" id="default_customer_id"
 						value="{{ $transaction->contact->id }}" >
-						<input type="hidden" id="default_customer_name" 
+						<input type="hidden" id="default_customer_name"
 						value="{{ $transaction->contact->name }}" >
-						{!! Form::select('contact_id', 
+						{!! Form::select('contact_id',
 						[], null, ['class' => 'form-control mousetrap', 'id' => 'customer_id', 'placeholder' => 'Enter Customer name / phone', 'required']); !!}
 						<span class="input-group-btn">
 							<button type="button" class="btn btn-default bg-white btn-flat add_new_customer" data-name=""><i class="fa fa-plus-circle text-primary fa-lg"></i></button>
@@ -100,7 +100,7 @@
 			<div class="col-sm-3">
 				<div class="form-group">
 					{!! Form::label('commission_agent', __('lang_v1.commission_agent') . ':') !!}
-					{!! Form::select('commission_agent', 
+					{!! Form::select('commission_agent',
 					$commission_agent, $transaction->commission_agent, ['class' => 'form-control select2']); !!}
 				</div>
 			</div>
@@ -144,10 +144,10 @@
 				<br/>
 				{!! Form::number('pay_term_number', $transaction->pay_term_number, ['class' => 'form-control width-40 pull-left', 'placeholder' => __('contact.pay_term')]); !!}
 
-				{!! Form::select('pay_term_type', 
-				['months' => __('lang_v1.months'), 
-				'days' => __('lang_v1.days')], 
-				$transaction->pay_term_type, 
+				{!! Form::select('pay_term_type',
+				['months' => __('lang_v1.months'),
+				'days' => __('lang_v1.days')],
+				$transaction->pay_term_type,
 				['class' => 'form-control width-60 pull-left','placeholder' => __('messages.please_select')]); !!}
 			</div>
 		</div>
@@ -163,7 +163,7 @@
 	<div class="clearfix"></div>
 	<!-- Call restaurant module if defined -->
 	@if(in_array('tables' ,$enabled_modules) || in_array('service_staff' ,$enabled_modules))
-	<span id="restaurant_module_span" 
+	<span id="restaurant_module_span"
 	data-transaction_id="{{$transaction->id}}">
 	<div class="col-md-3"></div>
 </span>
@@ -192,7 +192,7 @@
 	<input type="hidden" name="sell_price_tax" id="sell_price_tax" value="{{$business_details->sell_price_tax}}">
 
 	<!-- Keeps count of product rows -->
-	<input type="hidden" id="product_row_count" 
+	<input type="hidden" id="product_row_count"
 	value="{{count($sell_details)}}">
 	@php
 	$hide_tax = '';
@@ -204,7 +204,7 @@
 	<table class="table table-condensed table-bordered table-striped table-responsive" id="pos_table">
 		<thead>
 			<tr>
-				<th class="text-center">	
+				<th class="text-center">
 					@lang('sale.product')
 				</th>
 				<th class="text-center">
@@ -236,7 +236,7 @@
 		<tr>
 			<td>
 				<div class="pull-right">
-					<b>@lang('sale.item'):</b> 
+					<b>@lang('sale.item'):</b>
 					<span class="total_quantity">0</span>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<b>@lang('sale.total'): </b>
@@ -285,7 +285,7 @@
 				</div>
 			</div>
 			<div class="col-md-4"><br>
-				<b>@lang( 'sale.discount_amount' ):</b>(-) 
+				<b>@lang( 'sale.discount_amount' ):</b>(-)
 				<span class="display_currency" id="total_discount">0</span>
 			</div>
 			<div class="clearfix"></div>
@@ -322,13 +322,13 @@
 						</span>
 						{!! Form::select('tax_rate_id', $taxes['tax_rates'], $transaction->tax_id, ['placeholder' => __('messages.please_select'), 'class' => 'form-control', 'data-default'=> $business_details->default_sales_tax], $taxes['attributes']); !!}
 
-						<input type="hidden" name="tax_calculation_amount" id="tax_calculation_amount" 
+						<input type="hidden" name="tax_calculation_amount" id="tax_calculation_amount"
 						value="{{@num_format(optional($transaction->tax)->amount)}}" data-default="{{$business_details->tax_calculation_amount}}">
 					</div>
 				</div>
 			</div>
 			<div class="col-md-4 col-md-offset-4">
-				<b>@lang( 'sale.order_tax' ):</b>(+) 
+				<b>@lang( 'sale.order_tax' ):</b>(+)
 				<span class="display_currency" id="order_tax">{{$transaction->tax_amount}}</span>
 			</div>
 			<div class="clearfix"></div>
@@ -381,7 +381,7 @@
 				@if(!empty($pos_settings['amount_rounding_method']) && $pos_settings['amount_rounding_method'] > 0)
 				<small id="round_off"><br>(@lang('lang_v1.round_off'): <span id="round_off_text">0</span>)</small>
 				<br/>
-				<input type="hidden" name="round_off_amount" 
+				<input type="hidden" name="round_off_amount"
 				id="round_off_amount" value=0>
 				@endif
 				<div><b>@lang('sale.total_payable'): </b>
@@ -408,7 +408,7 @@
 			<div class="col-md-2">
 				<div class="form-group">
 					{!! Form::label('placa',  'Placa:' ) !!}
-					{!! Form::text('placa', $transaction->placa, ['class' => 'form-control','placeholder' => 'placa', 
+					{!! Form::text('placa', $transaction->placa, ['class' => 'form-control','placeholder' => 'placa',
 					'data-mask="AAA-AAAA"', 'data-mask-reverse="true"']); !!}
 				</div>
 			</div>
@@ -533,10 +533,10 @@
 	@include('contact.create', ['quick_add' => true])
 </div>
 <!-- /.content -->
-<div class="modal fade register_details_modal" tabindex="-1" role="dialog" 
+<div class="modal fade register_details_modal" tabindex="-1" role="dialog"
 aria-labelledby="gridSystemModalLabel">
 </div>
-<div class="modal fade close_register_modal" tabindex="-1" role="dialog" 
+<div class="modal fade close_register_modal" tabindex="-1" role="dialog"
 aria-labelledby="gridSystemModalLabel">
 </div>
 <!-- quick product modal -->

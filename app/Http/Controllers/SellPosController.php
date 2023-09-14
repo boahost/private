@@ -348,8 +348,6 @@ class SellPosController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-
         \Log::debug("request: ", $request->all());
 
         if (!auth()->user()->can('sell.create') && !auth()->user()->can('direct_sell.access')) {
@@ -1000,6 +998,7 @@ class SellPosController extends Controller
                 DB::raw('vld.qty_available + transaction_sell_lines.quantity AS qty_available')
             )
             ->get();
+
         if (!empty($sell_details)) {
             foreach ($sell_details as $key => $value) {
 
@@ -1164,6 +1163,8 @@ class SellPosController extends Controller
         //pos screen view from module
         $pos_module_data = $this->moduleUtil->getModuleData('get_pos_screen_view', $sub_type);
 
+        // dd($transaction);
+
         $invoice_layouts = InvoiceLayout::forDropdown($business_id);
 
         return view('sale_pos.edit')
@@ -1171,7 +1172,37 @@ class SellPosController extends Controller
             ->with('cities', $this->prepareCities())
             ->with('paises', $this->preparePaises())
             ->with('estados', $this->prepareUFs())
-            ->with(compact('business_details', 'taxes', 'payment_types', 'walk_in_customer', 'sell_details', 'transaction', 'payment_lines', 'location_printer_type', 'shortcuts', 'commission_agent', 'categories', 'pos_settings', 'change_return', 'types', 'customer_groups', 'brands', 'accounts', 'waiters', 'redeem_details', 'edit_price', 'edit_discount', 'shipping_statuses', 'warranties', 'sub_type', 'pos_module_data', 'invoice_layouts', 'payment_lines'));
+            ->with(
+                compact(
+                    'business_details',
+                    'taxes',
+                    'payment_types',
+                    'walk_in_customer',
+                    'sell_details',
+                    'transaction',
+                    'payment_lines',
+                    'location_printer_type',
+                    'shortcuts',
+                    'commission_agent',
+                    'categories',
+                    'pos_settings',
+                    'change_return',
+                    'types',
+                    'customer_groups',
+                    'brands',
+                    'accounts',
+                    'waiters',
+                    'redeem_details',
+                    'edit_price',
+                    'edit_discount',
+                    'shipping_statuses',
+                    'warranties',
+                    'sub_type',
+                    'pos_module_data',
+                    'invoice_layouts',
+                    'payment_lines'
+                )
+            );
     }
 
     /**

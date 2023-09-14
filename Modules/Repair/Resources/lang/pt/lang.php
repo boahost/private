@@ -137,7 +137,7 @@ return [
     "pending"                              => "Pendente",
     "completed"                            => "Concluído",
     "invoices"                             => "Faturas",
-    "add_invoice"                          => "Adicionar fatura",
+    "add_invoice"                          => "Faturar",
     "list_invoices"                        => "Listar faturas",
     "delivery_date"                        => "Data de entrega",
     "default_job_sheet_status"             => "Status do reparo padrão",

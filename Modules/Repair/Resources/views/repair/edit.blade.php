@@ -40,7 +40,7 @@
 							{!! Form::select('contact_id',
 								[], null, ['class' => 'form-control mousetrap', 'id' => 'customer_id', 'placeholder' => 'Enter Customer name / phone', 'required']); !!}
 							<span class="input-group-btn">
-								<button type="button" class="btn btn-default bg-white btn-flat add_new_customer" data-name=""><i class="fa fa-plus-circle text-primary fa-lg"></i></button>
+								<button type="button" class="bg-white btn btn-default btn-flat add_new_customer" data-name=""><i class="fa fa-plus-circle text-primary fa-lg"></i></button>
 							</span>
 						</div>
 					</div>

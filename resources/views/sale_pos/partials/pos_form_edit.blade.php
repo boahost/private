@@ -22,7 +22,7 @@
                     'style' => 'width: 100%;',
                 ]) !!}
                 <span class="input-group-btn">
-                    <button type="button" class="btn btn-default bg-white btn-flat add_new_customer" data-name=""
+                    <button type="button" class="bg-white btn btn-default btn-flat add_new_customer" data-name=""
                         @if (!auth()->user()->can('customer.create')) disabled @endif>
                         <i class="fa fa-plus-circle text-primary fa-lg">
                         </i>
@@ -35,7 +35,7 @@
         <div class="form-group">
             <div class="input-group">
                 <div class="input-group-btn">
-                    <button type="button" class="btn btn-default bg-white btn-flat" data-toggle="modal"
+                    <button type="button" class="bg-white btn btn-default btn-flat" data-toggle="modal"
                         data-target="#configure_search_modal" title="{{ __('lang_v1.configure_product_search') }}">
                         <i class="fa fa-barcode">
                         </i>
@@ -51,14 +51,14 @@
 
                     <!-- Show button for weighing scale modal -->
                     @if (isset($pos_settings['enable_weighing_scale']) && $pos_settings['enable_weighing_scale'] == 1)
-                        <button type="button" class="btn btn-default bg-white btn-flat" id="weighing_scale_btn"
+                        <button type="button" class="bg-white btn btn-default btn-flat" id="weighing_scale_btn"
                             data-toggle="modal" data-target="#weighing_scale_modal" title="@lang('lang_v1.weighing_scale')">
                             <i class="fa fa-digital-tachograph text-primary fa-lg">
                             </i>
                         </button>
                     @endif
 
-                    <button type="button" class="btn btn-default bg-white btn-flat pos_add_quick_product"
+                    <button type="button" class="bg-white btn btn-default btn-flat pos_add_quick_product"
                         data-href="{{ action('ProductController@quickAdd') }}"
                         data-container=".quick_add_product_modal">
                         <i class="fa fa-plus-circle text-primary fa-lg">
@@ -212,6 +212,7 @@
         </div>
     @endif
 </div>
+
 <!-- include module fields -->
 @if (!empty($pos_module_data))
     @foreach ($pos_module_data as $key => $value)
@@ -220,6 +221,7 @@
         @endif
     @endforeach
 @endif
+
 <div class="row">
     <div class="col-sm-12 pos_product_div">
         <input type="hidden" name="sell_price_tax" id="sell_price_tax" value="{{ $business_details->sell_price_tax }}">

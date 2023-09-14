@@ -3,8 +3,10 @@
 namespace App\Utils;
 
 use App\Models\AccountTransaction;
+use App\Models\Brands;
 use App\Models\Business;
 use App\Models\BusinessLocation;
+use App\Models\Category;
 use App\Models\Contact;
 use App\Models\Revenue;
 use App\Models\Currency;
@@ -55,6 +57,7 @@ class TransactionUtil extends Util
             'location_id'            => $input['location_id'],
             'type'                   => 'sell',
             'status'                 => $input['status'],
+            'payment_status'         => $input['payment_status'] ?? 'due',
             'contact_id'             => $input['contact_id'],
             'customer_group_id'      => !empty($input['customer_group_id']) ? $input['customer_group_id'] : null,
             'invoice_no'             => $invoice_no,
@@ -79,7 +82,7 @@ class TransactionUtil extends Util
             'delivered_to'           => isset($input['delivered_to']) ? $input['delivered_to'] : null,
             'shipping_charges'       => isset($input['shipping_charges']) ? $uf_data ? $this->num_uf($input['shipping_charges']) : $input['shipping_charges'] : 0,
             'exchange_rate'          => !empty($input['exchange_rate']) ?
-            $uf_data ? $this->num_uf($input['exchange_rate']) : $input['exchange_rate'] : 1,
+                $uf_data ? $this->num_uf($input['exchange_rate']) : $input['exchange_rate'] : 1,
             'selling_price_group_id' => isset($input['selling_price_group_id']) ? $input['selling_price_group_id'] : null,
             'pay_term_number'        => isset($input['pay_term_number']) ? $input['pay_term_number'] : null,
             'pay_term_type'          => isset($input['pay_term_type']) ? $input['pay_term_type'] : null,
@@ -179,7 +182,7 @@ class TransactionUtil extends Util
             'shipping_status'        => isset($input['shipping_status']) ? $input['shipping_status'] : null,
             'delivered_to'           => isset($input['delivered_to']) ? $input['delivered_to'] : null,
             'exchange_rate'          => !empty($input['exchange_rate']) ?
-            $uf_data ? $this->num_uf($input['exchange_rate']) : $input['exchange_rate'] : 1,
+                $uf_data ? $this->num_uf($input['exchange_rate']) : $input['exchange_rate'] : 1,
             'selling_price_group_id' => isset($input['selling_price_group_id']) ? $input['selling_price_group_id'] : null,
             'pay_term_number'        => isset($input['pay_term_number']) ? $input['pay_term_number'] : null,
             'pay_term_type'          => isset($input['pay_term_type']) ? $input['pay_term_type'] : null,
@@ -1480,7 +1483,7 @@ class TransactionUtil extends Util
 
             if (!empty($il->module_info['repair']['show_device'])) {
                 $output['device_label'] = $il->module_info['repair']['device_label'];
-                $device                 = \App\Category::find($transaction->repair_device_id);
+                $device                 = Category::find($transaction->repair_device_id);
 
                 $output['repair_device'] = '';
                 if (!empty($device)) {
@@ -1490,7 +1493,7 @@ class TransactionUtil extends Util
 
             if (!empty($il->module_info['repair']['show_brand'])) {
                 $output['brand_label']  = $il->module_info['repair']['brand_label'];
-                $brand                  = \App\Brands::find($transaction->repair_brand_id);
+                $brand                  = Brands::find($transaction->repair_brand_id);
                 $output['repair_brand'] = '';
                 if (!empty($brand)) {
                     $output['repair_brand'] = $brand->name;
