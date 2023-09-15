@@ -2,6 +2,7 @@
 /public/hot
 /public/*
 !/public/css
+!/public/js
 /public/storage
 /vendor
 /vendor.old
