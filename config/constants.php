@@ -35,7 +35,7 @@ return [
     'image_size_limit'                   => '500000',
     //in Bytes
 
-    'asset_version'                      => 1694703399,
+    'asset_version'                      => 1694774839,
 
     'disable_purchase_in_other_currency' => true,
 
