@@ -114,7 +114,7 @@ return [
     "on_site"                              => "Executar no cliente",
     "expected_delivery_date"               => "Data de entrega prevista",
     "total_costs"                          => "Valor Total",
-    "estimated_cost"                       => "Valor Estimado",
+    "estimated_cost"                       => "Valor Total Estimado",
     "service_costs"                        => "Mão de Obra",
     "repair_tc_conditions"                 => "Termos e condições de reparo",
     "product_configuration"                => "Configuração do produto",
