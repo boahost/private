@@ -167,11 +167,11 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-12">
         <div class="form-group">
             {!! Form::label('repair_defects', __('repair::lang.problem_reported_by_customer') . ':') !!} <br>
             {!! Form::textarea('repair_defects', !empty($repair['repair_defects']) ? $repair['repair_defects'] : null, [
-                'class' => 'tags-look',
+                'class' => 'tags-look form-control',
                 'rows' => 3,
             ]) !!}
         </div>

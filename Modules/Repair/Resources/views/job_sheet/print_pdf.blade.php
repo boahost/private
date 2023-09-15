@@ -66,9 +66,12 @@
         <tr>
             <th width="80">
                 @if (!empty(Session::get('business.logo')))
-                    <img width="80" height="80"
-                        src="{{ asset('uploads/business_logos/' . Session::get('business.logo')) }}" alt="Logo"
-                        style="margin: 5px;">
+                    <img id="logo" height="80" width="80"
+                        src="{{ asset('uploads/business_logos/' . Session::get('business.logo')) }}" title="Logomarca"
+                        alt="Logomarca" />
+                @else
+                    <img id="logo" height="80" width="80"
+                        src="https://privatevisualsistemas.com//uploads/logo.png" title="Logomarca" alt="Logomarca" />
                 @endif
             </th>
             <th colspan="3">
@@ -185,7 +188,7 @@
             </td>
             <td style="padding-top: 0">
                 <strong>@lang('repair::lang.estimated_cost'):</strong>
-                <span class="display_currency" data-currency_symbol="true">
+                <span>
                     @format_currency($job_sheet->estimated_cost)
                 </span>
             </td>
@@ -248,13 +251,13 @@
 
     <div class="width-100 content-div">
         @if (!empty($job_sheet->custom_field_1))
-            <div class="width-50 f-left mb-5">
+            <div class="width-50 f-left">
                 <strong>{{ $repair_settings['job_sheet_custom_field_1'] ?? __('lang_v1.custom_field', ['number' => 1]) }}:</strong>
                 {{ $job_sheet->custom_field_1 }}
             </div>
         @endif
         @if (!empty($job_sheet->custom_field_2))
-            <div class="width-50 f-left mb-5">
+            <div class="width-50 f-left">
                 <strong>{{ $repair_settings['job_sheet_custom_field_2'] ?? __('lang_v1.custom_field', ['number' => 2]) }}:</strong>
                 {{ $job_sheet->custom_field_2 }}
             </div>
@@ -266,13 +269,13 @@
             </div>
         @endif
         @if (!empty($job_sheet->custom_field_4))
-            <div class="width-50 f-left mb-5">
+            <div class="width-50 f-left">
                 <strong>{{ $repair_settings['job_sheet_custom_field_4'] ?? __('lang_v1.custom_field', ['number' => 4]) }}:</strong>
                 {{ $job_sheet->custom_field_4 }}
             </div>
         @endif
         @if (!empty($job_sheet->custom_field_5))
-            <div class="width-50 f-left mb-5">
+            <div class="width-50 f-left">
                 <strong>{{ $repair_settings['job_sheet_custom_field_5'] ?? __('lang_v1.custom_field', ['number' => 5]) }}:</strong>
                 {{ $job_sheet->custom_field_5 }}
             </div>
@@ -281,25 +284,25 @@
 </div>
 @if (!empty($job_sheet->sheet_lines))
     <div class="box">
-        <table class="table-pdf table-slim">
+        <table class="table-pdf">
             <thead>
                 <tr>
-                    <th class="col-8">
+                    <th class="col-8 f-left">
                         <strong>
                             Nome
                         </strong>
                     </th>
-                    <th class="col-2 text-right">
+                    <th class="col-2" align="right">
                         <strong>
                             Quantidade
                         </strong>
                     </th>
-                    <th class="col-2 text-right">
+                    <th class="col-2" align="right">
                         <strong>
                             Tipo
                         </strong>
                     </th>
-                    <th class="col-2 text-right">
+                    <th class="col-2" align="right">
                         <strong>
                             Valor
                         </strong>
@@ -309,22 +312,47 @@
             <tbody>
                 @foreach ($job_sheet->sheet_lines as $part)
                     <tr>
-                        <td class="text-left">
+                        <td class=" f-left">
                             {{ mb_strtoupper($part->product->name) }}
                         </td>
-                        <td class="text-right">
+                        <td align="right">
                             {{ $part->quantity }}
                         </td>
-                        <td class="text-right">
+                        <td align="right">
                             {{ $part->product->unit->short_name }}
                         </td>
-                        <td class="text-right">
-                            <span class="display_currency" data-currency_symbol="true">
-                                {{ $part->unit_price_inc_tax }}
+                        <td align="right">
+                            <span>
+                                @format_currency($part->unit_price_inc_tax)
                             </span>
                         </td>
                     </tr>
                 @endforeach
+                {{-- <tr>
+                    <td colspan="4">
+                        <hr />
+                    </td>
+                </tr> --}}
+                <tr>
+                    <td colspan="3" align="right">
+                        <strong>
+                            @lang('repair::lang.service_costs'):
+                        </strong>
+                    </td>
+                    <td colspan="1" align="right">
+                        @format_currency($job_sheet->service_costs)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" align="right">
+                        <strong>
+                            @lang('sale.total_amount'):
+                        </strong>
+                    </td>
+                    <td colspan="1" align="right">
+                        @format_currency($job_sheet->total_costs)
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -344,7 +372,7 @@
         <td><strong>@lang('repair::lang.technician'):</strong> {{ optional($job_sheet->technician)->user_full_name }}</td>
     </tr>
 </table>
-<span style='font-size:20px;'>&#9986;
+<span style='font-size:20px;'><br/><br/>&#9986;
     ------------------------------------------------------------------------------------------------------</span>
 
 <table class="table-pdf">
