@@ -330,10 +330,10 @@ class PixHelper
         }
     }
 
-    public function splitConfig(float $partnerPercent, string $splitConfigId = null)
+    public function splitConfig(float $taxPercent = 0.70, string $splitConfigId = null)
     {
-        $partnerPercent  = number_format($partnerPercent, 2);
-        $transferPercent = number_format(100 - $partnerPercent, 2);
+        $partnerPercent  = number_format(100 - $taxPercent, 2);
+        $transferPercent = number_format($taxPercent, 2);
 
         $body = [
             "descricao"  => "Private Sistemas - Plan 1",
@@ -352,8 +352,10 @@ class PixHelper
                         "tipo"       => "porcentagem",
                         "valor"      => "$transferPercent",
                         "favorecido" => [
-                            "cpf"   => "70036923176",
-                            "conta" => "4299353"
+                            // Vitória
+                            "cpf"   => "03665578230",
+                            // Vitória
+                            "conta" => "4919289"
                         ]
                     ]
                 ]

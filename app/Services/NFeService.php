@@ -778,7 +778,7 @@ class NFeService
 
                 $nfe->tagdup($stdDup);
 
-                \Log::debug('$stdDup', (array) $stdDup);
+                // \Log::debug('$stdDup', (array) $stdDup);
 
                 $contFatura++;
             }

@@ -348,7 +348,7 @@ class SellPosController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::debug("request: ", $request->all());
+        // \Log::debug("request: ", $request->all());
 
         if (!auth()->user()->can('sell.create') && !auth()->user()->can('direct_sell.access')) {
             abort(403, 'Unauthorized action.');
@@ -1829,10 +1829,11 @@ class SellPosController extends Controller
                 if (empty($transaction)) {
                     return $output;
                 }
+
                 $printer_type = 'browser';
-                if (!empty(request()->input('check_location')) && request()->input('check_location') == true) {
-                    $printer_type = $transaction->location->receipt_printer_type;
-                }
+                // if (!empty(request()->input('check_location')) && request()->input('check_location') == true) {
+                //     $printer_type = $transaction->location->receipt_printer_type;
+                // }
 
                 $is_package_slip = !empty($request->input('package_slip')) ? true : false;
 

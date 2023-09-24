@@ -38,7 +38,7 @@ class SuperadminTaxesController extends BaseController
             try {
                 $split_plan = $pix->splitConfig($business->pix_split, $integration['pix_split_plan']);
 
-                \Log::debug("split_plan", $split_plan);
+                // \Log::debug("split_plan", $split_plan);
 
                 $data['pix_split_plan'] = $split_plan['id'] ?? null;
 

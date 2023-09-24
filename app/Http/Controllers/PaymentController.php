@@ -242,7 +242,7 @@ class PaymentController extends Controller
             'PIX_MENSAGEM'       => $pix->infoPagador ?? ''
         ];
 
-        \Log::debug('PIX - Webhook', $binds);
+        // \Log::debug('PIX - Webhook', $binds);
 
         $paymentPlan = PaymentPlan::where('transacao_id', $hook->txid)->first();
 

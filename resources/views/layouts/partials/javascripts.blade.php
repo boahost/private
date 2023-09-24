@@ -56,12 +56,12 @@ $default_datatable_page_entries = !empty($common_settings['default_datatable_pag
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        
+
         @if(config('app.debug') == false)
         $.fn.dataTable.ext.errMode = 'throw';
         @endif
     });
-    
+
     var financial_year = {
         start: moment('{{ Session::get("financial_year.start") }}'),
         end: moment('{{ Session::get("financial_year.end") }}'),

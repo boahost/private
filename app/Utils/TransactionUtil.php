@@ -4287,6 +4287,7 @@ class TransactionUtil extends Util
             ->where('transactions.type', 'sell')
             ->where('transactions.status', 'final')
             ->select(
+                'transactions.repair_job_sheet_id',
                 'transactions.id',
                 'transactions.pedido_ecommerce_id',
                 'transactions.transaction_date',

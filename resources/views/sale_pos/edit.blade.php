@@ -114,7 +114,6 @@
             @endif
         @endforeach
     @endif
-
 @endsection
 
 @section('css')

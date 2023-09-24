@@ -280,7 +280,7 @@
             value="{{ @num_format($unit_price_inc_tax) }}" @if (!$edit_price) readonly @endif
             @if (!empty($pos_settings['enable_msp'])) data-rule-min-value="{{ $unit_price_inc_tax }}" data-msg-min-value="{{ __('lang_v1.minimum_selling_price_error_msg', ['price' => @num_format($unit_price_inc_tax)]) }}" @endif>
     </td>
-    <td class="text-center v-center">
+    <td class="text-center">
         @php
             $subtotal_type = !empty($pos_settings['is_pos_subtotal_editable']) ? 'text' : 'hidden';
 

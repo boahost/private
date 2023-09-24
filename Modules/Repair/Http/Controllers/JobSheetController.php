@@ -211,7 +211,7 @@ class JobSheetController extends Controller
                     </li>';
                     }
 
-                    if (auth()->user()->can("sell.create")) {
+                    if (auth()->user()->can("sell.create") && request()->get('is_completed_status') == 1) {
                         // $html .= '<li>
                         //             <a href="' . action('SellPosController@create') . '?sub_type=repair&job_sheet_id=' . $row->id . '" class="cursor-pointer">
                         //                 <i class="fa fa-dollar-sign"></i>' . __('repair::lang.add_invoice') . '
@@ -309,12 +309,12 @@ class JobSheetController extends Controller
                     }
 
                     $add_invoice = '';
-                    if (auth()->user()->can("repair.create")) {
-                        $add_invoice = '<br><a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@convertToSell', [$row->id]) . '" class="cursor-pointer" data-toggle="tooltip" title="' . __('repair::lang.add_invoice') . '">
+                    if (auth()->user()->can("repair.create") && request()->get('is_completed_status') == 1) {
+                        $add_invoice = '<a href="' . action('\Modules\Repair\Http\Controllers\JobSheetController@convertToSell', [$row->id]) . '" class="cursor-pointer" style="margin-right: 5px;" data-toggle="tooltip" title="' . __('repair::lang.add_invoice') . '">
                     <i class="fas fa-plus-circle"></i></a>';
                     }
 
-                    return implode(', ', $invoice_no) . $add_invoice;
+                    return $add_invoice . implode(', ', $invoice_no);
                 })
                 ->editColumn('status', function ($row) {
                     $html = '<a data-href="' . action("\Modules\Repair\Http\Controllers\JobSheetController@editStatus", [$row->id]) . '" class="cursor-pointer edit_job_sheet_status" data-orig-value="' . $row->status . '" data-status-name="' . $row->status . '">
