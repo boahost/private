@@ -408,6 +408,9 @@ class SellPosController extends Controller
                 }
             }
 
+            if (!isset($input['status']))
+                $input['status'] = '';
+
             $input['is_quotation'] = 0;
             //status is send as quotation from Add sales screen.
             if ($input['status'] == 'quotation') {
