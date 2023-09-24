@@ -76,9 +76,13 @@
                                     'style' => 'width: 100%;',
                                 ]) !!}
                                 <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default bg-white btn-flat add_new_customer"
-                                        data-name="" @if (!auth()->user()->can('customer.create')) disabled @endif>
-                                        <i class="fa fa-plus-circle text-primary fa-lg"></i>
+                                    <button type="button" class="btn btn-default bg-white btn-flat btn-modal"
+                                        data-href="{{ action('ContactController@create', ['type' => 'customer']) }}"
+                                        data-container=".contact_modal">
+                                        @if (!auth()->user()->can('customer.create'))
+                                            disabled
+                                        @endif
+                                        <i class="fa fa-plus"></i>
                                     </button>
                                 </span>
                             </div>
