@@ -45,7 +45,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="box-body" id="job_sheet">
+                    <div class="box-body">
                         {{-- business address --}}
                         {{-- <div class="width-100">
                             <div class="width-50 f-left" style="padding-top: 40px;">
@@ -58,451 +58,491 @@
                         {{-- Job sheet details --}}
 
                         <div class="container-fluid invoice-container">
-                            <!-- Header -->
-                            {{-- <h3 class="text-center" style="margin-bottom: 30px;">
-                                {{ $job_sheet->customer->business->name }}
-                                <br />
-                                <small class="text-sm text-center">
-                                    {{ $job_sheet->businessLocation->website }}
-                                </small>
-                            </h3> --}}
-                            <header style="margin-top: 30px;">
-                                <div class="row align-items-center" style="margin-bottom: 30px;">
-                                    <div class="mb-3 text-left col-xs-7 text-xs-start mb-xs-0">
-                                        <div class="row">
-                                            <div class="col-xs-3">
-                                                @if (!empty(Session::get('business.logo')))
-                                                    <img id="logo" height="80" width="80"
-                                                        src="{{ asset('uploads/business_logos/' . Session::get('business.logo')) }}"
-                                                        title="Logomarca" alt="Logomarca" />
-                                                @else
-                                                    <img id="logo" height="80" width="80"
-                                                        src="https://privatevisualsistemas.com//uploads/logo.png"
-                                                        title="Logomarca" alt="Logomarca" />
-                                                @endif
-                                            </div>
-                                            <div class="col-xs-9">
-                                                {{-- empresa --}}
-                                                <div class="row">
-                                                    <div class="col-xs-12">
-                                                        <strong>
-                                                            @lang('business.business_name'):
-                                                        </strong>
-                                                        <span>
-                                                            {{ $job_sheet->businessLocation->name }}
-                                                        </span>
-                                                        <br>
-                                                    </div>
-                                                    <div class="col-xs-12">
-                                                        <strong>
-                                                            @lang('business.address'):
-                                                        </strong>
-                                                        <span>
-                                                            {{ $job_sheet->businessLocation->getFormatedAddressAttribute() }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-xs-12">
-                                                        <strong>
-                                                            @lang('business.mobile'):
-                                                        </strong>
-                                                        <span>
-                                                            {{ $job_sheet->businessLocation->mobile }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-xs-12">
-                                                        <strong>
-                                                            @lang('business.email'):
-                                                        </strong>
-                                                        <span>
-                                                            {{ $job_sheet->businessLocation->email }}
-                                                        </span>
-                                                    </div>
+                            <div id="job_sheet">
+                                <header style="margin-top: 30px;">
+                                    <div class="row align-items-center" style="margin-bottom: 30px;">
+                                        <div class="mb-3 text-left col-xs-7 text-xs-start mb-xs-0">
+                                            <div class="row">
+                                                <div class="col-xs-3">
+                                                    @if (!empty(Session::get('business.logo')))
+                                                        <img id="logo" height="80" width="80"
+                                                            src="{{ asset('uploads/business_logos/' . Session::get('business.logo')) }}"
+                                                            title="Logomarca" alt="Logomarca" />
+                                                    @else
+                                                        <img id="logo" height="80" width="80"
+                                                            src="https://privatevisualsistemas.com//uploads/logo.png"
+                                                            title="Logomarca" alt="Logomarca" />
+                                                    @endif
                                                 </div>
-                                                {{-- empresa --}}
+                                                <div class="col-xs-9">
+                                                    {{-- empresa --}}
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <strong>
+                                                                @lang('business.business_name'):
+                                                            </strong>
+                                                            <span>
+                                                                {{ $job_sheet->businessLocation->name }}
+                                                            </span>
+                                                            <br>
+                                                        </div>
+                                                        <div class="col-xs-12">
+                                                            <strong>
+                                                                @lang('business.address'):
+                                                            </strong>
+                                                            <span>
+                                                                {{ $job_sheet->businessLocation->getFormatedAddressAttribute() }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="col-xs-12">
+                                                            <strong>
+                                                                @lang('business.mobile'):
+                                                            </strong>
+                                                            <span>
+                                                                {{ $job_sheet->businessLocation->mobile }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="col-xs-12">
+                                                            <strong>
+                                                                @lang('business.email'):
+                                                            </strong>
+                                                            <span>
+                                                                {{ $job_sheet->businessLocation->email }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {{-- empresa --}}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="text-right col-xs-5">
-                                        <h4 class="m-0">
-                                            @lang('repair::lang.repair')
-                                        </h4>
-                                        <p class="mb-0">
-                                            @lang('repair::lang.job_sheet_no'):
-                                            {{ $job_sheet->job_sheet_no }}
-                                        </p>
-                                        <h5 class="mb-0">
-                                            {{-- @lang('sale.status'): --}}
-                                            {{ $job_sheet->status->name ?? 'Aguardando' }}
-                                        </h5>
-                                    </div>
-                                </div>
-                                {{-- <hr> --}}
-                            </header>
-                            <!-- Main Content -->
-                            <main>
-                                {{-- cliente --}}
-                                <div class="mt-10 row">
-                                    {{-- <div class="col-xs-12">
-                                        <div class="fw-600 text-4">
-                                            @lang('role.customer'):
+                                        <div class="text-right col-xs-5">
+                                            <h4 class="m-0">
+                                                @lang('repair::lang.repair')
+                                            </h4>
+                                            <p class="mb-0">
+                                                @lang('repair::lang.job_sheet_no'):
+                                                {{ $job_sheet->job_sheet_no }}
+                                            </p>
+                                            <h5 class="mb-0">
+                                                {{-- @lang('sale.status'): --}}
+                                                {{ $job_sheet->status->name ?? 'Aguardando' }}
+                                            </h5>
                                         </div>
-                                    </div> --}}
-                                    <div class="col-xs-12">
-                                        <strong>
-                                            @lang('contact.name'):
-                                        </strong>
-                                        <span>
-                                            {{ $job_sheet->customer->name }}
-                                        </span>
                                     </div>
-                                    <div class="col-xs-12">
-                                        <strong>
-                                            @lang('business.address'):
-                                        </strong>
-                                        <span>
-                                            {{ $job_sheet->customer->getFormatedAddressAttribute() }}
-                                        </span>
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <strong>
-                                            @lang('business.mobile'):
-                                        </strong>
-                                        <span>
-                                            {{ $job_sheet->customer->mobile }} - {{ $job_sheet->customer->tax_number }}
-                                        </span>
-                                    </div>
-                                    <div class="text-right col-xs-6">
-                                        <strong>
-                                            @lang('business.email'):
-                                        </strong>
-                                        <span>
-                                            {{ $job_sheet->customer->email }}
-                                        </span>
-                                    </div>
-                                </div>
-                                {{-- cliente --}}
-                                {{-- O.S --}}
-                                @if (!empty($job_sheet->pick_up_on_site_addr))
-                                    <div class="mt-10 row">
-                                        <div class="col-xs-12">
+                                    {{-- <hr> --}}
+                                </header>
+                                <!-- Main Content -->
+                                <main>
+                                    {{-- cliente --}}
+                                    <div class="row">
+                                        <div class="border col-xs-12">
                                             <strong>
-                                                @lang('repair::lang.pick_up_on_site_addr')
+                                                @lang('contact.name'):
                                             </strong>
-                                            <br />
-                                            {{ $job_sheet->pick_up_on_site_addr }}
+                                            <span>
+                                                {{ $job_sheet->customer->name }}
+                                            </span>
                                         </div>
-                                    </div>
-                                @endif
-                                <div class="mt-10 row">
-                                    {{-- <div class="col-xs-12">
-                                        <div class="fw-600 text-4">
-                                            @lang('repair::lang.repair')
-                                        </div>
-                                    </div> --}}
-                                    <div class="col-xs-4">
-                                        <strong>
-                                            @lang('repair::lang.service_type'):
-                                        </strong>
-                                        <br />
-                                        <span>
-                                            @lang('repair::lang.' . $job_sheet->service_type)
-                                        </span>
-                                    </div>
-                                    <div class="text-right col-xs-4">
-                                        <strong>
-                                            @lang('receipt.date')
-                                        </strong>
-                                        <br />
-                                        <span>
-                                            {{ @format_datetime($job_sheet->created_at) }}
-                                        </span>
-                                    </div>
-                                    <div class="text-right col-xs-4">
-                                        <strong>
-                                            @lang('repair::lang.expected_delivery_date'):
-                                        </strong>
-                                        <br />
-                                        <span>
-                                            {{ @format_datetime($job_sheet->delivery_date) }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="mt-10 row">
-                                    <div class="col-xs-3">
-                                        <strong>
-                                            @lang('product.brand')
-                                        </strong>
-                                        <br>
-                                        <span>
-                                            {{ $job_sheet->brand->name ?? 'N/A' }}
-                                        </span>
-                                        <br>
-                                    </div>
-                                    <div class="text-center col-xs-3">
-                                        <strong>
-                                            @lang('repair::lang.device')
-                                        </strong>
-                                        <br>
-                                        <span>
-                                            {{ $job_sheet->device->name ?? 'N/A' }}
-                                        </span>
-                                        <br>
-                                    </div>
-                                    <div class="text-center col-xs-3">
-                                        <strong>
-                                            @lang('repair::lang.device_model')
-                                        </strong>
-                                        <br>
-                                        <span>
-                                            {{ $job_sheet->deviceModel->name ?? 'N/A' }}
-                                        </span>
-                                    </div>
-                                    <div class="text-right col-xs-3">
-                                        <strong>
-                                            @lang('repair::lang.serial_no_abreviated')
-                                        </strong>
-                                        <br>
-                                        <span>
-                                            {{ $job_sheet->serial_no }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="mt-10 row">
-                                    <div class="col-xs-6">
-                                        <strong>
-                                            @lang('repair::lang.product_configuration'):
-                                        </strong>
-                                        <br />
-                                        {{ $job_sheet->product_configuration ?? 'Nada Consta' }}
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <strong>
-                                            @lang('repair::lang.problem_reported_by_customer'):
-                                        </strong>
-                                        <br />
-                                        {{ $job_sheet->defects ?? 'Nada Consta' }}
-                                    </div>
-                                </div>
-                                <div class="mt-10 row">
-                                    <div class="col-xs-6">
-                                        <strong>
-                                            @lang('repair::lang.services_performed'):
-                                        </strong>
-                                        <br />
-                                        {{ $job_sheet->custom_field_1 ?? 'Nada Consta' }}
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <strong>
-                                            @lang('repair::lang.condition_of_product'):
-                                        </strong>
-                                        <br />
-                                        {{ $job_sheet->product_condition ?? 'Nada Consta' }}
-                                    </div>
-                                </div>
-                                <div class="mt-10 row">
-                                    <div class="col-xs-8">
-                                        <strong>
-                                            @lang('repair::lang.comment_by_ss'):
-                                        </strong>
-                                        <br />
-                                        {{ $job_sheet->comment_by_ss ?? 'Nada Consta' }}
-                                    </div>
-                                    <div
-                                        class="text-right @empty($job_sheet->security_pattern) col-xs-4 @else col-xs-2 @endif">
-                                        <strong>
-                                            Pin
-                                        </strong>
-                                        <br>
-                                        <span>
-                                            {{ $job_sheet->security_pwd ?? 'N/A' }}
-                                        </span>
-                                    </div>
-                                    @if (!empty($job_sheet->security_pattern))
-                                        <div class="text-right col-xs-2">
+                                        <div class="border col-xs-12">
                                             <strong>
-                                                Padrão
+                                                @lang('business.address'):
                                             </strong>
-                                            <br>
-                                            <div
-                                                style="line-height: 18px; letter-spacing: 6px; font-size: 1.3em; font-family: monospace; font-weight: 600;">
-                                                <?php
-                                                $padrao = '';
-                                                $password = str_split($job_sheet->security_pattern ?? '');
-                                                $first = $password[0] ?? '';
-
-                                                for ($linha = 1; $linha <= 3; $linha++) {
-                                                    for ($coluna = 1; $coluna <= 3; $coluna++) {
-                                                        $posicao = ($linha - 1) * 3 + $coluna;
-                                                        $sequencia = array_search($posicao, $password) + 1;
-                                                        if (in_array($posicao, $password)) {
-                                                            $padrao .= "<span class=\"text-success\">$sequencia</span>";
-                                                        } else {
-                                                            $padrao .= "<span class=\"text-muted\">0</span>";
-                                                        }
-                                                    }
-                                                    $padrao .= "\n";
-                                                }
-
-                                                echo nl2br($padrao);
-                                                ?>
+                                            <span>
+                                                {{ $job_sheet->customer->getFormatedAddressAttribute() }}
+                                            </span>
+                                        </div>
+                                        <div class="border col-xs-6">
+                                            <strong>
+                                                @lang('business.mobile'):
+                                            </strong>
+                                            <span>
+                                                {{ $job_sheet->customer->mobile }} -
+                                                {{ $job_sheet->customer->tax_number }}
+                                            </span>
+                                        </div>
+                                        <div class="border text-right col-xs-6">
+                                            <strong>
+                                                @lang('business.email'):
+                                            </strong>
+                                            <span>
+                                                {{ $job_sheet->customer->email }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {{-- cliente --}}
+                                    {{-- O.S --}}
+                                    @if (!empty($job_sheet->pick_up_on_site_addr))
+                                        <div class="row">
+                                            <div class="border col-xs-12">
+                                                <strong>
+                                                    @lang('repair::lang.pick_up_on_site_addr')
+                                                </strong>
+                                                <br />
+                                                {{ $job_sheet->pick_up_on_site_addr }}
                                             </div>
                                         </div>
                                     @endif
-                                </div>
-                                {{-- O.S --}}
-                                <br>
-                                @if (count($job_sheet->sheet_lines))
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <span class="fw-600 text-4">
-                                                @lang('report.products')
+                                    <div class="row">
+                                        <div class="border col-xs-4">
+                                            <strong>
+                                                @lang('repair::lang.service_type'):
+                                            </strong>
+                                            <br />
+                                            <span>
+                                                @lang('repair::lang.' . $job_sheet->service_type)
                                             </span>
                                         </div>
-                                        <div class="p-0 card-body">
-                                            <div class="table-responsive table-bordered">
-                                                <table class="table mb-0">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>
-                                                                <strong>
-                                                                    Nome
-                                                                </strong>
-                                                            </th>
-                                                            <th class="text-right">
-                                                                <strong>
-                                                                    Quantidade
-                                                                </strong>
-                                                            </th>
-                                                            <th class="text-right">
-                                                                <strong>
-                                                                    Tipo
-                                                                </strong>
-                                                            </th>
-                                                            <th class="text-right">
-                                                                <strong>
-                                                                    R$ Unit.
-                                                                </strong>
-                                                            </th>
-                                                            <th class="text-right">
-                                                                <strong>
-                                                                    R$ Total
-                                                                </strong>
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @if (!empty($job_sheet->sheet_lines))
-                                                            @foreach ($job_sheet->sheet_lines as $part)
-                                                                <tr>
-                                                                    {{-- <td>
+                                        <div class="border text-right col-xs-4">
+                                            <strong>
+                                                @lang('receipt.date')
+                                            </strong>
+                                            <br />
+                                            <span>
+                                                {{ @format_datetime($job_sheet->created_at) }}
+                                            </span>
+                                        </div>
+                                        <div class="border text-right col-xs-4">
+                                            <strong>
+                                                @lang('repair::lang.expected_delivery_date'):
+                                            </strong>
+                                            <br />
+                                            <span>
+                                                {{ @format_datetime($job_sheet->delivery_date) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="border col-xs-3">
+                                            <strong>
+                                                @lang('product.brand')
+                                            </strong>
+                                            {{-- <br> --}}
+                                            <span>
+                                                {{ $job_sheet->brand->name ?? 'N/A' }}
+                                            </span>
+                                            <br>
+                                        </div>
+                                        <div class="border text-center col-xs-3">
+                                            <strong>
+                                                @lang('repair::lang.device')
+                                            </strong>
+                                            {{-- <br> --}}
+                                            <span>
+                                                {{ $job_sheet->device->name ?? 'N/A' }}
+                                            </span>
+                                            <br>
+                                        </div>
+                                        <div class="border text-center col-xs-3">
+                                            <strong>
+                                                @lang('repair::lang.device_model')
+                                            </strong>
+                                            {{-- <br> --}}
+                                            <span>
+                                                {{ $job_sheet->deviceModel->name ?? 'N/A' }}
+                                            </span>
+                                        </div>
+                                        <div class="border text-right col-xs-3">
+                                            <strong>
+                                                @lang('repair::lang.serial_no_abreviated')
+                                            </strong>
+                                            {{-- <br> --}}
+                                            <span>
+                                                {{ $job_sheet->serial_no }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="border col-xs-6">
+                                            <strong>
+                                                @lang('repair::lang.product_configuration'):
+                                            </strong>
+                                            <br />
+                                            {{ $job_sheet->product_configuration ?? 'Nada Consta' }}
+                                        </div>
+                                        <div class="border col-xs-6">
+                                            <strong>
+                                                @lang('repair::lang.problem_reported_by_customer'):
+                                            </strong>
+                                            <br />
+                                            {{ $job_sheet->defects ?? 'Nada Consta' }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="border col-xs-6">
+                                            <strong>
+                                                @lang('repair::lang.condition_of_product'):
+                                            </strong>
+                                            <br />
+                                            {{ $job_sheet->product_condition ?? 'Nada Consta' }}
+                                        </div>
+                                        @if (!empty($repair_settings['job_sheet_custom_field_1']))
+                                            <div class="border col-xs-6">
+                                                <strong>
+                                                    {{ $repair_settings['job_sheet_custom_field_1'] }}:
+                                                </strong>
+                                                <br />
+                                                {{ $job_sheet->custom_field_1 ?? 'Nada Consta' }}
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <div class="row">
+                                        @if (!empty($repair_settings['job_sheet_custom_field_2']))
+                                            <div class="border col-xs-6">
+                                                <strong>
+                                                    {{ $repair_settings['job_sheet_custom_field_2'] }}:
+                                                </strong>
+                                                <br />
+                                                {{ $job_sheet->custom_field_2 ?? 'Nada Consta' }}
+                                            </div>
+                                        @endif
+                                        @if (!empty($repair_settings['job_sheet_custom_field_3']))
+                                            <div class="border col-xs-6">
+                                                <strong>
+                                                    {{ $repair_settings['job_sheet_custom_field_3'] }}:
+                                                </strong>
+                                                <br />
+                                                {{ $job_sheet->custom_field_3 ?? 'Nada Consta' }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="row">
+                                        @if (!empty($repair_settings['job_sheet_custom_field_4']))
+                                            <div class="border col-xs-6">
+                                                <strong>
+                                                    {{ $repair_settings['job_sheet_custom_field_4'] }}:
+                                                </strong>
+                                                <br />
+                                                {{ $job_sheet->custom_field_4 ?? 'Nada Consta' }}
+                                            </div>
+                                        @endif
+                                        @if (!empty($repair_settings['job_sheet_custom_field_5']))
+                                            <div class="border col-xs-6">
+                                                <strong>
+                                                    {{ $repair_settings['job_sheet_custom_field_5'] }}:
+                                                </strong>
+                                                <br />
+                                                {{ $job_sheet->custom_field_5 ?? 'Nada Consta' }}
+                                            </div>
+                                        @endif
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="border col-xs-12">
+                                            <strong>
+                                                @lang('repair::lang.services_performed'):
+                                            </strong>
+                                            <br />
+                                            {{ $job_sheet->services_performed ?? 'Nada Consta' }}
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="border col-xs-8">
+                                            <strong>
+                                                @lang('repair::lang.comment_by_ss'):
+                                            </strong>
+                                            <br />
+                                            {{ $job_sheet->comment_by_ss ?? 'Nada Consta' }}
+                                        </div>
+                                        <div
+                                            class="@empty($job_sheet->security_pattern) col-xs-4 @else col-xs-2 @endempty border text-right">
+                                            <strong>
+                                                Pin
+                                            </strong>
+                                            <br>
+                                            <span>
+                                                {{ $job_sheet->security_pwd ?? 'N/A' }}
+                                            </span>
+                                        </div>
+                                        @if (!empty($job_sheet->security_pattern))
+                                            <div class="border text-right col-xs-2">
+                                                <strong>
+                                                    Padrão
+                                                </strong>
+                                                <br>
+                                                <div
+                                                    style="line-height: 18px; letter-spacing: 6px; font-size: 1.3em; font-family: monospace; font-weight: 600;">
+                                                    <?php
+                                                    $padrao = '';
+                                                    $password = str_split($job_sheet->security_pattern ?? '');
+                                                    $first = $password[0] ?? '';
+
+                                                    for ($linha = 1; $linha <= 3; $linha++) {
+                                                        for ($coluna = 1; $coluna <= 3; $coluna++) {
+                                                            $posicao = ($linha - 1) * 3 + $coluna;
+                                                            $sequencia = array_search($posicao, $password) + 1;
+                                                            if (in_array($posicao, $password)) {
+                                                                $padrao .= "<span class=\"text-success\">$sequencia</span>";
+                                                            } else {
+                                                                $padrao .= "<span class=\"text-muted\">0</span>";
+                                                            }
+                                                        }
+                                                        $padrao .= "\n";
+                                                    }
+
+                                                    echo nl2br($padrao);
+                                                    ?>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    {{-- O.S --}}
+                                    <br>
+                                    @if (count($job_sheet->sheet_lines))
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <span class="fw-600 text-4">
+                                                    @lang('report.products')
+                                                </span>
+                                            </div>
+                                            <div class="p-0 card-body">
+                                                <div class="table-responsive table-bordered">
+                                                    <table class="table mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    <strong>
+                                                                        Nome
+                                                                    </strong>
+                                                                </th>
+                                                                <th class="text-right">
+                                                                    <strong>
+                                                                        Quantidade
+                                                                    </strong>
+                                                                </th>
+                                                                <th class="text-right">
+                                                                    <strong>
+                                                                        Tipo
+                                                                    </strong>
+                                                                </th>
+                                                                <th class="text-right">
+                                                                    <strong>
+                                                                        R$ Unit.
+                                                                    </strong>
+                                                                </th>
+                                                                <th class="text-right">
+                                                                    <strong>
+                                                                        R$ Total
+                                                                    </strong>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @if (!empty($job_sheet->sheet_lines))
+                                                                @foreach ($job_sheet->sheet_lines as $part)
+                                                                    <tr>
+                                                                        {{-- <td>
                                                                     {{ dd($part->toArray()) }}
                                                                 </td> --}}
-                                                                    <td class="text-left">
-                                                                        {{ mb_strtoupper($part->product->name) }}
-                                                                    </td>
-                                                                    <td class="text-right">
-                                                                        {{ $part->quantity }}
-                                                                    </td>
-                                                                    <td class="text-right">
-                                                                        {{ $part->product->unit->short_name }}
-                                                                    </td>
-                                                                    <td class="text-right">
-                                                                        <span class="display_currency"
-                                                                            data-currency_symbol="true">
-                                                                            {{ $part->unit_price_inc_tax }}
-                                                                        </span>
-                                                                    </td>
-                                                                    <td class="text-right">
-                                                                        <span class="display_currency"
-                                                                            data-currency_symbol="true">
-                                                                            {{ $part->quantity * $part->unit_price_inc_tax }}
-                                                                        </span>
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        @endif
+                                                                        <td class="text-left">
+                                                                            {{ mb_strtoupper($part->product->name) }}
+                                                                        </td>
+                                                                        <td class="text-right">
+                                                                            {{ $part->quantity }}
+                                                                        </td>
+                                                                        <td class="text-right">
+                                                                            {{ $part->product->unit->short_name }}
+                                                                        </td>
+                                                                        <td class="text-right">
+                                                                            <span class="display_currency"
+                                                                                data-currency_symbol="true">
+                                                                                {{ $part->unit_price_inc_tax }}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td class="text-right">
+                                                                            <span class="display_currency"
+                                                                                data-currency_symbol="true">
+                                                                                {{ $part->quantity * $part->unit_price_inc_tax }}
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            @endif
 
-                                                    </tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </main>
+                                <div style="margin-top: 30px;">
+                                    <div class="row">
+                                        <div class="text-right col-xs-9">
+                                            <strong>
+                                                @lang('repair::lang.estimated_cost'):
+                                            </strong>
+                                        </div>
+                                        <div class="text-right col-xs-3">
+                                            <span class="display_currency" data-currency_symbol="true">
+                                                {{ $job_sheet->estimated_cost }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="text-right col-xs-9">
+                                            <strong>
+                                                @lang('repair::lang.service_costs'):
+                                            </strong>
+                                        </div>
+                                        <div class="text-right col-xs-3">
+                                            <span class="display_currency" data-currency_symbol="true">
+                                                {{ $job_sheet->service_costs }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="text-right col-xs-9">
+                                            <strong>
+                                                @lang('sale.total_amount'):
+                                            </strong>
+                                        </div>
+                                        <div class="text-right col-xs-3">
+                                            <span class="display_currency" data-currency_symbol="true">
+                                                {{ $job_sheet->total_costs }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (!empty($repair_settings['repair_tc_condition']))
+                                    <div style="margin-top: 30px;">
+                                        <div class="row">
+                                            <div class="text-sm text-justify col-xs-12 text-muted">
+                                                <strong>@lang('lang_v1.terms_conditions'):</strong>
+                                                {!! $repair_settings['repair_tc_condition'] !!}
+                                            </div>
+                                            <div class="text-justify col-xs-12 text-muted">
+                                                <table class="table-pdf">
+                                                    <tr>
+                                                        <td class="px-2" width="33%">
+                                                            <hr class="mt-16" />
+                                                        </td>
+                                                        <td class="px-2" width="33%">
+                                                            <hr class="mt-16" />
+                                                        </td>
+                                                        <td class="px-2" width="33%">
+                                                            <hr class="mt-16" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            @lang('repair::lang.customer_signature'):
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @lang('repair::lang.authorized_signature'):
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @lang('repair::lang.technician'):
+                                                        </td>
+                                                    </tr>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                 @endif
-                            </main>
-                            <div style="margin-top: 30px;">
-                                <div class="mt-10 row">
-                                    <div class="text-right col-xs-9">
-                                        <strong>
-                                            @lang('repair::lang.estimated_cost'):
-                                        </strong>
-                                    </div>
-                                    <div class="text-right col-xs-3">
-                                        <span class="display_currency" data-currency_symbol="true">
-                                            {{ $job_sheet->estimated_cost }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="mt-10 row">
-                                    <div class="text-right col-xs-9">
-                                        <strong>
-                                            @lang('repair::lang.service_costs'):
-                                        </strong>
-                                    </div>
-                                    <div class="text-right col-xs-3">
-                                        <span class="display_currency" data-currency_symbol="true">
-                                            {{ $job_sheet->service_costs }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="mt-10 row">
-                                    <div class="text-right col-xs-9">
-                                        <strong>
-                                            @lang('sale.total_amount'):
-                                        </strong>
-                                    </div>
-                                    <div class="text-right col-xs-3">
-                                        <span class="display_currency" data-currency_symbol="true">
-                                            {{ $job_sheet->total_costs }}
-                                        </span>
-                                    </div>
-                                </div>
                             </div>
-                            @if (!empty($repair_settings['repair_tc_condition']))
-                                <div style="margin-top: 30px;">
-                                    <div class="row">
-                                        <div class="text-sm text-justify col-xs-12 text-muted">
-                                            <strong>@lang('lang_v1.terms_conditions'):</strong>
-                                            {!! $repair_settings['repair_tc_condition'] !!}
-                                        </div>
-                                        <div class="text-justify col-xs-12 text-muted">
-                                            <table class="table-pdf">
-                                                <tr>
-                                                    <td class="px-2" width="33%">
-                                                          <hr class="mt-16"/>
-                                                    </td>
-                                                    <td class="px-2" width="33%">
-                                                          <hr class="mt-16"/>
-                                                    </td>
-                                                    <td class="px-2" width="33%">
-                                                          <hr class="mt-16"/>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-center">
-                                                        @lang('repair::lang.customer_signature'):
-                                                    </td>
-                                                    <td class="text-center">
-                                                        @lang('repair::lang.authorized_signature'):
-                                                    </td>
-                                                    <td class="text-center">
-                                                        @lang('repair::lang.technician'):
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
 
                         {{-- Job sheet details --}}
@@ -528,15 +568,15 @@
                 </div>
             @endif
             <div class="col-md-6">
-                                        <div class="box box-solid no-print">
-                                            <div class="box-header with-border">
-                                                <h3 class="box-title">{{ __('repair::lang.activities') }}:</h3>
-                                            </div>
-                                            <!-- /.box-header -->
-                                            @include('repair::repair.partials.activities')
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="box box-solid no-print">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ __('repair::lang.activities') }}:</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    @include('repair::repair.partials.activities')
+                </div>
+            </div>
+        </div>
     </section>
     <!-- /.content -->
 @stop
@@ -550,6 +590,10 @@
         .table-bordered>thead>tr>th {
             border: 1px solid #ddd !important;
         }
+
+        /* .border {
+            border: 1px solid #ddd !important;
+        } */
 
         hr {
             border-top: 1px solid #ddd !important;
@@ -565,7 +609,7 @@
 
         /* =================================== */
         /*  Helpers Classes
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /* =================================== */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    /* =================================== */
         /* Border Radius */
         .rounded-top-0 {
             border-top-left-radius: 0px !important;
@@ -586,6 +630,7 @@
             border-top-right-radius: 0px !important;
             border-bottom-right-radius: 0px !important;
         }
+
 
         @media print {
 
@@ -627,7 +672,7 @@
 
         /* =================================== */
         /*  Layouts
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                /* =================================== */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            /* =================================== */
         .invoice-container {
             margin: 15px auto;
             padding: 25px 50px;
@@ -645,7 +690,9 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#print_jobsheet').click(function() {
-                $('#job_sheet').printThis();
+                $('#job_sheet').printThis({
+                    importStyle: true
+                });
             });
             $(document).on('click', '.delete_media', function(e) {
                 e.preventDefault();

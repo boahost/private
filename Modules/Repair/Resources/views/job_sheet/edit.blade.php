@@ -55,9 +55,14 @@
                                     'style' => 'width: 100%;',
                                 ]) !!}
                                 <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default bg-white btn-flat add_new_customer"
-                                        data-name="" @if (!auth()->user()->can('customer.create')) disabled @endif><i
-                                            class="fa fa-plus-circle text-primary fa-lg"></i></button>
+                                    <button type="button" class="btn btn-default bg-white btn-flat btn-modal"
+                                        data-href="{{ action('ContactController@create', ['type' => 'customer']) }}"
+                                        data-container=".contact_modal">
+                                        @if (!auth()->user()->can('customer.create'))
+                                            disabled
+                                        @endif
+                                        <i class="fa fa-plus"></i>
+                                    </button>
                                 </span>
                             </div>
                         </div>
@@ -327,24 +332,25 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             {{-- colocar serviços realizados --}}
-                            {!! Form::label('custom_field_1', __('repair::lang.services_performed') . ':') !!}
-                            {!! Form::textarea('custom_field_1', null, [
+                            {!! Form::label('services_performed', __('repair::lang.services_performed') . ':') !!}
+                            {!! Form::textarea('services_performed', null, [
                                 'class' => 'form-control',
                                 'rows' => '3',
                             ]) !!}
                         </div>
                     </div>
-                    {{-- <div class="clearfix"></div>
+                    <div class="clearfix"></div>
                     <hr>
-                    <div class="clearfix"></div> --}}
-                    {{-- <div class="col-sm-4">
+                    <div class="clearfix"></div>
+                    <div class="col-sm-4">
                         <div class="form-group">
                             @php
                                 $custom_field_1_label = !empty($repair_settings['job_sheet_custom_field_1']) ? $repair_settings['job_sheet_custom_field_1'] : __('lang_v1.custom_field', ['number' => 1]);
                             @endphp
                             {!! Form::label('custom_field_1', $custom_field_1_label . ':') !!}
                             {!! Form::text('custom_field_1', $job_sheet->custom_field_1, [
-                                'class' => 'form-control']) !!}
+                                'class' => 'form-control',
+                            ]) !!}
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -354,7 +360,8 @@
                             @endphp
                             {!! Form::label('custom_field_2', $custom_field_2_label . ':') !!}
                             {!! Form::text('custom_field_2', $job_sheet->custom_field_2, [
-                                'class' => 'form-control']) !!}
+                                'class' => 'form-control',
+                            ]) !!}
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -364,7 +371,8 @@
                             @endphp
                             {!! Form::label('custom_field_3', $custom_field_3_label . ':') !!}
                             {!! Form::text('custom_field_3', $job_sheet->custom_field_3, [
-                                'class' => 'form-control']) !!}
+                                'class' => 'form-control',
+                            ]) !!}
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -374,7 +382,8 @@
                             @endphp
                             {!! Form::label('custom_field_4', $custom_field_4_label . ':') !!}
                             {!! Form::text('custom_field_4', $job_sheet->custom_field_4, [
-                                'class' => 'form-control']) !!}
+                                'class' => 'form-control',
+                            ]) !!}
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -384,9 +393,10 @@
                             @endphp
                             {!! Form::label('custom_field_5', $custom_field_5_label . ':') !!}
                             {!! Form::text('custom_field_5', $job_sheet->custom_field_5, [
-                                'class' => 'form-control']) !!}
+                                'class' => 'form-control',
+                            ]) !!}
                         </div>
-                    </div> --}}
+                    </div>
                     <div class="col-sm-12 text-right">
                         <input type="hidden" name="submit_type" id="submit_type">
                         <button type="submit" class="btn btn-success submit_button" value="save_and_add_parts"
