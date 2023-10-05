@@ -5,6 +5,7 @@
 !/public/js
 /public/storage
 /vendor
+/vendor_acc
 /vendor.old
 /storage
 .env

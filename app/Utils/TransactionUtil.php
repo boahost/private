@@ -2627,6 +2627,11 @@ class TransactionUtil extends Util
      */
     public function mapPurchaseSell($business, $transaction_lines, $mapping_type = 'purchase', $check_expiry = true, $purchase_line_id = null)
     {
+        //  traçar log da origem
+        \Log::debug('mapPurchaseSell return false');
+
+        // return false;
+
         if (empty($transaction_lines)) {
             return false;
         }
@@ -2643,6 +2648,7 @@ class TransactionUtil extends Util
                 }
             }
         }
+
 
         $qty_selling = null;
         foreach ($transaction_lines as $line) {
@@ -2816,11 +2822,14 @@ class TransactionUtil extends Util
                 }
             }
 
+
             //Insert the mapping
             if (!empty($purchase_adjustment_map)) {
+                \Log::debug('Insert the mapping', [$purchase_adjustment_map]);
                 TransactionSellLinesPurchaseLines::insert($purchase_adjustment_map);
             }
             if (!empty($purchase_sell_map)) {
+                \Log::debug('Insert the mapping', [$purchase_sell_map]);
                 TransactionSellLinesPurchaseLines::insert($purchase_sell_map);
             }
         }
@@ -2844,39 +2853,65 @@ class TransactionUtil extends Util
         $business,
         $deleted_line_ids = []
     ) {
+        return;
+
+        if (request()->ip() == '186.194.185.209') {
+            // dd(
+            //     $status_before,
+            //     $transaction,
+            //     $business,
+            //     $deleted_line_ids
+            // );
+        }
+
         if ($status_before == 'final' && $transaction->status == 'draft') {
             //Get sell lines used for the transaction.
             $sell_purchases = Transaction::join('transaction_sell_lines AS SL', 'transactions.id', '=', 'SL.transaction_id')
                 ->join('transaction_sell_lines_purchase_lines as TSP', 'SL.id', '=', 'TSP.sell_line_id')
                 ->where('transactions.id', $transaction->id)
-                ->select('TSP.purchase_line_id', 'TSP.quantity', 'TSP.id')
+                // ->select('TSP.purchase_line_id', 'TSP.quantity', 'TSP.id')
+                ->groupBy('purchase_line_id')
+                ->select(DB::raw('TSP.purchase_line_id, sum(TSP.quantity) as quantity'))
                 ->get()
                 ->toArray();
 
+            // DB::rollBack();
+            // dd($sell_purchases);
+
             //Included the deleted sell lines
             if (!empty($deleted_line_ids)) {
-                $deleted_sell_purchases = TransactionSellLinesPurchaseLines::whereIn('sell_line_id', $deleted_line_ids)
-                    ->select('purchase_line_id', 'quantity', 'id')
-                    ->get()
-                    ->toArray();
 
-                $sell_purchases = $sell_purchases + $deleted_sell_purchases;
+                $purchase_lines = TransactionSellLinesPurchaseLines::whereIn('sell_line_id', $deleted_line_ids)
+                    ->groupBy('purchase_line_id')
+                    ->select(DB::raw('purchase_line_id, sum(quantity) as quantity'));
+
+                $deleted_sell_purchase_lines = $purchase_lines->get()->toArray();
+
+                $purchase_lines->delete();
+
+                // DB::rollBack();
+                // dd($deleted_sell_purchase_lines);
+
+                $sell_purchases = array_merge($sell_purchases, $deleted_sell_purchase_lines);
             }
 
+            // DB::rollBack();
+            // dd($sell_purchases);
+
             //TODO: Optimize the query to take our of loop.
-            $sell_purchase_ids = [];
+            // $sell_purchase_ids = [];
             if (!empty($sell_purchases)) {
                 //Decrease the quantity sold of products
                 foreach ($sell_purchases as $row) {
+
+                    // DB::rollBack();
+                    // dd($row);
+
                     PurchaseLine::where('id', $row['purchase_line_id'])
                         ->decrement('quantity_sold', $row['quantity']);
 
-                    $sell_purchase_ids[] = $row['id'];
+                    // $sell_purchase_ids[] = $row['id'];
                 }
-
-                //Delete the lines.
-                TransactionSellLinesPurchaseLines::whereIn('id', $sell_purchase_ids)
-                    ->delete();
             }
         } elseif ($status_before == 'draft' && $transaction->status == 'final') {
             $this->mapPurchaseSell($business, $transaction->sell_lines, 'purchase');
@@ -2893,6 +2928,8 @@ class TransactionUtil extends Util
                 }
             }
 
+            // dd($transaction->id);
+
             //Check for update quantity, new added rows, deleted rows.
             $sell_purchases = Transaction::join('transaction_sell_lines AS SL', 'transactions.id', '=', 'SL.transaction_id')
                 ->leftjoin('transaction_sell_lines_purchase_lines as TSP', 'SL.id', '=', 'TSP.sell_line_id')
@@ -2905,7 +2942,6 @@ class TransactionUtil extends Util
                 )
                 ->get();
 
-            $deleted_sell_lines   = [];
             $new_sell_lines       = [];
             $processed_sell_lines = [];
 
@@ -4160,6 +4196,7 @@ class TransactionUtil extends Util
             } else {
                 $deleted_sell_lines     = $transaction->sell_lines;
                 $deleted_sell_lines_ids = $deleted_sell_lines->pluck('id')->toArray();
+
                 $this->deleteSellLines(
                     $deleted_sell_lines_ids,
                     $transaction->location_id

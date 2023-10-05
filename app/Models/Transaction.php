@@ -108,7 +108,7 @@ class Transaction extends Model
 
     public function sell_lines()
     {
-        return $this->hasMany(\App\Models\TransactionSellLine::class);
+        return $this->hasMany(\App\Models\TransactionSellLine::class)->orderBy('unit_price');
     }
 
     public function contact()

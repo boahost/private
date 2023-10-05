@@ -137,17 +137,25 @@ class NFCeService
             $dest = $nfe->tagdest($stdDest);
         }
 
+        // \Log::debug('NFCeService:gerarNFCe:1', $venda->toArray());
+
         $somaProdutos = 0;
         $somaICMS     = 0;
         //PRODUTOS
-        $itemCont      = 0;
-        $totalItens    = count($venda->sell_lines);
-        $somaAcrescimo = 0;
+        $itemCont   = 0;
+        $totalItens = count($venda->sell_lines);
+        // $somaAcrescimo = 0;
         $somaDesconto  = 0;
         $somaFederal   = 0;
         $somaEstadual  = 0;
         $somaMunicipal = 0;
-        $totalDesconto = $venda->discount_amount;
+
+        if ($venda->discount_type == 'percentage') {
+            $totalDesconto = ($venda->total_before_tax * $venda->discount_amount) / 100;
+            $totalDesconto = number_format($totalDesconto, 3, '.', '');
+        } else {
+            $totalDesconto = $venda->discount_amount;
+        }
 
         foreach ($venda->sell_lines as $i) {
             $itemCont++;
@@ -238,7 +246,6 @@ class NFCeService
             }
 
             $somaProdutos += $i->quantity * $i->unit_price;
-
 
             $prod = $nfe->tagprod($stdProd);
 
@@ -452,7 +459,7 @@ class NFCeService
                 $tipo            = '99';
             } else if ($det->method == 'pix_efi') {
                 // $stdDetPag->xPag = "Pix";
-                $tipo            = '17';
+                $tipo = '17';
             } else {
                 $stdDetPag->xPag = "Outros";
                 $tipo            = '99';
@@ -593,6 +600,10 @@ class NFCeService
             ];
             return $arr;
         } catch (\Exception $e) {
+            \Log::debug('Erro NFCeService:gerarNFCe', [
+                'venda' => $venda->toArray(),
+                'erro'  => $e->getMessage(),
+            ]);
             return [
                 'erros_xml' => $nfe->getErrors()
             ];

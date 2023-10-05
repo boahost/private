@@ -1220,6 +1220,9 @@ class SellPosController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // mostrar ip da requisição
+        // \Log::debug($request->ip());
+
         if (!auth()->user()->can('sell.update') && !auth()->user()->can('direct_sell.access')) {
             abort(403, 'Unauthorized action.');
         }
@@ -1420,7 +1423,10 @@ class SellPosController extends Controller
                     'location_id'       => $input['location_id'],
                     'pos_settings'      => $pos_settings
                 ];
+
                 $this->transactionUtil->adjustMappingPurchaseSell($status_before, $transaction, $business, $deleted_lines);
+
+                // dd('a');
 
                 if ($this->transactionUtil->isModuleEnabled('tables')) {
                     $transaction->res_table_id = request()->get('res_table_id');
@@ -1532,10 +1538,10 @@ class SellPosController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
+
         if (!auth()->user()->can('sell.delete')) {
             abort(403, 'Unauthorized action.');
         }
@@ -1544,7 +1550,7 @@ class SellPosController extends Controller
 
             try {
                 $business_id = request()->session()->get('user.business_id');
-                //Begin transaction
+
                 DB::beginTransaction();
 
                 $transaction = Transaction::find($id);
@@ -1555,7 +1561,6 @@ class SellPosController extends Controller
                     $output['success'] = false;
                     $output['msg']     = "Não é possível remover venda com NFCe emitida!";
                 } else {
-
                     $output = $this->transactionUtil->deleteSale($business_id, $id);
 
                     DB::commit();
@@ -1563,7 +1568,8 @@ class SellPosController extends Controller
 
             } catch (\Exception $e) {
                 DB::rollBack();
-                \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
+
+                \Log::emergency("File:" . $e->getFile() . ":" . $e->getLine() . " Message:" . $e->getMessage());
 
                 $output['success'] = false;
                 $output['msg']     = trans("messages.something_went_wrong") . $e->getMessage();

@@ -281,6 +281,9 @@ class NFeService
         $somaFederal   = 0;
         $somaEstadual  = 0;
         $somaMunicipal = 0;
+        $novoV         = 0;
+
+        // dd($venda->sell_lines);
         foreach ($venda->sell_lines as $i) {
 
             $itemCont++;
@@ -354,12 +357,18 @@ class NFeService
             $stdProd->indTot  = 1;
             $somaProdutos += ($i->quantity * $i->unit_price);
 
-            $vDesc = 0;
+
             if ($totalDesconto > 0) {
+                $valor_alto = [];
+                foreach ($venda->sell_lines as $item) {
+                    array_unshift($valor_alto, $item->unit_price);
+                }
+                $valor_maximo = max($valor_alto);
+                $vDesc        = 0;
+                $vDD          = 0;
+                //if($i->unit_price > $valor_maximo){
                 if ($itemCont < sizeof($venda->sell_lines)) {
-
                     $quantidade = (int) $i->quantity;
-
                     if ($quantidade > 1) {
                         $novoValor      = (float) ($totalDesconto / $totalItens) / $quantidade;
                         $stdProd->vDesc = number_format($novoValor, 2, '.', '');
@@ -367,16 +376,22 @@ class NFeService
                     } else {
                         $stdProd->vDesc = (float) $totalDesconto / $totalItens;
                         $a              = (float) $totalDesconto / $totalItens;
-
                         $somaDesconto += $vDesc = number_format($a, 2, '.', '');
                     }
-
-
-
                 } else {
+
                     $stdProd->vDesc = $somaDesconto = $vDesc = $totalDesconto - $somaDesconto;
+                    //$stdProd->vDesc = $totalDesconto - $somaDesconto;
                 }
+
             }
+
+
+
+
+
+
+            // dump($somaDesconto);
 
             // if($totalDesconto >= 0.1){
             // 	if($itemCont < sizeof($venda->sell_lines)){
@@ -765,6 +780,8 @@ class NFeService
 
         $fatura = $nfe->tagfat($stdFat);
 
+        // log $venda
+        \Log::debug(json_encode($venda->payment_lines));
 
         if (count($venda->payment_lines) > 1) {
             $contFatura = 1;
@@ -777,23 +794,27 @@ class NFeService
                 $stdDup->vDup  = $this->format($ft->amount + $somaFrete);
 
                 $nfe->tagdup($stdDup);
-
-                // \Log::debug('$stdDup', (array) $stdDup);
-
                 $contFatura++;
             }
         } else {
-            $pay          = $venda->payment_lines[0];
-            $stdDup       = new \stdClass();
-            $stdDup->nDup = '001';
-            // if($pay->paid_on) $stdDup->dVenc = substr($pay->paid_on, 0, 10);
-            if ($pay->vencimento)
-                $stdDup->dVenc = $pay->vencimento;
-            else
-                $stdDup->dVenc = date('Y-m-d');
-            $stdDup->vDup = $this->format($somaProdutos + $somaFrete - $totalDesconto);
+            $pay = $venda->payment_lines[0];
 
-            $nfe->tagdup($stdDup);
+            if ($pay->method != 'cash') {
+                $stdDup       = new \stdClass();
+                $stdDup->nDup = '001';
+
+                // if ($pay->paid_on)
+                // $stdDup->dVenc = substr($pay->paid_on, 0, 10);
+
+                if ($pay->vencimento)
+                    $stdDup->dVenc = $pay->vencimento;
+                else
+                    $stdDup->dVenc = date('Y-m-d');
+
+                $stdDup->vDup = $this->format($somaProdutos + $somaFrete - $totalDesconto);
+
+                $nfe->tagdup($stdDup);
+            }
         }
 
 
@@ -955,6 +976,10 @@ class NFeService
             return $arr;
 
         } catch (\Exception $e) {
+            // log all
+
+            \Log::debug($e->getMessage());
+
             return [
                 'xml_erros' => $nfe->getErrors()
             ];
