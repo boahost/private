@@ -97,8 +97,8 @@ class CashRegisterController extends Controller
                 'transaction_type' => 'initial'
             ]);
         } catch (\Exception $e) {
-            die;
             \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
+            die;
         }
 
         return redirect()->action('SellPosController@create', ['sub_type' => $sub_type]);
@@ -219,14 +219,13 @@ class CashRegisterController extends Controller
 
         $payment_types = $this->cashRegisterUtil->payment_types($register_details->location_id);
         return view('cash_register.close_register_modal')
-            ->with(compact('register_details', 'details', 'lista_suprimentos', 'details', 'payment_types'));
+            ->with(compact('register_details', 'details', 'lista_suprimentos', 'lista_sangrias', 'payment_types'));
     }
 
     /**
      * Closes currently opened register.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
     public function postCloseRegister(Request $request)
     {

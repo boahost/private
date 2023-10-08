@@ -108,6 +108,40 @@
     @include('sale_pos.partials.recent_transactions_modal')
     @include('sale_pos.partials.weighing_scale_modal')
 
+    <div class="modal" id="modal-sangria-suprimento" tabindex="-1" role="dialog">
+        <form id="modal-form-sangria-suprimento" method="post" action="{{ route('sangria-suprimento') }}">
+            @csrf
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="titulo-modal-sangria-suprimento"></h2>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="first_name">Quantia R$:</label>
+                            <input type="text" class="form-control input_number payment_amount valid" id="quantia"
+                                name="quantia" required>
+                        </div>
+
+                        <input type="hidden" name="tipo" id="modal-form-sangria-suprimento-tipo">
+
+                        <div class="form-group">
+                            <label for="last_name">Justificativa</label>
+                            <input type="text" maxlength="254" class="form-control" id="justificativa"
+                                name="justificativa" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
 @stop
 @section('javascript')
     <script src="{{ asset('js/pos.js?v=' . $asset_v) }}"></script>
@@ -131,4 +165,19 @@
             @endif
         @endforeach
     @endif
+
+
+    <script>
+        $('#btn_suprimento').on('click', function(evt) {
+            $('#titulo-modal-sangria-suprimento').text('Realizar Suprimento');
+            $('#modal-form-sangria-suprimento-tipo').val('suprimento');
+            $('#modal-sangria-suprimento').modal('show');
+        });
+
+        $('#btn_sangria').on('click', function(evt) {
+            $('#titulo-modal-sangria-suprimento').text('Realizar Sangria');
+            $('#modal-form-sangria-suprimento-tipo').val('sangria');
+            $('#modal-sangria-suprimento').modal('show');
+        });
+    </script>
 @endsection

@@ -126,16 +126,26 @@
                         </tr>
 
 
-                        @foreach ($lista_suprimentos as $suprimento)
-                            <tr style="color: #004d2a;">
-                                <td>Suprimento - {{ $suprimento['justification'] }}</td>
-                                <td class="text-right">{{ @num_format($suprimento['amount']) }}</td>
+                        @foreach ($lista_suprimentos as $item)
+                            <tr style="color: #004d2a;" title="Suprimento">
+                                <td>
+                                    <i class="fas fa-plus-circle"></i>
+                                    {{ $item['justification'] }}
+                                </td>
+                                <td class="display_currency" data-currency_symbol="true">
+                                    {{ $item['amount'] }}
+                                </td>
                             </tr>
                         @endforeach
-                        @foreach ($lista_sangrias as $sangria)
-                            <tr style="color: #a31515;">
-                                <td>Sangria - {{ $sangria['justification'] }}</td>
-                                <td class="text-right">{{ @num_format($sangria['amount']) }}</td>
+                        @foreach ($lista_sangrias as $item)
+                            <tr style="color: #a31515;" title="Sangria">
+                                <td>
+                                    <i class="fas fa-minus-circle"></i>
+                                    {{ $item['justification'] }}
+                                </td>
+                                <td class="display_currency" data-currency_symbol="true">
+                                    {{ $item['amount'] }}
+                                </td>
                             </tr>
                         @endforeach
 

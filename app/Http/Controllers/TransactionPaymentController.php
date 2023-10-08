@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashRegister;
+use App\Models\CashRegisterTransaction;
 use App\Models\Contact;
 
 use App\Events\TransactionPaymentAdded;
@@ -12,6 +14,7 @@ use App\Models\TransactionPayment;
 use App\Utils\ModuleUtil;
 use App\Utils\TransactionUtil;
 
+use App\Utils\Util;
 use Datatables;
 use DB;
 use Illuminate\Http\Request;
@@ -523,6 +526,43 @@ class TransactionPaymentController extends Controller
                     ->with(compact('contact_details', 'payment_types', 'payment_line', 'due_payment_type', 'ob_due', 'amount_formated', 'accounts'));
             }
         }
+    }
+
+    public function postSangriaSuprimento(Request $request)
+    {
+        $user_id  = auth()->user()->id;
+        $register = CashRegister::where('user_id', $user_id)->where('status', 'open')->first();
+
+        try {
+            DB::beginTransaction();
+
+            $register->cash_register_transactions()->save(new CashRegisterTransaction([
+                'amount'           => (new Util)->num_uf($request->quantia),
+                'pay_method'       => 'cash',
+                'type'             => ($request->tipo == 'suprimento') ? 'credit' : 'debit',
+                'transaction_type' => $request->tipo,
+                'justification'    => $request->justificativa
+            ]));
+
+            DB::commit();
+
+            $output = [
+                'success' => true,
+                'msg'     => 'Ação realizada com sucesso!!!'
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
+
+            $output = [
+                'success'                => false,
+                'msg'                    => "File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage(),
+                'transaction_payment_id' => ''
+            ];
+        }
+
+        return redirect()->back()->with(['status' => $output]);
     }
 
     /**

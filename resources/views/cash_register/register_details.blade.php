@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-lg" role="document" id="register_details">
     <div class="modal-content">
 
         <div class="modal-header">
@@ -119,6 +119,31 @@
                         <!--  </td>-->
                         <!--</tr>-->
 
+
+                        @foreach ($lista_suprimentos as $item)
+                            <tr style="color: #004d2a;" title="Suprimento">
+                                <td>
+                                    <i class="fas fa-plus-circle"></i>
+                                    {{ $item['justification'] }}
+                                </td>
+                                <td class="display_currency" data-currency_symbol="true">
+                                    {{ $item['amount'] }}
+                                </td>
+                            </tr>
+                        @endforeach
+                        @foreach ($lista_sangrias as $item)
+                            <tr style="color: #a31515;" title="Sangria">
+                                <td>
+                                    <i class="fas fa-minus-circle"></i>
+                                    {{ $item['justification'] }}
+                                </td>
+                                <td class="display_currency" data-currency_symbol="true">
+                                    {{ $item['amount'] }}
+                                </td>
+                            </tr>
+                        @endforeach
+
+
                         <tr class="success">
                             <th>
                                 @lang('cash_register.total_refund')
@@ -211,7 +236,38 @@
                                 </b>
                             </td>
                         </tr>
+
+                        <tr class="danger">
+                            <td>
+                                <b>Total de Retirada R$</b>
+                            </td>
+                            <td>
+                                <b>
+                                    <span class="display_currency" data-currency_symbol="true">
+                                        {{ $register_details->total_cash_sangria }}
+                                    </span>
+                                </b>
+                            </td>
+                        </tr>
+                        <tr class="success">
+                            <td>
+                                <b>Total de Suprimento R$</b>
+                            </td>
+                            <td>
+                                <b>
+                                    <span class="display_currency" data-currency_symbol="true">
+                                        {{ $register_details->total_cash_suprimento }}
+                                    </span>
+                                </b>
+                            </td>
+                        </tr>
                     </table>
+
+                    <style>
+                        #register_details table.table tr td:last-child {
+                            text-align: end;
+                        }
+                    </style>
                 </div>
             </div>
 

@@ -243,6 +243,10 @@ class CashRegisterUtil extends Util
             DB::raw("SUM(IF(pay_method='custom_pay_1', IF(transaction_type='sell', amount, 0), 0)) as total_custom_pay_1"),
             DB::raw("SUM(IF(pay_method='custom_pay_2', IF(transaction_type='sell', amount, 0), 0)) as total_custom_pay_2"),
             DB::raw("SUM(IF(pay_method='custom_pay_3', IF(transaction_type='sell', amount, 0), 0)) as total_custom_pay_3"),
+
+            DB::raw("SUM(IF(pay_method='cash',          IF(transaction_type='suprimento', amount, 0), 0)) as total_cash_suprimento"),
+            DB::raw("SUM(IF(pay_method='cash',          IF(transaction_type='sangria', amount, 0), 0))    as total_cash_sangria"),
+
             DB::raw("SUM(IF(pay_method='pix_efi', IF(transaction_type='sell', amount, 0), 0)) as total_pix_efi"),
             DB::raw("SUM(IF(transaction_type='refund', amount, 0)) as total_refund"),
             DB::raw("SUM(IF(transaction_type='refund', IF(pay_method='cash', amount, 0), 0)) as total_cash_refund"),
