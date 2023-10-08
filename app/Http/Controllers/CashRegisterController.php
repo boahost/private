@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BusinessLocation;
 use App\Models\CashRegister;
+use App\Models\CashRegisterTransaction;
 use App\Utils\CashRegisterUtil;
 use App\Utils\ModuleUtil;
 use Illuminate\Http\Request;
@@ -117,10 +118,23 @@ class CashRegisterController extends Controller
         $close_time       = !empty($register_details['closed_at']) ? $register_details['closed_at'] : \Carbon::now()->toDateTimeString();
         $details          = $this->cashRegisterUtil->getRegisterTransactionDetails($user_id, $open_time, $close_time);
 
+        $cash_register_transaction = CashRegisterTransaction::query()
+            ->where('cash_register_id', $id)
+            ->select(['amount', 'justification', 'transaction_type'])
+            ->get();
+
+        $lista_suprimentos = array_filter($cash_register_transaction->toArray(), function ($item) {
+            return $item['transaction_type'] == 'suprimento';
+        });
+
+        $lista_sangrias = array_filter($cash_register_transaction->toArray(), function ($item) {
+            return $item['transaction_type'] == 'sangria';
+        });
+
         $payment_types = $this->cashRegisterUtil->payment_types();
 
         return view('cash_register.register_details')
-            ->with(compact('register_details', 'details', 'payment_types', 'close_time'));
+            ->with(compact('register_details', 'details', 'lista_suprimentos', 'lista_sangrias', 'payment_types', 'close_time'));
     }
 
     /**
@@ -133,9 +147,26 @@ class CashRegisterController extends Controller
     {
         $register_details = $this->cashRegisterUtil->getRegisterDetails();
 
-        $user_id    = auth()->user()->id;
+        $user_id  = auth()->user()->id;
+        $register = CashRegister::where('user_id', $user_id)->where('status', 'open')->select('id')->first();
+
         $open_time  = $register_details['open_time'];
         $close_time = \Carbon::now()->toDateTimeString();
+
+        $cash_register_transaction = CashRegisterTransaction::query()
+            ->where('cash_register_id', $register->id)
+            ->select(['amount', 'justification', 'transaction_type'])
+            ->get();
+
+        // \Log::debug("register_details: " . print_r($cash_register_transaction->toArray(), true));
+
+        $lista_suprimentos = array_filter($cash_register_transaction->toArray(), function ($item) {
+            return $item['transaction_type'] == 'suprimento';
+        });
+
+        $lista_sangrias = array_filter($cash_register_transaction->toArray(), function ($item) {
+            return $item['transaction_type'] == 'sangria';
+        });
 
         $is_types_of_service_enabled = $this->moduleUtil->isModuleEnabled('types_of_service');
 
@@ -144,7 +175,7 @@ class CashRegisterController extends Controller
         $payment_types = $this->cashRegisterUtil->payment_types($register_details->location_id);
 
         return view('cash_register.register_details')
-            ->with(compact('register_details', 'details', 'payment_types', 'close_time'));
+            ->with(compact('register_details', 'details', 'lista_suprimentos', 'lista_sangrias', 'payment_types', 'close_time'));
     }
 
     /**
@@ -159,9 +190,28 @@ class CashRegisterController extends Controller
 
         // \Log::debug("register_details: " . print_r($register_details->toArray(), true));
 
-        $user_id    = auth()->user()->id;
+        $user_id = auth()->user()->id;
+
+        $register = CashRegister::where('user_id', $user_id)->where('status', 'open')->select('id')->first();
+
         $open_time  = $register_details['open_time'];
         $close_time = \Carbon::now()->toDateTimeString();
+
+        $cash_register_transaction = CashRegisterTransaction::query()
+            ->where('cash_register_id', $register->id)
+            ->select(['amount', 'justification', 'transaction_type'])
+            ->get();
+
+        // \Log::debug("register_details: " . print_r($cash_register_transaction->toArray(), true));
+
+        $lista_suprimentos = array_filter($cash_register_transaction->toArray(), function ($item) {
+            return $item['transaction_type'] == 'suprimento';
+        });
+
+        $lista_sangrias = array_filter($cash_register_transaction->toArray(), function ($item) {
+            return $item['transaction_type'] == 'sangria';
+        });
+
 
         $is_types_of_service_enabled = $this->moduleUtil->isModuleEnabled('types_of_service');
 
@@ -169,7 +219,7 @@ class CashRegisterController extends Controller
 
         $payment_types = $this->cashRegisterUtil->payment_types($register_details->location_id);
         return view('cash_register.close_register_modal')
-            ->with(compact('register_details', 'details', 'payment_types'));
+            ->with(compact('register_details', 'details', 'lista_suprimentos', 'details', 'payment_types'));
     }
 
     /**

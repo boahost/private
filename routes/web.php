@@ -552,6 +552,8 @@ Route::middleware(['authh', 'auth', 'SetSessionData', 'language', 'timezone', 'A
     Route::post('/payments/pay-contact-due', 'TransactionPaymentController@postPayContactDue');
     Route::resource('payments', 'TransactionPaymentController');
 
+    Route::post('payments/sangria-suprimento', 'TransactionPaymentController@postSangriaSuprimento')->name('sangria-suprimento');
+
     //Printers...
     Route::resource('printers', 'PrinterController');
 

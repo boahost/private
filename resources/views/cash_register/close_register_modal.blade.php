@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-lg" role="document" id="close_register_modal">
     <div class="modal-content">
         {!! Form::open(['url' => action('CashRegisterController@postCloseRegister'), 'method' => 'post']) !!}
         <div class="modal-header">
@@ -124,6 +124,22 @@
                                 </span>
                             </td>
                         </tr>
+
+
+                        @foreach ($lista_suprimentos as $suprimento)
+                            <tr style="color: #004d2a;">
+                                <td>Suprimento - {{ $suprimento['justification'] }}</td>
+                                <td class="text-right">{{ @num_format($suprimento['amount']) }}</td>
+                            </tr>
+                        @endforeach
+                        @foreach ($lista_sangrias as $sangria)
+                            <tr style="color: #a31515;">
+                                <td>Sangria - {{ $sangria['justification'] }}</td>
+                                <td class="text-right">{{ @num_format($sangria['amount']) }}</td>
+                            </tr>
+                        @endforeach
+
+
                         <tr class="success">
                             <th>
                                 @lang('cash_register.total_refund')
@@ -219,21 +235,55 @@
                                 </b>
                             </td>
                         </tr>
+                        <tr class="danger">
+                            <td>
+                                <b>Total de Retirada R$</b>
+                            </td>
+                            <td>
+                                <b>
+                                    <span class="display_currency" data-currency_symbol="true">
+                                        {{ $register_details->total_cash_sangria }}
+                                    </span>
+                                </b>
+                            </td>
+                        </tr>
+                        <tr class="success">
+                            <td>
+                                <b>Total de Suprimento R$</b>
+                            </td>
+                            <td>
+                                <b>
+                                    <span class="display_currency" data-currency_symbol="true">
+                                        {{ $register_details->total_cash_suprimento }}
+                                    </span>
+                                </b>
+                            </td>
+                        </tr>
                     </table>
+
+                    <style>
+                        #close_register_modal table.table tr td:last-child {
+                            text-align: end;
+                        }
+                    </style>
                 </div>
             </div>
 
+
+            @php
+                $total_cash = $register_details->cash_in_hand + $register_details->total_cash - $register_details->total_cash_refund + $register_details->total_cash_suprimento - $register_details->total_cash_sangria;
+            @endphp
 
 
             <div class="row">
                 <div class="col-sm-4">
                     <div class="form-group">
                         {!! Form::label('closing_amount', __('cash_register.total_cash') . ':*') !!}
-                        {!! Form::text(
-                            'closing_amount',
-                            @num_format($register_details->cash_in_hand + $register_details->total_cash - $register_details->total_cash_refund),
-                            ['class' => 'form-control input_number', 'required', 'placeholder' => __('cash_register.total_cash')],
-                        ) !!}
+                        {!! Form::text('closing_amount', @num_format($total_cash), [
+                            'class' => 'form-control input_number',
+                            'required',
+                            'placeholder' => __('cash_register.total_cash'),
+                        ]) !!}
                     </div>
                 </div>
                 <div class="col-sm-4">
