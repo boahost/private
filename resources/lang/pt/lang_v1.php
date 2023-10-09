@@ -191,7 +191,7 @@ return [
     'login'                                      => 'Login',
     'register'                                   => 'Registrar-se',
     'username'                                   => 'Username',
-    'password'                                   => 'Password',
+    'password'                                   => 'Senha',
     'remember_me'                                => 'Lembre-se de mim',
     'forgot_your_password'                       => 'Esqueceu sua senha?',
     'reset_password'                             => 'Redefinir a senha',

@@ -211,6 +211,17 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+            // if param status=pending show tab pending
+            var url = new URL(window.location.href);
+            var status = url.searchParams.get("status");
+
+            // if (status == 'pending') {
+            //     $('a[href="#pending_job_sheet_tab"]').tab('show');
+            // } else if (status == 'completed') {
+            //     $('a[href="#completed_job_sheet_tab"]').tab('show');
+            // }
+
+
             pending_job_sheets_datatable = $("#pending_job_sheets_table").DataTable({
                 processing: true,
                 serverSide: true,
@@ -602,6 +613,7 @@
             $(document).on('click', '.update_status_button', function() {
                 $('#status_form_redirect').val($(this).data('href'));
             })
+
             $(document).on('submit', 'form#update_status_form', function(e) {
                 e.preventDefault();
                 var data = $(this).serialize();
@@ -636,6 +648,9 @@
                 pending_job_sheets_datatable.ajax.reload();
                 completed_job_sheets_datatable.ajax.reload();
             });
+
+
+            $('#status_id').val(status).trigger('change');
         });
     </script>
 @endsection

@@ -14,7 +14,7 @@
 						<br>
 					@endif
 					<a href="{{$media->display_url}}" class="cursor-pointer"target="_blank">
-						{{$media->display_name}}	
+						{{$media->display_name}}
 					</a>
 				</td>
 				<td>

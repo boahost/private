@@ -20,7 +20,7 @@ use Modules\Repair\Notifications\RepairStatusUpdated;
 class RepairUtil extends Util
 {
     public function replaceModuleTags($business_id, $data, $job_sheet)
-    {   
+    {
         $id = empty($job_sheet->repair_job_sheet_id) ? $job_sheet->id : $job_sheet->repair_job_sheet_id;
 
         $job_sheet = JobSheet::with('customer', 'technician', 'Brand',
@@ -140,7 +140,7 @@ class RepairUtil extends Util
         $data['sms_settings'] = $business->sms_settings;
         $data['mobile_number'] = $contact->mobile;
         $data['sms_body'] = $tag_replaced_data['sms_body'];
-        
+
         //Send sms
         if (!empty($contact->mobile) && !empty($data['sms_body'])) {
             $response = $this->sendSms($data);
@@ -199,7 +199,7 @@ class RepairUtil extends Util
     }
 
     public function sendJobSheetUpdateEmailNotification($notification_data, $job_sheet)
-    {   
+    {
         $business_id = $job_sheet->business_id;
         $customer = $job_sheet->customer;
 
@@ -232,7 +232,8 @@ class RepairUtil extends Util
                     DB::raw('COUNT(repair_job_sheets.id) as total_job_sheets'),
                     'rs.name as status_name',
                     'rs.color',
-                    'rs.sort_order'
+                    'rs.sort_order',
+                    'rs.id as status_id'
                 )
                 ->groupBy('rs.id')
                 ->orderBy('sort_order', 'asc')
@@ -255,7 +256,7 @@ class RepairUtil extends Util
                         )
                         ->groupBy('repair_job_sheets.service_staff')
                         ->get();
-                        
+
         return $job_sheets_by_service_staff;
     }
 
@@ -306,7 +307,7 @@ class RepairUtil extends Util
             ],
         ];
     }
-    
+
     public function getTrendingDevices($business_id)
     {
         $job_sheets = JobSheet::leftJoin('categories as CAT',

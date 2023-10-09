@@ -61,6 +61,9 @@ class Media extends Model
     {
         $html = '<img';
         $html .= ' src="' . $this->display_url . '"';
+        // object-cover
+        $html .= ' style="object-fit: cover;"';
+        $html .= ' class="overflow-hidden rounded-lg"';
         $html .= ' width="' . $size[0] . '"';
         $html .= ' height="' . $size[1] . '"';
 
@@ -86,7 +89,7 @@ class Media extends Model
         }
 
         if ($request->hasFile($file_name)) {
-            $files = $request->file($file_name);
+            $files          = $request->file($file_name);
             $uploaded_files = [];
 
             //If multiple files present
@@ -138,7 +141,7 @@ class Media extends Model
     public static function deleteMedia($business_id, $media_id)
     {
         $media = Media::where('business_id', $business_id)
-                        ->findOrFail($media_id);
+            ->findOrFail($media_id);
 
         $media_path = public_path('uploads/media/' . $media->file_name);
 
@@ -160,22 +163,24 @@ class Media extends Model
                 $media_obj = [];
                 foreach ($uploaded_files as $value) {
                     $media_obj[] = new \App\Models\Media([
-                            'file_name' => $value,
-                            'business_id' => $business_id,
-                            'description' => !empty($request->description) ? $request->description : null,
-                            'uploaded_by' => !empty($request->uploaded_by) ? $request->uploaded_by : auth()->user()->id]);
+                        'file_name'   => $value,
+                        'business_id' => $business_id,
+                        'description' => !empty($request->description) ? $request->description : null,
+                        'uploaded_by' => !empty($request->uploaded_by) ? $request->uploaded_by : auth()->user()->id
+                    ]);
                 }
-                
+
                 $model->media()->saveMany($media_obj);
             } else {
                 //delete previous media if exists
                 $model->media()->delete();
-                
+
                 $media_obj = new \App\Models\Media([
-                        'file_name' => $uploaded_files,
-                        'business_id' => $business_id,
-                        'description' => !empty($request->description) ? $request->description : null,
-                        'uploaded_by' => !empty($request->uploaded_by) ? $request->uploaded_by : auth()->user()->id]);
+                    'file_name'   => $uploaded_files,
+                    'business_id' => $business_id,
+                    'description' => !empty($request->description) ? $request->description : null,
+                    'uploaded_by' => !empty($request->uploaded_by) ? $request->uploaded_by : auth()->user()->id
+                ]);
                 $model->media()->save($media_obj);
             }
         }

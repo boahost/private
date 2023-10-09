@@ -21,14 +21,18 @@
                     <div class="box-body">
                         <div class="row">
                             @forelse($job_sheets_by_status as $job_sheet)
-                                <div class="col-md-3 col-sm-6 col-xs-12">
-                                    <div class="small-box text-white" style="background-color: {{ $job_sheet->color }};">
-                                        <div class="inner">
-                                            <p>{{ $job_sheet->status_name }}</p>
-                                            <h3 class="text-white">{{ $job_sheet->total_job_sheets }}</h3>
+                                <a
+                                    href="{{ action('\Modules\Repair\Http\Controllers\JobSheetController@index') . '?status=' . $job_sheet->status_id }}">
+                                    <div class="col-md-3 col-sm-6 col-xs-12">
+                                        <div class="small-box text-white"
+                                            style="background-color: {{ $job_sheet->color }};">
+                                            <div class="inner">
+                                                <p>{{ $job_sheet->status_name }}</p>
+                                                <h3 class="text-white">{{ $job_sheet->total_job_sheets }}</h3>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             @empty
                                 <div class="col-md-12">
                                     <div class="alert alert-info">
