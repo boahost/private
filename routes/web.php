@@ -542,6 +542,7 @@ Route::middleware(['authh', 'auth', 'SetSessionData', 'language', 'timezone', 'A
     Route::get('/revenues/receive/{id}', 'RevenueController@receive')->name('revenue.receive');
     Route::put('/revenues/{id}/receivePut', 'RevenueController@receivePut')->name('revenue.receivePut');
 
+    // oi lindo
 
     //Transaction payments...
     // Route::get('/payments/opening-balance/{contact_id}', 'TransactionPaymentController@getOpeningBalancePayments');
