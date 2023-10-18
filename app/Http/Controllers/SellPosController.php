@@ -737,6 +737,8 @@ class SellPosController extends Controller
             ];
         }
 
+        $output['venda_id'] = $transaction->id;
+
         if (!$is_direct_sale) {
             return $output;
         } else {
@@ -1506,6 +1508,8 @@ class SellPosController extends Controller
                 'msg'     => __('messages.something_went_wrong')
             ];
         }
+
+        $output['venda_id'] = $transaction->id;
 
         if (!$is_direct_sale) {
             return $output;

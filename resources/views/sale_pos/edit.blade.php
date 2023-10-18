@@ -23,7 +23,7 @@
             'id' => 'edit_pos_sell_form',
         ]) !!}
         {{ method_field('PUT') }}
-        <div class="mb-12 row">
+        <div class="row" style="margin-bottom: 90px;">
             <div class="col-md-12">
                 <div class="row">
                     <div
@@ -65,6 +65,35 @@
         </div>
         @include('sale_pos.partials.pos_form_actions', ['edit' => true])
         {!! Form::close() !!}
+
+        @if (isset($transaction))
+            @include('sale_pos.partials.edit_discount_modal', [
+                'sales_discount' => $transaction->discount_amount,
+                'discount_type' => $transaction->discount_type,
+                'rp_redeemed' => $transaction->rp_redeemed,
+                'rp_redeemed_amount' => $transaction->rp_redeemed_amount,
+                'max_available' => !empty($redeem_details['points']) ? $redeem_details['points'] : 0,
+            ])
+        @else
+            @include('sale_pos.partials.edit_discount_modal', [
+                'sales_discount' => $business_details->default_sales_discount,
+                'discount_type' => 'percentage',
+                'rp_redeemed' => 0,
+                'rp_redeemed_amount' => 0,
+                'max_available' => 0,
+            ])
+        @endif
+
+        @if (isset($transaction))
+            @include('sale_pos.partials.edit_order_tax_modal', ['selected_tax' => $transaction->tax_id])
+        @else
+            @include('sale_pos.partials.edit_order_tax_modal', [
+                'selected_tax' => $business_details->default_sales_tax,
+            ])
+        @endif
+
+        @include('sale_pos.partials.edit_shipping_modal')
+
     </section>
 
     <!-- This will be printed -->

@@ -604,10 +604,10 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .pos_product_div {
-    min-height: 45vh;
-    /* max-height: 57vh; */
+    min-height: 150px;
+    max-height: 45vh;
     overflow-y: auto;
-    margin-bottom: 20px;
+    /* margin-bottom: 90px; */
 }
 
 .bg-lightgray {

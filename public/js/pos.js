@@ -952,7 +952,6 @@ $(document).ready(function () {
             data: data,
             dataType: 'json',
             success: function (result) {
-                console.log(result)
                 if (result.success == 1) {
                     $('#modal_payment').modal('hide');
 
@@ -1026,6 +1025,10 @@ $(document).ready(function () {
                             if (!isSuspend) {
                                 // console.log("else")
                                 toastr.success(result.msg);
+
+                                // console.log('result.receipt', result.receipt)
+                                // console.log('result.venda_id', result.venda_id)
+
                                 if (result.venda_id) {
                                     pos_print(result.receipt);
                                 } else {

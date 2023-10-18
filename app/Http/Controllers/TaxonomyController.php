@@ -39,14 +39,14 @@ class TaxonomyController extends Controller
         }
 
         $category_type = request()->get('type');
-        
+
 
         if (request()->ajax()) {
             $business_id = request()->session()->get('user.business_id');
 
             $category = Category::where('business_id', $business_id)
             ->where('category_type', $category_type)
-            ->select(['name', 'short_code', 'description', 'id', 'parent_id', 'image', 
+            ->select(['name', 'short_code', 'description', 'id', 'parent_id', 'image',
                 'destaque', 'ecommerce']);
 
             return Datatables::of($category)
@@ -148,7 +148,7 @@ class TaxonomyController extends Controller
         }
 
         try {
-            $input = $request->only(['name', 'short_code', 'category_type', 'description', 
+            $input = $request->only(['name', 'short_code', 'category_type', 'description',
                 'destaque', 'ecommerce']);
             if (!empty($request->input('add_as_sub_cat')) &&  $request->input('add_as_sub_cat') == 1 && !empty($request->input('parent_id'))) {
                 $input['parent_id'] = $request->input('parent_id');
@@ -209,7 +209,7 @@ class TaxonomyController extends Controller
         if (request()->ajax()) {
             $business_id = request()->session()->get('user.business_id');
             $category = Category::where('business_id', $business_id)->find($id);
-            
+
             $category_type = request()->get('type');
             $module_category_data = $this->moduleUtil->getTaxonomyData($category_type);
 
@@ -219,7 +219,7 @@ class TaxonomyController extends Controller
             ->where('id', '!=', $id)
             ->pluck('name', 'id');
             $is_parent = false;
-            
+
             if ($category->parent_id == 0) {
                 $is_parent = true;
                 $selected_parent = null;

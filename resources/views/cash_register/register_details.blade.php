@@ -216,7 +216,7 @@
                         </tr>
                         <tr class="success">
                             <th>
-                                @lang('Vendas Fiado'):
+                                @lang('Vendas NF-e / Fiado'):
                             </th>
                             <td>
                                 <b><span class="display_currency"

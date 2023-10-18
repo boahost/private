@@ -1,16 +1,16 @@
 <script type="text/javascript">
-    $(document).ready( function() {
-
-
-        function getTaxonomiesIndexPage () {
-            var data = {category_type : $('#category_type').val()};
+    $(document).ready(function() {
+        function getTaxonomiesIndexPage() {
+            var data = {
+                category_type: $('#category_type').val()
+            };
             $.ajax({
                 method: "GET",
                 dataType: "html",
                 url: '/taxonomies-ajax-index-page',
                 data: data,
                 async: false,
-                success: function(result){
+                success: function(result) {
                     $('.taxonomy_body').html(result);
                 }
             });
@@ -23,28 +23,54 @@
                 category_table = $('#category_table').DataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: '/taxonomies?type=' + category_type,
-                    columns: [
-                    { data: 'image', name: 'image' },
-                    { data: 'name', name: 'name' },
-                    @if($cat_code_enabled)
-                    { data: 'short_code', name: 'short_code' },
-                    @endif
-                    { data: 'description', name: 'description' },
-                    { data: 'destaque', name: 'destaque' },
-                    { data: 'ecommerce', name: 'ecommerce' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false},
+                    ajax: '/taxonomies?type=' + $('#category_type').val(),
+                    columns: [{
+                            data: 'image',
+                            name: 'image',
+                            orderable: false,
+                            searchable: false,
+                        },
+                        {
+                            data: 'name',
+                            name: 'name',
+                            width: '90%'
+
+                        },
+                        @if ($cat_code_enabled)
+                            {
+                                data: 'short_code',
+                                name: 'short_code'
+                            },
+                        @endif {
+                            data: 'description',
+                            name: 'description'
+                        },
+                        // {
+                        //     data: 'destaque',
+                        //     name: 'destaque'
+                        // },
+                        // {
+                        //     data: 'ecommerce',
+                        //     name: 'ecommerce'
+                        // },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false
+                        },
                     ],
                 });
             }
         }
 
-        @if(empty(request()->get('type')))
-        getTaxonomiesIndexPage();
+        @if (empty(request()->get('type')))
+            getTaxonomiesIndexPage();
         @endif
 
         initializeTaxonomyDataTable();
     });
+
     // $(document).on('submit', 'form#category_add_form', function(e) {
     //     e.preventDefault();
     //     $(this)
@@ -127,17 +153,22 @@
         });
     });
 
-    function md(img){
+    function md(img) {
         setTimeout(() => {
             var img_fileinput_setting = {
                 showUpload: false,
                 showPreview: true,
                 browseLabel: LANG.file_browse_label,
                 removeLabel: LANG.remove,
-                initialPreview: '/uploads/img/categorias/'+img,
+                initialPreview: '/uploads/img/categorias/' + img,
                 initialPreviewAsData: true,
                 previewSettings: {
-                    image: { width: '150px', height: '150px', 'max-width': '100%', 'max-height': '100%' },
+                    image: {
+                        width: '150px',
+                        height: '150px',
+                        'max-width': '100%',
+                        'max-height': '100%'
+                    },
                 },
             };
             $('#upload_image').fileinput(img_fileinput_setting);
@@ -154,12 +185,16 @@
                 browseLabel: LANG.file_browse_label,
                 removeLabel: LANG.remove,
                 previewSettings: {
-                    image: { width: '150px', height: '150px', 'max-width': '100%', 'max-height': '100%' },
+                    image: {
+                        width: '150px',
+                        height: '150px',
+                        'max-width': '100%',
+                        'max-height': '100%'
+                    },
                 },
             };
             $('#upload_image').fileinput(img_fileinput_setting);
 
         }, 1500)
     })
-
 </script>
