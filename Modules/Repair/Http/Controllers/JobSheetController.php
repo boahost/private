@@ -1169,19 +1169,20 @@ class JobSheetController extends Controller
 
             JobSheetLines::where('job_sheets_id', $id)->delete();
 
-            foreach ($parts as $variation_id => $part) {
-                $data = [
-                    'job_sheets_id'      => $id,
-                    'product_id'         => $part['product_id'],
-                    'variation_id'       => $variation_id,
-                    'quantity'           => $part['quantity'],
-                    'unit_price'         => $part['unit_price'],
-                    'unit_price_inc_tax' => $part['unit_price'],
-                    'item_tax'           => 0,
-                ];
+            if ($parts)
+                foreach ($parts as $variation_id => $part) {
+                    $data = [
+                        'job_sheets_id'      => $id,
+                        'product_id'         => $part['product_id'],
+                        'variation_id'       => $variation_id,
+                        'quantity'           => $part['quantity'],
+                        'unit_price'         => $part['unit_price'],
+                        'unit_price_inc_tax' => $part['unit_price'],
+                        'item_tax'           => 0,
+                    ];
 
-                JobSheetLines::create($data);
-            }
+                    JobSheetLines::create($data);
+                }
 
             $this->updateTotalCost($id);
 
