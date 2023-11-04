@@ -111,7 +111,9 @@ class SellPosController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+
         $business_id = request()->session()->get('user.business_id');
+        $payment_types     = $this->transactionUtil->payment_types(null, $business_id);
 
         $business_locations = BusinessLocation::forDropdown($business_id, false);
         $customers          = Contact::customersDropdown($business_id, false);
@@ -135,7 +137,7 @@ class SellPosController extends Controller
         $is_types_service_enabled = $this->moduleUtil->isModuleEnabled('types_of_service');
 
         return view('sale_pos.index')
-            ->with(compact('business_locations', 'customers', 'sales_representative', 'is_cmsn_agent_enabled', 'commission_agents', 'service_staffs', 'is_tables_enabled', 'is_service_staff_enabled', 'is_types_service_enabled'));
+            ->with(compact('business_locations', 'payment_types', 'customers', 'sales_representative', 'is_cmsn_agent_enabled', 'commission_agents', 'service_staffs', 'is_tables_enabled', 'is_service_staff_enabled', 'is_types_service_enabled'));
     }
 
     /**

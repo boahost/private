@@ -20,6 +20,7 @@ use App\Utils\ContactUtil;
 use App\Utils\ModuleUtil;
 use App\Utils\ProductUtil;
 use App\Utils\TransactionUtil;
+use App\Utils\Util;
 use App\Models\Warranty;
 use DB;
 use Illuminate\Http\Request;
@@ -38,7 +39,6 @@ class SellController extends Controller
     protected $businessUtil;
     protected $transactionUtil;
     protected $productUtil;
-
 
     /**
      * Constructor
@@ -89,7 +89,16 @@ class SellController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+
+    //  public function reck(Request $request){
+
+
+    //  }
+
+
+
+    public function index(Request $request)
     {
         if (!auth()->user()->can('sell.view') && !auth()->user()->can('sell.create') && !auth()->user()->can('direct_sell.access') && !auth()->user()->can('view_own_sell_only')) {
             abort(403, 'Unauthorized action.');
@@ -106,7 +115,7 @@ class SellController extends Controller
             $payment_types     = $this->transactionUtil->payment_types(null, $business_id);
             $with              = [];
             $shipping_statuses = $this->transactionUtil->shipping_statuses();
-            $sells             = $this->transactionUtil->getListSells($business_id);
+            $sells             = $this->transactionUtil->getListSells($business_id, $request->input('pagamento'));
 
             $permitted_locations = auth()->user()->permitted_locations();
             if ($permitted_locations != 'all') {
@@ -249,11 +258,11 @@ class SellController extends Controller
                     $with[] = 'service_staff';
                 }
 
+
                 $sales = $sells->where('transactions.is_suspend', 1)
                     ->with($with)
                     ->addSelect('transactions.is_suspend', 'transactions.res_table_id', 'transactions.res_waiter_id', 'transactions.additional_notes')
                     ->get();
-
                 return view('sale_pos.partials.suspended_sales_modal')->with(
                     compact(
                         'sales',
@@ -437,21 +446,19 @@ class SellController extends Controller
                 )
                 ->addColumn('payment_methods', function ($row) use ($payment_types) {
 
-                    //  \Log::debug($row->toArray());
-
-                    // \Log::debug($row->payment_lines);
-
                     $methods = array_unique($row->payment_lines->pluck('method')->toArray());
 
                     $count          = count($methods);
                     $payment_method = '';
-                    if ($count == 1) {
-                        if (isset($payment_types[$methods[0]])) {
-                            $payment_method = $payment_types[$methods[0]];
+
+                        if ($count == 1) {
+                            if (isset($payment_types[$methods[0]])) {
+                                $payment_method = $payment_types[$methods[0]];
+                            }
+                        } elseif ($count > 1) {
+                            $payment_method = 'Pagamento multiplo';
                         }
-                    } elseif ($count > 1) {
-                        $payment_method = 'Pagamento multiplo';
-                    }
+
 
                     $html = !empty($payment_method) ? '<span class="payment-method" data-orig-value="' . $payment_method . '" data-status-name="' . $payment_method . '">' . $payment_method . '</span>' : '';
 
@@ -554,8 +561,10 @@ class SellController extends Controller
             $service_staffs = $this->productUtil->serviceStaffDropdown($business_id);
         }
 
-        return view('sell.index')
-            ->with(compact('business_locations', 'customers', 'is_woocommerce', 'sales_representative', 'is_cmsn_agent_enabled', 'commission_agents', 'service_staffs', 'is_tables_enabled', 'is_service_staff_enabled', 'is_types_service_enabled'));
+        $payment_types     = $this->transactionUtil->payment_types(null, $business_id);
+
+        return view('sell.index',)
+            ->with(compact('business_locations', 'payment_types', 'customers', 'is_woocommerce', 'sales_representative', 'is_cmsn_agent_enabled', 'commission_agents', 'service_staffs', 'is_tables_enabled', 'is_service_staff_enabled', 'is_types_service_enabled'));
     }
 
     /**

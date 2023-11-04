@@ -20,7 +20,7 @@ class Booking extends Model
 
     public function table()
     {
-        return $this->belongsTo(\App\Models\Restaurant\ResTable::class, 'table_id');
+        return $this->belongsTo(\App\Restaurant\ResTable::class, 'table_id');
     }
 
     public function correspondent()

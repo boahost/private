@@ -75,7 +75,7 @@
                         </tr>
                     </thead>
                     <tbody></tbody>
-                    <!-- <tfoot>
+                     <tfoot>
                                                         <tr class="bg-gray font-17 footer-total text-center">
                                                             <td colspan="4"><strong>@lang('sale.total'):</strong></td>
                                                             <td class="footer_payment_status_count"></td>
@@ -88,7 +88,7 @@
                                                             <td class="service_type_count"></td>
                                                             <td colspan="2"></td>
                                                         </tr>
-                                                    </tfoot> -->
+                                                    </tfoot>
                 </table>
             @endif
         @endcomponent
@@ -145,6 +145,7 @@
 
                         d.location_id = $('#sell_list_filter_location_id').val();
                         d.customer_id = $('#sell_list_filter_customer_id').val();
+                        d.pagamento = $('#formas_pagamento').val();
                         d.payment_status = $('#sell_list_filter_payment_status').val();
                         d.created_by = $('#created_by').val();
                         d.sales_cmsn_agnt = $('#sales_cmsn_agnt').val();
@@ -298,7 +299,7 @@
             });
 
             $(document).on('change',
-                '#sell_list_filter_location_id, #sell_list_filter_customer_id, #sell_list_filter_payment_status, #created_by, #sales_cmsn_agnt, #service_staffs',
+                '#sell_list_filter_location_id, #formas_pagamento, #sell_list_filter_customer_id, #sell_list_filter_payment_status, #created_by, #sales_cmsn_agnt, #service_staffs',
                 function() {
                     sell_table.ajax.reload();
                 });

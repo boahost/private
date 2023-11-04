@@ -14,7 +14,7 @@ $('#sell_list_filter_date_range').on('cancel.daterangepicker', function(ev, pick
     sell_table.ajax.reload();
 });
 
-$(document).on('change', '#sell_list_filter_location_id, #sell_list_filter_customer_id, #sell_list_filter_payment_status, #created_by, #sales_cmsn_agnt, #service_staffs',  function() {
+$(document).on('change', '#formas_pagamento', '#sell_list_filter_location_id, #sell_list_filter_customer_id, #sell_list_filter_payment_status, #created_by, #sales_cmsn_agnt, #service_staffs',  function() {
     sell_table.ajax.reload();
 });
 
@@ -33,6 +33,7 @@ sell_table = $('#sell_table').DataTable({
                     d.end_date = end;
                 }
                 d.is_direct_sale = 0;
+                d.pagamento = $('#formas_pagamento').val();
 
                 if($('#sell_list_filter_location_id').length) {
                     d.location_id = $('#sell_list_filter_location_id').val();
@@ -85,7 +86,7 @@ sell_table = $('#sell_table').DataTable({
             { data: 'waiter', name: 'ss.first_name', @if(empty($is_service_staff_enabled)) visible: false @endif }
         ],
         "fnDrawCallback": function (oSettings) {
-            
+
             $('#footer_sale_total').text(sum_table_col($('#sell_table'), 'final-total'));
 
             // $('#footer_total_paid').text(sum_table_col($('#sell_table'), 'total-paid'));
@@ -103,7 +104,7 @@ sell_table = $('#sell_table').DataTable({
             $( row ).find('td:eq(6)').attr('class', 'clickable_td');
         }
     });
-    
+
     $('#only_subscriptions').on('ifChanged', function(event){
         sell_table.ajax.reload();
     });
