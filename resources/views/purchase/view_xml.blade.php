@@ -12,9 +12,9 @@
 	@component('components.widget', ['class' => 'box-primary'])
 
 	@if(count($business_locations) == 1)
-	@php 
+	@php
 	$default_location = current(array_keys($business_locations->toArray()));
-	$search_disable = false; 
+	$search_disable = false;
 	@endphp
 	@else
 	@php $default_location = null;
@@ -30,7 +30,6 @@
 	</div>
 
 	<input type="hidden" value="{{json_encode($contact)}}" name="contact">
-	<input type="hidden" value="{{json_encode($itens)}}" name="itens">
 	<input type="hidden" value="{{json_encode($fatura)}}" name="fatura">
 	<input type="hidden" value="{{json_encode($dadosNf)}}" name="dadosNf">
 
@@ -55,6 +54,13 @@
 						<span>Bairro: <strong>{{$contact['bairro']}}</strong></span><br>
 						<span>Cidade: <strong>{{$cidade->nome}} ({{$cidade->uf}})</strong></span>
 
+                        <BR><BR>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="check_price" id="defaultCheck1" onchange="valueChanged()"/>
+                                <label class="form-check-label" for="defaultCheck1">
+                                  Habilitar preço fixo?
+                                </label>
+                              </div>
 					</div>
 				</div>
 			</div>
@@ -63,7 +69,6 @@
 		<div class="col-sm-12">
 			<div class="form-group">
 				<h3 class="box-title">Dados do Documento</h3>
-
 				<div class="row">
 					<div class="col-sm-12">
 
@@ -75,6 +80,8 @@
 						<span>Valor Final: <strong>{{$dadosNf['vFinal']}}</strong></span><br>
 					</div>
 
+
+
 				</div>
 			</div>
 		</div>
@@ -85,7 +92,7 @@
 
 
 				<div class="">
-					
+
 					<!-- Inicio tabela -->
 					<div class="nav-tabs-custom">
 
@@ -99,7 +106,7 @@
 											<table class="table table-bordered table-striped ajax_view hide-footer dataTable no-footer" id="product_table" role="grid" aria-describedby="product_table_info" style="width: 1300px;">
 												<thead>
 													<tr role="row">
-														
+
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 200px;" aria-label="Produto">Produto</th>
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 80px;" aria-label="Produto">Código</th>
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 80px;" aria-label="Produto">NCM</th>
@@ -109,6 +116,7 @@
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 100px;" aria-label="Produto">Cod. Barras</th>
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 80px;" aria-label="Produto">Unidade</th>
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 80px;" aria-label="Produto">Conversão Unitária</th>
+                                                        <th class="sorting_disabled dn" rowspan="1" colspan="1" style="width: 80px;" aria-label="Produto">Valor do Produto</th>
 													</tr>
 												</thead>
 
@@ -130,13 +138,27 @@
 															<label>Somente números</label>
 														</td>
 
+                                                        <td style="width: 80px;">
+															<input class="dn" id="dn_{{$key}}" value="0" type="" name="">
+														</td>
 													</tr>
 													@endforeach
-													
+
 												</tbody>
 											</table>
 
-											<?php $conversao = ''; ?>
+
+                                            {{-- @php
+
+                                             $item = compact("price_product", $itens)
+
+                                            @endphp --}}
+{{--
+                                            @dd($item) --}}
+
+                                            <input type="hidden" value="{{json_encode($itens)}}" name="itens">
+
+											<?php $conversao = ''; $valores = ''; ?>
 
 											@foreach($itens as $key => $i)
 
@@ -147,11 +169,21 @@
 
 											@endforeach
 
+                                            @foreach($itens as $key => $i)
+
+											<?php $valores .= '0' ; ?>
+											@if($key < sizeof($itens)-1)
+											<?php $valores .= ',' ; ?>
+											@endif
+
+											@endforeach
+
 
 											<input type="hidden" name="conversao" value="{{$conversao}}" id="conversao">
+                                            <input type="hidden" name="valores" value="{{$valores}}" id="valor">
 											<div class="row">
 												<div class="col-sm-3">
-													<div class="form-group">
+													<div class="form-group" id="acrescimo">
 														{!! Form::label('perc_venda', '% de acrescimo para valor de venda, sobre o valor de compra' . ':') !!}
 														{!! Form::text('perc_venda', $lucro, ['id' => 'perc_venda', 'class' => 'form-control']); !!}
 													</div>
@@ -191,7 +223,7 @@
 											<table class="table table-bordered table-striped ajax_view hide-footer dataTable no-footer" id="product_table" role="grid" aria-describedby="product_table_info" style="width: 700px;">
 												<thead>
 													<tr role="row">
-														
+
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 100px;" aria-label="Produto">Número</th>
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 100px;" aria-label="Produto">Vencimento</th>
 														<th class="sorting_disabled" rowspan="1" colspan="1" style="width: 100px;" aria-label="Produto">Valor</th>
@@ -216,7 +248,7 @@
 														<td colspan="3">Nenhuma fatura neste XML</td>
 													</tr>
 													@endif
-													
+
 												</tbody>
 											</table>
 
@@ -249,16 +281,38 @@
 	@endcomponent
 	{!! Form::close() !!}
 
-	
+
 </section>
 
 @section('javascript')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.11/jquery.mask.min.js"></script>
+
+<script type="text/javascript">
+    $(".dn").hide('slow');
+    function valueChanged()
+    {
+        if($('.form-check-input').is(":checked")){
+            $("#acrescimo").hide('slow');
+            $(".dn").show('slow');
+        }else{
+            $("#acrescimo").show('slow');
+            $(".dn").hide('slow');
+        }
+
+    }
+</script>
+
+
+
 <script type="text/javascript">
 	$('#perc_venda').mask('000.00')
 
 	$('.cn').keyup(() => {
 		percorreTabela()
+	})
+
+    $('.dn').keyup(() => {
+		percorreTabela2()
 	})
 
 
@@ -273,6 +327,23 @@
 		if(valido){
 			valores = valores.substring(0, valores.length-1);
 			$('#conversao').val(valores)
+		}else{
+
+		}
+	}
+
+
+    function percorreTabela2(){
+		let valores = '';
+		let valido = true;
+		$('#itens tr').each(function(){
+			if(!$(this).find('.dn').val()) valido = false;
+			 valores += ($(this).find('.dn').val()) + ',';
+		});
+
+		if(valido){
+			valores = valores.substring(0, valores.length-1);
+			$('#valor').val(valores)
 		}else{
 
 		}

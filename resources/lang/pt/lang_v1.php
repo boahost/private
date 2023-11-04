@@ -277,7 +277,7 @@ return [
     'time_format'                                => 'Formato da hora',
     '12_hour'                                    => '12 horas ',
     '24_hour'                                    => '24 horas ',
-    'list_quotations'                            => 'Lista de cotações',
+    'list_quotations'                            => 'Lista de orçamentos',
     'list_drafts'                                => 'Lista de rascunhos',
     'you_cannot_delete_this_contact'             => "O contato não pode ser excluído: as transações já existem para o contato",
     'enable_row'                                 => 'Ativar linha',

@@ -57,14 +57,14 @@ class PurchaseXmlController extends Controller
 
 				if($msgImport == ""){
 					$user_id = $request->session()->get('user.id');
-					
+
 
 					$cidade = City::getCidadeCod($xml->NFe->infNFe->emit->enderEmit->cMun);
 					$contact = [
 						'business_id' => $business_id,
 						'city_id' => $cidade->id,
-						'cpf_cnpj' => $xml->NFe->infNFe->emit->CNPJ ? 
-						$this->formataCnpj($xml->NFe->infNFe->emit->CNPJ) : 
+						'cpf_cnpj' => $xml->NFe->infNFe->emit->CNPJ ?
+						$this->formataCnpj($xml->NFe->infNFe->emit->CNPJ) :
 						$this->formataCpf($xml->NFe->infNFe->emit->CPF),
 						'ie_rg' => $xml->NFe->infNFe->emit->IE,
 						'consumidor_final' => 1,
@@ -114,7 +114,7 @@ class PurchaseXmlController extends Controller
 
 					$chave = substr($xml->NFe->infNFe->attributes()->Id, 3, 44);
 
-					$vFrete = number_format((double) $xml->NFe->infNFe->total->ICMSTot->vFrete, 
+					$vFrete = number_format((double) $xml->NFe->infNFe->total->ICMSTot->vFrete,
 						2, ",", ".");
 
 					$vDesc = $xml->NFe->infNFe->total->ICMSTot->vDesc;
@@ -138,7 +138,7 @@ class PurchaseXmlController extends Controller
 							$vencimento = $dup->dVenc;
 							$vencimento = explode('-', $vencimento);
 							$vencimento = $vencimento[2]."/".$vencimento[1]."/".$vencimento[0];
-							$vlr_parcela = number_format((double) $dup->vDup, 2, ",", ".");	
+							$vlr_parcela = number_format((double) $dup->vDup, 2, ",", ".");
 
 							$parcela = [
 								'numero' => $titulo,
@@ -294,7 +294,6 @@ class PurchaseXmlController extends Controller
 	}
 
 	public function save(Request $request){
-
 		try{
 
 			$business_id = request()->session()->get('user.business_id');
@@ -310,6 +309,9 @@ class PurchaseXmlController extends Controller
 			$perc_venda = $request->perc_venda;
 			$conversao = $request->conversao;
 			$conversao = explode(",", $conversao);
+
+            $valores = $request->valores;
+			$valores = explode(",", $valores);
 
 			$data = [
 				'business_id' => $contact['business_id'],
@@ -354,6 +356,8 @@ class PurchaseXmlController extends Controller
 
 			foreach($itens as $key => $i){
 
+                // dd($i);
+
 				$taxa = (int)$conversao[$key] ?? 1;
 				$quantidade = (float)$i['qCom'][0];
 				$quantidade = $quantidade * $taxa;
@@ -371,7 +375,7 @@ class PurchaseXmlController extends Controller
 						$unidade = Unit::where('business_id', $business_id)->where('short_name', 'UN')->first();
 					}
 				}
-				
+
 				$sku = $i['codBarras'] ? ($i['codBarras'][0] != 'SEM GTIN' ? $i['codBarras'][0] : $this->lastCodeProduct()) : '';
 
 				$cfop = $i['CFOP'][0];
@@ -394,7 +398,6 @@ class PurchaseXmlController extends Controller
 					'cfop_externo' => '6'.$lastCfop,
 					'type' => 'single',
 					'enable_stock' => 1,
-
 					'cst_csosn' => $business->cst_csosn_padrao,
 					'cst_pis' => $business->cst_cofins_padrao,
 					'cst_cofins' => $business->cst_pis_padrao,
@@ -439,8 +442,8 @@ class PurchaseXmlController extends Controller
 					'dpp_inc_tax' => $valorCompra,
 					'product_variation_id' => $produtoVariacao->id,
 					'profit_percent' => $perc_venda,
-					'default_sell_price' => $valorCompra + (($valorCompra * $perc_venda)/100),
-					'sell_price_inc_tax' => $valorCompra + (($valorCompra * $perc_venda)/100)
+					'default_sell_price' =>  !is_null($request->input('check_price')) ? (int)$valores[$key] : $valorCompra + (($valorCompra * $perc_venda)/100),
+					'sell_price_inc_tax' =>  !is_null($request->input('check_price')) ? (int)$valores[$key] : $valorCompra + (($valorCompra * $perc_venda)/100)
 				];
 
 				$var = Variation::where('product_id', $prod->id)->where('name', 'DUMMY')
@@ -476,7 +479,7 @@ class PurchaseXmlController extends Controller
 
 				if($prodNovo == null){
 				//criar stock
-					$this->openStock($business_id, $prod, $valorCompra, $quantidade, $user_id, $request->location_id, 
+					$this->openStock($business_id, $prod, $valorCompra, $quantidade, $user_id, $request->location_id,
 						$variacao->id, $produtoVariacao->id);
 				//add estoque
 
@@ -489,7 +492,7 @@ class PurchaseXmlController extends Controller
 				// ->value('qty_available');
 
 					if($current_stock == null){
-						$this->openStock($business_id, $prod, $valorCompra, $quantidade, $user_id, 
+						$this->openStock($business_id, $prod, $valorCompra, $quantidade, $user_id,
 							$request->location_id, $variacao->id, $produtoVariacao->id);
 
 					}else{
@@ -569,7 +572,7 @@ class PurchaseXmlController extends Controller
 	}
 
 
-	private function openStock($business_id, $produto, $valorUnit, $quantidade, $user_id, $location_id, $variacao_id, 
+	private function openStock($business_id, $produto, $valorUnit, $quantidade, $user_id, $location_id, $variacao_id,
 		$product_variation_id){
 
 		$transaction = Transaction::create(

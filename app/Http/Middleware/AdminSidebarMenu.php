@@ -290,7 +290,7 @@ class AdminSidebarMenu
                             );
                             $sub->url(
                                 action('SellController@getQuotations'),
-                                'Lista de cotações',
+                                'Lista de Orçamentos',
                                 ['icon' => 'fa fas fa-pen-square', 'active' => request()->segment(1) == 'sells' && request()->segment(2) == 'quotations']
                             );
                         }

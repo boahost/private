@@ -1175,6 +1175,8 @@ class SellController extends Controller
 
         $sales_representative = User::forDropdown($business_id, false, false, true);
 
+        //dd($sales_representative);
+
         return view('sale_pos.quotations')
             ->with(compact('business_locations', 'customers', 'sales_representative'));
     }
@@ -1184,33 +1186,61 @@ class SellController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getDraftDatables()
+    public function getDraftDatables(Request $request)
     {
         if (request()->ajax()) {
             $business_id  = request()->session()->get('user.business_id');
             $is_quotation = request()->only('is_quotation', 0);
 
+            // var_dump($is_quotation);
+
             $is_woocommerce = $this->moduleUtil->isModuleInstalled('Woocommerce');
 
-            $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
-                ->join(
-                    'business_locations AS bl',
-                    'transactions.location_id',
-                    '=',
-                    'bl.id'
-                )
-                ->where('transactions.business_id', $business_id)
-                ->where('transactions.type', 'sell')
-                ->where('transactions.status', 'draft')
-                ->where('is_quotation', $is_quotation)
-                ->select(
-                    'transactions.id',
-                    'transaction_date',
-                    'invoice_no',
-                    'contacts.name',
-                    'bl.name as business_location',
-                    'is_direct_sale'
-                );
+            if($request->input('is_quotation') == 1){
+
+                $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
+                    ->join(
+                        'business_locations AS bl',
+                        'transactions.location_id',
+                        '=',
+                        'bl.id'
+                    )
+                    ->where('transactions.business_id', $business_id)
+                    ->where('transactions.type', 'sell')
+                    ->where('transactions.status', 'pending')
+                    ->where('is_quotation', $is_quotation)
+                    ->select(
+                        'transactions.id',
+                        'transaction_date',
+                        'invoice_no',
+                        'contacts.name',
+                        'bl.name as business_location',
+                        'is_direct_sale'
+                    );
+            } else {
+
+                $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
+                    ->join(
+                        'business_locations AS bl',
+                        'transactions.location_id',
+                        '=',
+                        'bl.id'
+                    )
+                    ->where('transactions.business_id', $business_id)
+                    ->where('transactions.type', 'sell')
+                    ->where('transactions.status', 'draft')
+                    ->where('is_quotation', $is_quotation)
+                    ->select(
+                        'transactions.id',
+                        'transaction_date',
+                        'invoice_no',
+                        'contacts.name',
+                        'bl.name as business_location',
+                        'is_direct_sale'
+                    );
+
+            }
+
 
             $permitted_locations = auth()->user()->permitted_locations();
             if ($permitted_locations != 'all') {
@@ -1268,7 +1298,7 @@ class SellController extends Controller
                 )
                 ->removeColumn('id')
                 ->editColumn('invoice_no', function ($row) {
-                    $invoice_no = $row->invoice_no;
+                    $invoice_no = $row->id;
                     if (!empty($row->woocommerce_order_id)) {
                         $invoice_no .= ' <i class="fab fa-wordpress text-primary no-print" title="' . __('lang_v1.synced_from_woocommerce') . '"></i>';
                     }
