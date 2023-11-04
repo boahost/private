@@ -55,6 +55,7 @@ return [
     "location"               => "Localização",
     "add_payment_row"        => "Adicionar Pgo.",
     "finalize_payment"       => "Concluir Pgo.",
+    "finalize_payment_pix"   => "Gerar PIX",
     "sale_date"              => "Data de venda",
     "list_pos"               => "lista de POS",
     "edit_sale"              => "Editar venda",

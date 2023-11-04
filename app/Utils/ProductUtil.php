@@ -1380,13 +1380,13 @@ class ProductUtil extends Util
             return false;
         }
 
-        \Log::debug('adjustStockOverSelling', [$transaction]);
+        // \Log::debug('adjustStockOverSelling', [$transaction]);
         // return;
 
         foreach ($transaction->purchase_lines as $purchase_line) {
             if ($purchase_line->product->enable_stock == 1) {
 
-                \Log::debug('adjustStockOverSelling loop');
+                // \Log::debug('adjustStockOverSelling loop');
 
                 //Available quantity in the purchase line
                 $purchase_line_qty_avlbl = $purchase_line->quantity_remaining;
@@ -1409,7 +1409,7 @@ class ProductUtil extends Util
 
                 foreach ($sell_line_purchase_lines as $slpl) {
 
-                    \Log::debug('adjustStockOverSelling loop loop');
+                    // \Log::debug('adjustStockOverSelling loop loop');
 
 
                     if ($purchase_line_qty_avlbl > 0) {
@@ -1430,7 +1430,7 @@ class ProductUtil extends Util
                             $purchase_line->quantity_sold += $slpl->quantity;
                             $purchase_line->save();
 
-                            \Log::debug('TransactionSellLinesPurchaseLines', [$slpl]);
+                            // \Log::debug('TransactionSellLinesPurchaseLines', [$slpl]);
 
                             TransactionSellLinesPurchaseLines::create([
                                 'sell_line_id'     => $slpl->sell_line_id,

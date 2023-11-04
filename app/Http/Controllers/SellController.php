@@ -23,6 +23,7 @@ use App\Utils\TransactionUtil;
 use App\Models\Warranty;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\NaturezaOperacao;
 use App\Models\Transportadora;
@@ -385,7 +386,19 @@ class SellController extends Controller
                     'payment_status',
                     function ($row) {
                         $payment_status = Transaction::getPaymentStatus($row);
-                        return (string) view('sell.partials.payment_status', ['payment_status' => $payment_status, 'id' => $row->id]);
+
+                        $string = (string) view('sell.partials.payment_status', ['payment_status' => $payment_status, 'id' => $row->id]);
+
+                        if ($payment_status == 'due' or $payment_status == 'partial') {
+                            // Log::debug($row->toArray());
+                            $string .= (string) view('sell.partials.payment_pix_button', [
+                                'id'              => $row->id,
+                                'phone'           => $row->mobile ?: $row->landline ?: $row->alternate_number,
+                                'total_remaining' => $row->final_total - $row->total_paid
+                            ]);
+                        }
+
+                        return $string;
                     }
                 )
                 ->editColumn(
@@ -437,7 +450,7 @@ class SellController extends Controller
                 )
                 ->addColumn('payment_methods', function ($row) use ($payment_types) {
 
-                    //  \Log::debug($row->toArray());
+                    // \Log::debug($row->toArray());
 
                     // \Log::debug($row->payment_lines);
 

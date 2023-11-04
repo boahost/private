@@ -108,7 +108,7 @@
                         </div>
                     </div>
                 @endif
-                <div class="col-md-12">
+                {{-- <div class="col-md-12">
                     <div class="text-right form-group">
                         {!! Form::label('is_paid', __('lang_v1.paid')) !!}
                         <div>
@@ -122,7 +122,7 @@
                             </label>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-md-12">
                     <div class="form-group">
                         {!! Form::label('document', __('purchase.attach_document') . ':') !!}

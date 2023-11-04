@@ -352,10 +352,10 @@ class PixHelper
                         "tipo"       => "porcentagem",
                         "valor"      => "$transferPercent",
                         "favorecido" => [
-                            // Vitória
-                            "cpf"   => "03665578230",
-                            // Vitória
-                            "conta" => "4919289"
+                            // allissom
+                            "cpf"   => "70036923176",
+                            // allissom
+                            "conta" => "4299353"
                         ]
                     ]
                 ]

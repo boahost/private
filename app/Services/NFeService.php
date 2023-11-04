@@ -58,6 +58,8 @@ class NFeService
             return '15';
         elseif ($firstType == 'pix')
             return '17';
+        elseif ($firstType == 'pix_efi')
+            return '17';
         elseif ($firstType == 'custom_pay_1')
             return '99';
         elseif ($firstType == 'custom_pay_2')
@@ -781,7 +783,7 @@ class NFeService
         $fatura = $nfe->tagfat($stdFat);
 
         // log $venda
-        \Log::debug(json_encode($venda->payment_lines));
+        // \Log::debug(json_encode($venda->payment_lines));
 
         if (count($venda->payment_lines) > 1) {
             $contFatura = 1;
@@ -853,20 +855,32 @@ class NFeService
 
         $tipoPagamento = $this->pegaPagamento($venda->payment_lines);
 
+        // dd($venda->payment_lines);
+
+        // dd(__('lang_v1.custom_payment_1'));
+
         $custom_labels = !empty(session('business.custom_labels')) ? json_decode(session('business.custom_labels'), true) : [];
 
         $payment_types['custom_pay_1'] = !empty($custom_labels['payments']['custom_pay_1']) ? $custom_labels['payments']['custom_pay_1'] : __('lang_v1.custom_payment_1');
         $payment_types['custom_pay_2'] = !empty($custom_labels['payments']['custom_pay_2']) ? $custom_labels['payments']['custom_pay_2'] : __('lang_v1.custom_payment_2');
         $payment_types['custom_pay_3'] = !empty($custom_labels['payments']['custom_pay_3']) ? $custom_labels['payments']['custom_pay_3'] : __('lang_v1.custom_payment_3');
 
+        if ($tipoPagamento == '99') {
+            if ($venda->payment_lines[0]->method == 'custom_pay_1') {
+                $stdDetPag->xPag = $payment_types['custom_pay_1'];
+            } else if ($venda->payment_lines[0]->method == 'custom_pay_2') {
+                $stdDetPag->xPag = $payment_types['custom_pay_2'];
+            } else if ($venda->payment_lines[0]->method == 'custom_pay_3') {
+                $stdDetPag->xPag = $payment_types['custom_pay_3'];
+            }
 
-        if ($tipoPagamento == '99' and $venda->payment_lines[0]->method == 'custom_pay_1') {
-            $stdDetPag->xPag = $custom_labels['payments']['custom_pay_1'];
-        } elseif ($tipoPagamento == '99' and $venda->payment_lines[0]->method == 'custom_pay_2') {
-            $stdDetPag->xPag = $custom_labels['payments']['custom_pay_2'];
-        } elseif ($tipoPagamento == '99' and $venda->payment_lines[0]->method == 'custom_pay_3') {
-            $stdDetPag->xPag = $custom_labels['payments']['custom_pay_3'];
+            if (!$stdDetPag->xPag) {
+                $stdDetPag->xPag = 'Outros';
+            }
         }
+
+        // dd($tipoPagamento == '99');
+        // dd($stdDetPag->xPag);
 
         $stdDetPag->tPag = $tipoPagamento;
         // $stdDetPag->vPag = $venda->tipo_pagamento != '90' ? $this->format($stdProd->vProd - $venda->desconto) : 0.00;
@@ -978,7 +992,7 @@ class NFeService
         } catch (\Exception $e) {
             // log all
 
-            \Log::debug($e->getMessage());
+            \Log::emergency($e->getMessage());
 
             return [
                 'xml_erros' => $nfe->getErrors()

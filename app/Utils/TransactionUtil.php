@@ -2628,7 +2628,7 @@ class TransactionUtil extends Util
     public function mapPurchaseSell($business, $transaction_lines, $mapping_type = 'purchase', $check_expiry = true, $purchase_line_id = null)
     {
         //  traçar log da origem
-        \Log::debug('mapPurchaseSell return false');
+        // \Log::debug('mapPurchaseSell return false');
 
         // return false;
 
@@ -2709,12 +2709,19 @@ class TransactionUtil extends Util
                 'transactions.invoice_no'
             )->get();
 
+            // \Log::debug('rows', [$rows]);
+
             $purchase_sell_map = [];
 
             //Iterate over the rows, assign the purchase line to sell lines.
             $qty_selling = $line->quantity;
+
+            // \Log::debug('line', [$line]);
+
             foreach ($rows as $k => $row) {
                 $qty_allocated = 0;
+
+                // \Log::debug($row);
 
                 //Check if qty_available is more or equal
                 if ($qty_selling <= $row->quantity_available) {
@@ -2776,7 +2783,11 @@ class TransactionUtil extends Util
             if (!($qty_selling == 0 || is_null($qty_selling))) {
                 //If overselling not allowed through exception else create mapping with blank purchase_line_id
                 if (!$allow_overselling) {
-                    $variation     = Variation::find($line->variation_id);
+                    $variation = Variation::find($line->variation_id);
+
+                    // \Log::debug('product', [$product]);
+                    // \Log::debug('variation', [$variation]);
+
                     $mismatch_name = $product->name;
                     if (!empty($variation->sub_sku)) {
                         $mismatch_name .= ' ' . 'SKU: ' . $variation->sub_sku;
@@ -2825,11 +2836,11 @@ class TransactionUtil extends Util
 
             //Insert the mapping
             if (!empty($purchase_adjustment_map)) {
-                \Log::debug('Insert the mapping', [$purchase_adjustment_map]);
+                // \Log::debug('Insert the mapping', [$purchase_adjustment_map]);
                 TransactionSellLinesPurchaseLines::insert($purchase_adjustment_map);
             }
             if (!empty($purchase_sell_map)) {
-                \Log::debug('Insert the mapping', [$purchase_sell_map]);
+                // \Log::debug('Insert the mapping', [$purchase_sell_map]);
                 TransactionSellLinesPurchaseLines::insert($purchase_sell_map);
             }
         }
@@ -4333,6 +4344,8 @@ class TransactionUtil extends Util
                 'transactions.invoice_no as invoice_no_text',
                 'contacts.name',
                 'contacts.mobile',
+                'contacts.landline',
+                'contacts.alternate_number',
                 'contacts.contact_id',
                 'transactions.payment_status',
                 'transactions.final_total',

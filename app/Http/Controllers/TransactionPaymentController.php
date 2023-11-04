@@ -86,7 +86,8 @@ class TransactionPaymentController extends Controller
                     'bank_account_number'
                 ]);
 
-                $inputs['paid_on']        = $request->input('is_paid') == 'yes' ? \Carbon::now()->toDateTimeString() : null;
+                // $inputs['paid_on']        = $request->input('is_paid') == 'yes' ? \Carbon::now()->toDateTimeString() : null;
+                $inputs['paid_on']        = \Carbon::now()->toDateTimeString();
                 $inputs['transaction_id'] = $transaction->id;
                 $inputs['amount']         = $this->transactionUtil->num_uf($inputs['amount']);
                 $inputs['created_by']     = auth()->user()->id;

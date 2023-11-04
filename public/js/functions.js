@@ -387,7 +387,7 @@ function __print_receipt(section_id = null) {
     } else {
         var imgs = document.images;
     }
-    
+
     img_len = imgs.length;
     if (img_len) {
         img_counter = 0;
@@ -402,7 +402,7 @@ function __print_receipt(section_id = null) {
             // setTimeout(function() {
             //     $('#receipt_section').html('');
             // }, 5000);
-            
+
         }, 1000);
     }
 }
@@ -411,7 +411,7 @@ function incrementImageCounter() {
     img_counter++;
     if ( img_counter === img_len ) {
         window.print();
-        
+
         // setTimeout(function() {
         //     $('#receipt_section').html('');
         // }, 5000);
@@ -440,7 +440,7 @@ function __round(number, multiple = 0){
         number: rounded_number,
         diff: rounded_number - number
     }
-    
+
     return output;
 }
 

@@ -151,11 +151,15 @@ class NFCeService
         $somaMunicipal = 0;
 
         if ($venda->discount_type == 'percentage') {
-            $totalDesconto = ($venda->total_before_tax * $venda->discount_amount) / 100;
-            $totalDesconto = number_format($totalDesconto, 3, '.', '');
+            // $totalDesconto = ($venda->total_before_tax * $venda->discount_amount) / 100;
+            $totalDesconto = ($venda->total_before_tax - $venda->valor_recebido);
+            $totalDesconto = number_format($totalDesconto, 2, '.', '');
+            // dd($venda->valor_recebido);
         } else {
             $totalDesconto = $venda->discount_amount;
         }
+
+        // dd($totalDesconto);
 
         foreach ($venda->sell_lines as $i) {
             $itemCont++;
@@ -238,10 +242,10 @@ class NFCeService
             $vDesc = 0;
             if ($totalDesconto > 0.01) {
                 if ($itemCont < sizeof($venda->sell_lines)) {
-                    $stdProd->vDesc = $this->format($totalDesconto / $totalItens);
-                    $somaDesconto += $vDesc = $totalDesconto / $totalItens;
+                    $stdProd->vDesc = $vDesc = $this->format($i->quantity * $i->unit_price * ($totalDesconto / $venda->total_before_tax));
+                    $somaDesconto += $vDesc;
                 } else {
-                    $stdProd->vDesc = $somaDesconto = $vDesc = $totalDesconto - $somaDesconto;
+                    $stdProd->vDesc = $vDesc = $this->format($totalDesconto - $somaDesconto);
                 }
             }
 
@@ -381,6 +385,7 @@ class NFCeService
 
         $stdPag         = new \stdClass();
         $stdPag->vTroco = 0;
+
         if ($venda->troco > 0) {
             $stdPag->vTroco = $this->format($venda->troco);
         }
@@ -456,10 +461,10 @@ class NFCeService
                 $tipo            = '99';
             } else if ($det->method == 'pix') {
                 $stdDetPag->xPag = "Pix";
-                $tipo            = '99';
+                $tipo            = '17';
             } else if ($det->method == 'pix_efi') {
-                // $stdDetPag->xPag = "Pix";
-                $tipo = '17';
+                $stdDetPag->xPag = "Pix";
+                $tipo            = '17';
             } else {
                 $stdDetPag->xPag = "Outros";
                 $tipo            = '99';
@@ -600,7 +605,7 @@ class NFCeService
             ];
             return $arr;
         } catch (\Exception $e) {
-            \Log::debug('Erro NFCeService:gerarNFCe', [
+            \Log::emergency('Erro NFCeService:gerarNFCe', [
                 'venda' => $venda->toArray(),
                 'erro'  => $e->getMessage(),
             ]);
