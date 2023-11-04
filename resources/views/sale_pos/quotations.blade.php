@@ -78,7 +78,7 @@ $(document).ready( function(){
         $('#sell_list_filter_date_range').val('');
         sell_table.ajax.reload();
     });
-    
+
     sell_table = $('#sell_table').DataTable({
         processing: true,
         serverSide: true,
@@ -119,11 +119,11 @@ $(document).ready( function(){
             __currency_convert_recursively($('#purchase_table'));
         }
     });
-    
+
     $(document).on('change', '#sell_list_filter_location_id, #sell_list_filter_customer_id, #created_by',  function() {
         sell_table.ajax.reload();
     });
 });
 </script>
-	
+
 @endsection

@@ -525,12 +525,15 @@ return $contacts->rawColumns(['action', 'opening_balance', 'credit_limit', 'pay_
      */
     public function store(Request $request)
     {
+
         if (!auth()->user()->can('supplier.create') && !auth()->user()->can('customer.create')) {
             abort(403, 'Unauthorized action.');
         }
 
         try {
             $business_id = $request->session()->get('user.business_id');
+
+            $location = BusinessLocation::where('business_id', $business_id)->first();
 
             if (!$this->moduleUtil->isSubscribed($business_id)) {
                 return $this->moduleUtil->expiredResponse();
@@ -540,12 +543,12 @@ return $contacts->rawColumns(['action', 'opening_balance', 'credit_limit', 'pay_
             $request->merge([ 'id_estrangeiro' => $request->id_estrangeiro ?? '']);
 
 
-            $input = $request->only(['type', 'supplier_business_name', 'cpf_cnpj', 'ie_rg', 'contribuinte', 
+            $input = $request->only(['type', 'supplier_business_name', 'cpf_cnpj', 'ie_rg', 'contribuinte',
                 'consumidor_final', 'city_id', 'rua', 'numero', 'bairro', 'cep',
-                'name', 'tax_number', 'pay_term_number', 'pay_term_type', 'mobile', 'landline', 
-                'alternate_number', 'city', 'state', 'country', 'landmark', 'customer_group_id', 
-                'contact_id', 'custom_field1', 'custom_field2', 'custom_field3', 'custom_field4', 'email', 
-                'shipping_address', 'position', 'city_id', 'cod_pais', 'id_estrangeiro', 'rua_entrega', 
+                'name', 'tax_number', 'pay_term_number', 'pay_term_type', 'mobile', 'landline',
+                'alternate_number', 'city', 'state', 'country', 'landmark', 'customer_group_id',
+                'contact_id', 'custom_field1', 'custom_field2', 'custom_field3', 'custom_field4', 'email',
+                'shipping_address', 'position', 'city_id', 'cod_pais', 'id_estrangeiro', 'rua_entrega',
                 'numero_entrega', 'bairro_entrega', 'cep_entrega', 'city_id_entrega']);
             $input['business_id'] = $business_id;
             $input['created_by'] = $request->session()->get('user.id');
@@ -575,6 +578,71 @@ return $contacts->rawColumns(['action', 'opening_balance', 'credit_limit', 'pay_
 
 
                 $contact = Contact::create($input);
+
+
+
+                if($request->input('select_comanda') == "Sim"){
+                    if($contact){
+                        $dados = [
+
+                            "business_id" => $business_id,
+                            "location_id" => $location->id  ,
+                            "type"  => "sell",
+                            "status" => "final",
+                            "is_quotation" => 0,
+                            "payment_status" => "due",
+                            "contact_id" => $contact->id,
+                            "invoice_no" => str_replace('.', '', microtime(true)),
+                            "total_before_tax" => 0,
+                            "discount_type" => "percentage",
+                            "discount_amount" => 0,
+                            "rp_redeemed" => 0,
+                            "rp_redeemed_amount" => 0,
+                            "shipping_charges" => 0,
+                            "additional_notes" => $request->input('numero_comanda'),
+                            "round_off_amount" => 0,
+                            "final_total" => 0,
+                            "is_direct_sale" => 0,
+                            "is_suspend" => 1,
+                            "exchange_rate" => 1,
+                            "created_by" => 35,
+                            "mfg_production_cost_type" => "percentage",
+                            "mfg_is_final" => 0,
+                            "repair_updates_notif" => 0,
+                            "packing_charge" => 0,
+                            "is_created_from_api" => 0,
+                            "rp_earned" => 0,
+                            "is_recurring" => 0,
+                            "recur_interval_type" => "days",
+                            "recur_repetitions" => 0,
+                            "selling_price_group_id" => 0,
+                            "transaction_date" =>  date('Y-m-d H:i:s'),
+                            "valor_frete" => 0,
+                            "tipo" => 0,
+                            "qtd_volumes" => 0,
+                            "peso_liquido" =>0,
+                            "peso_bruto" => 0,
+                            "numero_nfe" => 0,
+                            "numero_nfce" => 0,
+                            "numer_nfe_entrada" => 0,
+                            "sequencia_cce" => 0,
+                            "cpf_nota" => "",
+                            "troco" => 0,
+                            "valor_recebido" => 0,
+                            "estado" => "NOVO",
+                            "pedido_ecommerce_id" => 0
+                        ];
+
+                        Transaction::create($dados);
+                    }
+
+
+
+                }
+
+
+
+
 
                 //Add opening balance
                 if (!empty($request->input('opening_balance'))) {
@@ -686,7 +754,7 @@ return $contacts->rawColumns(['action', 'opening_balance', 'credit_limit', 'pay_
             return view('contact.edit')
             ->with('cities', $this->prepareCities())
             ->with('paises', $this->preparePaises())
-            
+
             ->with(compact('contact', 'types', 'customer_groups', 'opening_balance', 'type'));
         }
     }
@@ -700,10 +768,10 @@ return $contacts->rawColumns(['action', 'opening_balance', 'credit_limit', 'pay_
 
         if (request()->ajax()) {
             try {
-                $input = $request->only(['type', 'supplier_business_name', 'cpf_cnpj', 'ie_rg', 'contribuinte', 'consumidor_final', 'name', 'tax_number', 'pay_term_number', 'pay_term_type', 'mobile', 'landline', 'alternate_number', 'city', 'state', 'country', 'landmark', 
-                    'customer_group_id', 'contact_id', 'custom_field1', 'custom_field2', 'custom_field3', 
-                    'custom_field4', 'email', 'shipping_address', 'position', 'rua', 'numero', 'bairro', 
-                    'cep', 'city_id', 'cod_pais', 'id_estrangeiro', 'rua_entrega', 'numero_entrega', 
+                $input = $request->only(['type', 'supplier_business_name', 'cpf_cnpj', 'ie_rg', 'contribuinte', 'consumidor_final', 'name', 'tax_number', 'pay_term_number', 'pay_term_type', 'mobile', 'landline', 'alternate_number', 'city', 'state', 'country', 'landmark',
+                    'customer_group_id', 'contact_id', 'custom_field1', 'custom_field2', 'custom_field3',
+                    'custom_field4', 'email', 'shipping_address', 'position', 'rua', 'numero', 'bairro',
+                    'cep', 'city_id', 'cod_pais', 'id_estrangeiro', 'rua_entrega', 'numero_entrega',
                     'bairro_entrega', 'cep_entrega', 'city_id_entrega']);
 
                 $input['credit_limit'] = $request->input('credit_limit') != '' ? $this->commonUtil->num_uf($request->input('credit_limit')) : null;

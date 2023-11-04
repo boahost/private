@@ -50,38 +50,55 @@
 @endif
 @endif
 @if(empty($only) || in_array('service_staffs', $only))
-@if(!empty($service_staffs))
-    <div class="col-md-3">
-        <div class="form-group">
-            {!! Form::label('service_staffs', __('restaurant.service_staff') . ':') !!}
-            {!! Form::select('service_staffs', $service_staffs, null, ['class' => 'form-control select2', 'style' => 'width:100%', 'placeholder' => __('lang_v1.all')]); !!}
+    @if(!empty($service_staffs))
+        <div class="col-md-3">
+            <div class="form-group">
+                {!! Form::label('service_staffs', __('restaurant.service_staff') . ':') !!}
+                {!! Form::select('service_staffs', $service_staffs, null, ['class' => 'form-control select2', 'style' => 'width:100%', 'placeholder' => __('lang_v1.all')]); !!}
+            </div>
         </div>
+    @endif
+@endif
+
+<div class="col-md-3">
+
+    <div class="form-group">
+        <label> Formas de pagamento </label>
+        <select id="formas_pagamento" style="width:100%" class="form-control select2">
+            @foreach($payment_types as $row => $value)
+                <option value="{{ $row }}"> {!!  $value !!} </option>
+            @endforeach
+        </select>
+
+        {{-- {!! Form::select('formas_pagamento', $payment_types, null, ['class' => 'form-control select2', 'style' => 'width:100%']); !!} --}}
+
+
     </div>
-@endif
-@endif
+
+</div>
+
 @if(empty($only) || in_array('only_subscriptions', $only))
 <div class="col-md-3">
     <div class="form-group">
         <div class="checkbox">
             <label>
                 <br>
-              {!! Form::checkbox('only_subscriptions', 1, false, 
+              {!! Form::checkbox('only_subscriptions', 1, false,
               [ 'class' => 'input-icheck', 'id' => 'only_subscriptions']); !!} {{ __('lang_v1.subscriptions') }}
             </label>
         </div>
     </div>
 </div>
-
 @endif
 
-<div class="col-md-3">
+{{-- <div class="col-md-3">
     <div class="form-group">
         <div class="checkbox">
             <label>
                 <br>
-              {!! Form::checkbox('ecommerce', 1, false, 
+              {!! Form::checkbox('ecommerce', 1, false,
               [ 'class' => 'input-icheck', 'id' => 'ecommerce']); !!} Ecommerce
             </label>
         </div>
     </div>
-</div>
+</div> --}}

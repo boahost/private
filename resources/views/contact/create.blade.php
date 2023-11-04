@@ -148,6 +148,36 @@
                     </div>
                 </div>
 
+                <div class="col-md-2 customer_fields">
+                    <div class="form-group">
+                        <label> Abrir Comanda ? </label>
+                        <select name="select_comanda" class="reck form-control select2 feature-field">
+                            <option>Não</option>
+                            <option selected>Sim</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="reck2 col-md-2 customer_fields">
+                    <div class="form-group">
+                        <label> Número da comanda </label>
+                        <input class="form-control" type="text" name="numero_comanda">
+                    </div>
+                </div>
+
+                        <script>
+                            $(document).ready(function(){
+                                $('.reck2').hide();
+});
+                    $('.reck').change(function() {
+                    if ($(this).val() == 'Sim') {
+                        $('.reck2').show();
+                    } else {
+                        $('.reck2').hide();
+                    }
+                    });
+                        </script>
+
                 <div class="clearfix"></div>
                 <div class="col-md-12">
                     <hr />

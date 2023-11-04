@@ -459,6 +459,8 @@ Route::middleware(['authh', 'auth', 'SetSessionData', 'language', 'timezone', 'A
     Route::get('/sells/pos/get-product-suggestion', 'SellPosController@getProductSuggestion');
     Route::resource('pos', 'SellPosController');
 
+    Route::get('/busca-comandas', 'SellController@reck');
+
     Route::resource('roles', 'RoleController');
 
     Route::resource('users', 'ManageUserController');

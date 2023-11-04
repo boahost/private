@@ -281,7 +281,10 @@ class Util
             }
         }
 
+        // var_dump($payment_types);
+        // exit;
         return $payment_types;
+
     }
 
     /**

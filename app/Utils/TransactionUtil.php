@@ -4305,10 +4305,10 @@ class TransactionUtil extends Util
      *
      * @return object
      */
-    public function getListSells($business_id)
+    public function getListSells($business_id, $pagamento)
     {
         $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
-            // ->leftJoin('transaction_payments as tp', 'transactions.id', '=', 'tp.transaction_id')
+            ->leftJoin('transaction_payments as tp', 'transactions.id', '=', 'tp.transaction_id')
             ->leftJoin('transaction_sell_lines as tsl', 'transactions.id', '=', 'tsl.transaction_id')
             ->leftJoin('users as u', 'transactions.created_by', '=', 'u.id')
             ->leftJoin('users as ss', 'transactions.res_waiter_id', '=', 'ss.id')
@@ -4334,6 +4334,7 @@ class TransactionUtil extends Util
             ->where('transactions.business_id', $business_id)
             ->where('transactions.type', 'sell')
             ->where('transactions.status', 'final')
+            ->where('tp.method', $pagamento)
             ->select(
                 'transactions.repair_job_sheet_id',
                 'transactions.id',
