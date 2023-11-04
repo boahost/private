@@ -1,13 +1,4 @@
-
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Busca Dinâmica</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -94,9 +85,6 @@
             });
         });
     </script>
-</body>
-</html>
-
 
 
 
