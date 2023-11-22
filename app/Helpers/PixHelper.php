@@ -42,6 +42,16 @@ class PixHelper
         return $this->integration;
     }
 
+    public static function isPixEnabled(int $business_id)
+    {
+        $integration = Integration::where('business_id', $business_id)
+            ->where('integration', 'efi')
+            ->firstOrFail();
+
+        return (!empty($integration->key_client_id) and !empty($integration->key_client_secret));
+
+    }
+
     public function genQRLoc($loc_id)
     {
         $api = $this->getApi();

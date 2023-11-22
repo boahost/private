@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\PixHelper;
 use App\Models\Account;
 use App\Models\City;
 use App\Models\Business;
@@ -283,6 +284,8 @@ class SellController extends Controller
                 $sells->addSelect('transactions.is_recurring', 'transactions.recur_parent_id');
             }
 
+            $pixEnabled = PixHelper::isPixEnabled($business_id);
+
             $datatable = Datatables::of($sells)
                 ->addColumn(
                     'action',
@@ -392,9 +395,24 @@ class SellController extends Controller
                 ->editColumn('transaction_date', '{{@format_datetime($transaction_date)}}')
                 ->editColumn(
                     'payment_status',
-                    function ($row) {
+                    function ($row) use ($pixEnabled) {
+
                         $payment_status = Transaction::getPaymentStatus($row);
-                        return (string) view('sell.partials.payment_status', ['payment_status' => $payment_status, 'id' => $row->id]);
+
+                        $return = view('sell.partials.payment_status', [
+                            'payment_status' => $payment_status,
+                            'id'             => $row->id
+                        ])->render();
+
+                        if ($pixEnabled and ($payment_status == 'due' or $payment_status == 'partial')) {
+                            $return .= (string) view('sell.partials.payment_pix_button', [
+                                'id'              => $row->id,
+                                'phone'           => $row->mobile ?: $row->landline ?: $row->alternate_number,
+                                'total_remaining' => $row->final_total - $row->total_paid
+                            ]);
+                        }
+
+                        return $return;
                     }
                 )
                 ->editColumn(
@@ -411,7 +429,7 @@ class SellController extends Controller
                 ->addColumn('return_due', function ($row) {
                     $return_due_html = '';
                     if (!empty($row->return_exists)) {
-                        $return_due      = $row->amount_return - $row->return_paid;
+                        $return_due = $row->amount_return - $row->return_paid;
                         // $return_due_html .= '<a href="' . action("TransactionPaymentController@show", [$row->return_transaction_id]) . '" class="view_purchase_return_payment_modal"><span class="display_currency sell_return_due" data-currency_symbol="true" data-orig-value="' . $return_due . '">' . $return_due . '</span></a>';
                     }
 
@@ -451,13 +469,13 @@ class SellController extends Controller
                     $count          = count($methods);
                     $payment_method = '';
 
-                        if ($count == 1) {
-                            if (isset($payment_types[$methods[0]])) {
-                                $payment_method = $payment_types[$methods[0]];
-                            }
-                        } elseif ($count > 1) {
-                            $payment_method = 'Pagamento multiplo';
+                    if ($count == 1) {
+                        if (isset($payment_types[$methods[0]])) {
+                            $payment_method = $payment_types[$methods[0]];
                         }
+                    } elseif ($count > 1) {
+                        $payment_method = 'Pagamento multiplo';
+                    }
 
 
                     $html = !empty($payment_method) ? '<span class="payment-method" data-orig-value="' . $payment_method . '" data-status-name="' . $payment_method . '">' . $payment_method . '</span>' : '';
@@ -561,9 +579,9 @@ class SellController extends Controller
             $service_staffs = $this->productUtil->serviceStaffDropdown($business_id);
         }
 
-        $payment_types     = $this->transactionUtil->payment_types(null, $business_id);
+        $payment_types = $this->transactionUtil->payment_types(null, $business_id);
 
-        return view('sell.index',)
+        return view('sell.index', )
             ->with(compact('business_locations', 'payment_types', 'customers', 'is_woocommerce', 'sales_representative', 'is_cmsn_agent_enabled', 'commission_agents', 'service_staffs', 'is_tables_enabled', 'is_service_staff_enabled', 'is_types_service_enabled'));
     }
 
@@ -1205,7 +1223,7 @@ class SellController extends Controller
 
             $is_woocommerce = $this->moduleUtil->isModuleInstalled('Woocommerce');
 
-            if($request->input('is_quotation') == 1){
+            if ($request->input('is_quotation') == 1) {
 
                 $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
                     ->join(

@@ -28,6 +28,11 @@ Route::middleware(['authEcommerce'])->group(function () {
         Route::post('/favorito', 'Api\\ProdutoController@favorito');
     });
 
+    Route::group(['prefix' => '/pix/efi'], function () {
+        Route::post('/', 'Api\\PixEfiController@store');
+        Route::post('/webhook', 'Api\\PixEfiController@atualizar');
+    });
+
     Route::group(['prefix' => '/config'], function () {
         Route::get('/', 'Api\\ConfigController@index');
         Route::post('/salvarEmail', 'Api\\ConfigController@salvarEmail');
