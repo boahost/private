@@ -220,7 +220,7 @@ class PaymentController extends Controller
     public function webhookPixEfi(Request $request)
     {
         $business_id = request()->session()->get('user.business_id');
-        $data = (object) $request->json()->all();
+        $data        = (object) $request->json()->all();
 
         if (($data->evento ?? null) == 'teste_webhook')
             return response()->json(['msg' => 'ok']);
@@ -261,13 +261,9 @@ class PaymentController extends Controller
         $business_id = request()->session()->get('user.business_id');
 
         $business = Business::findorfail($business_id);
-        $input    = $request->only('amount', 'customer_name');
-
-        // $cnpj = preg_replace('/[^0-9]+/', '', $business['cnpj']);
-
-        if (!isset($input['amount'], $input['customer_name'])) {
-            return response()->json('Dados inválidos', 400);
-        }
+        $input    = $request->validate([
+            'amount' => 'required|numeric',
+        ]);
 
         try {
             $pixHelper = new PixHelper($business_id);

@@ -51,6 +51,11 @@ Route::get('/efi/pix/{txid}', 'PaymentController@consultaPixEfi');
 //Routes for authenticated users only
 Route::middleware(['authh', 'auth', 'SetSessionData', 'language', 'timezone', 'AdminSidebarMenu', 'CheckUserLogin', 'CheckPayment'])->group(function () {
 
+    Route::group(['prefix' => '/pix/efi'], function ($route) {
+        $route->get('/', 'Api\\PixEfiController@store');
+        $route->post('/', 'Api\\PixEfiController@store');
+    });
+
     Route::group(['prefix' => '/naturezas'], function () {
         Route::get('/', 'NaturezaController@index');
         Route::get('/new', 'NaturezaController@new');

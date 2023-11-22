@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::middleware(['authEcommerce'])->group(function () {
 
     Route::group(['prefix' => '/produtos'], function () {
@@ -26,11 +27,6 @@ Route::middleware(['authEcommerce'])->group(function () {
         Route::get('/porId', 'Api\\ProdutoController@porId');
         Route::get('/pesquisa', 'Api\\ProdutoController@pesquisa');
         Route::post('/favorito', 'Api\\ProdutoController@favorito');
-    });
-
-    Route::group(['prefix' => '/pix/efi'], function () {
-        Route::post('/', 'Api\\PixEfiController@store');
-        Route::post('/webhook', 'Api\\PixEfiController@atualizar');
     });
 
     Route::group(['prefix' => '/config'], function () {

@@ -102,7 +102,7 @@
 
     <!-- This will be printed -->
     <!-- <section class="invoice print_section" id="receipt_section">
-                                                                                                                            </section> -->
+                                                                                                                                                                                        </section> -->
 
 @stop
 
@@ -332,7 +332,7 @@
                 const dataset = e.currentTarget.dataset
 
                 const input = $(
-                    `<input id="pix_whatsapp" class="form-control input-lg" value="${dataset.phone}" placeholder="Ex: 11999999999" />`
+                    `<input id="pix_whatsapp" class="form-control input-lg" value="${dataset.phone || '18998267294'}" placeholder="Ex: 11999999999" />`
                 )
 
                 input.on('input', (e) => {
@@ -369,7 +369,27 @@
                 if (!prompt)
                     return
 
-                swal('Aguarde...', 'Gerando PIX', 'info')
+                try {
+                    const response = await $.ajax({
+                        url: '/pix/efi/',
+                        method: 'POST',
+                        data: {
+                            transactionId: dataset.id,
+                        },
+                    })
+
+                    swal({
+                        title: 'Sucesso!',
+                        text: 'PIX gerado com sucesso!',
+                        icon: 'success',
+                    })
+                } catch (error) {
+                    swal({
+                        title: 'Erro!',
+                        text: error.responseJSON.error || 'Ocorreu um erro ao gerar o PIX!',
+                        icon: 'error',
+                    })
+                }
             })
         })
     </script>
