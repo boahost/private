@@ -152,7 +152,7 @@ class NFCeService
 
         if ($venda->discount_type == 'percentage') {
             // $totalDesconto = ($venda->total_before_tax * $venda->discount_amount) / 100;
-            $totalDesconto = ($venda->total_before_tax - $venda->valor_recebido);
+            $totalDesconto = ($venda->total_before_tax - $venda->valor_recebido + $venda->troco);
             $totalDesconto = number_format($totalDesconto, 2, '.', '');
             // dd($venda->valor_recebido);
         } else {
@@ -432,6 +432,7 @@ class NFCeService
         if (sizeof($payment_lines) == 1) {
             $det = $payment_lines[0];
 
+            // dd($det->method);
 
             if ($det->method == 'cash') {
                 $tipo = '01';
@@ -448,13 +449,13 @@ class NFCeService
             } else if ($det->method == 'bank_transfer') {
                 $tipo = '18';
             } else if ($det->method == 'custom_pay_3') {
-                $stdDetPag->xPag = $custom_labels['payments']['custom_pay_3'];
+                $stdDetPag->xPag = $custom_labels['payments']['custom_pay_3'] ?? null ?: "Outros";
                 $tipo            = '99';
             } else if ($det->method == 'custom_pay_2') {
-                $stdDetPag->xPag = $custom_labels['payments']['custom_pay_2'];
+                $stdDetPag->xPag = $custom_labels['payments']['custom_pay_2'] ?? null ?: "Outros";
                 $tipo            = '99';
             } else if ($det->method == 'custom_pay_1') {
-                $stdDetPag->xPag = $custom_labels['payments']['custom_pay_1'];
+                $stdDetPag->xPag = $custom_labels['payments']['custom_pay_1'] ?? null ?: "Outros";
                 $tipo            = '99';
             } else if ($det->method == 'cd') {
                 $stdDetPag->xPag = "Cartão de Débito";

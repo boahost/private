@@ -943,6 +943,8 @@ $(document).ready(function () {
     function salvar(form) {
         disable_pos_form_actions();
 
+        // console.log('salvar');
+
         var data = $(form).serialize();
         data = data + '&status=final';
         var url = $(form).attr('action');
@@ -952,6 +954,7 @@ $(document).ready(function () {
             data: data,
             dataType: 'json',
             success: function (result) {
+                // console.log(result);
                 if (result.success == 1) {
                     $('#modal_payment').modal('hide');
 
@@ -1045,6 +1048,9 @@ $(document).ready(function () {
                             }
                         }
                     }
+
+                    reset_pos_form()
+
                 } else {
                     toastr.error(result.msg);
                 }

@@ -368,7 +368,7 @@ class NFeService
                 $valor_maximo = max($valor_alto);
                 $vDesc        = 0;
                 $vDD          = 0;
-                //if($i->unit_price > $valor_maximo){
+
                 if ($itemCont < sizeof($venda->sell_lines)) {
                     $quantidade = (int) $i->quantity;
                     if ($quantidade > 1) {
@@ -381,17 +381,17 @@ class NFeService
                         $somaDesconto += $vDesc = number_format($a, 2, '.', '');
                     }
                 } else {
-
                     $stdProd->vDesc = $somaDesconto = $vDesc = $totalDesconto - $somaDesconto;
-                    //$stdProd->vDesc = $totalDesconto - $somaDesconto;
                 }
 
+                if ($stdProd->vDesc == 0) {
+                    $stdProd->vDesc = null;
+                }
             }
 
+            // $stdProd->vDesc = 1;
 
-
-
-
+            // dd($stdProd->vDesc);
 
             // dump($somaDesconto);
 
@@ -426,7 +426,9 @@ class NFeService
                 //$somaProdutos += $vFt;
             }
             // return $stdProd;
-            $prod = $nfe->tagprod($stdProd);
+
+
+            $nfe->tagprod($stdProd);
 
 
             if ($i->sell_line_note != '') {
