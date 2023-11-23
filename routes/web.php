@@ -40,20 +40,20 @@ Route::post('/paymentCartao', 'PaymentController@paymentCartao')->name('payment.
 
 Route::get('/payment/finish/{transaction_id}', 'PaymentController@finish')->name('payment.finish');
 
-Route::get('/efi/pix/webhook', 'PaymentController@listWebhookPixEfi');
-Route::post('/efi/pix/webhook', 'PaymentController@webhookPixEfi');
-
-Route::get('/efi/pix/', 'PaymentController@listPixEfi');
-Route::post('/efi/pix/', 'PaymentController@paymentPixEfi');
-
-Route::get('/efi/pix/{txid}', 'PaymentController@consultaPixEfi');
-
 //Routes for authenticated users only
 Route::middleware(['authh', 'auth', 'SetSessionData', 'language', 'timezone', 'AdminSidebarMenu', 'CheckUserLogin', 'CheckPayment'])->group(function () {
 
-    Route::group(['prefix' => '/pix/efi'], function ($route) {
-        $route->get('/', 'Api\\PixEfiController@store');
+    Route::group(['prefix' => '/efi/pix'], function ($route) {
+        $route->post('/{transaction_id}', 'Api\\PixEfiController@storeByTransactionId');
+        $route->get('/criar/{transaction_id}', 'Api\\PixEfiController@storeByTransactionId');
+
+        $route->get('/webhook', 'Api\\PixEfiController@listWebhook');
+        $route->post('/webhook', 'Api\\PixEfiController@webhook');
+
+        $route->get('/', 'Api\\PixEfiController@list');
         $route->post('/', 'Api\\PixEfiController@store');
+
+        $route->get('/{txid}', 'Api\\PixEfiController@show');
     });
 
     Route::group(['prefix' => '/naturezas'], function () {

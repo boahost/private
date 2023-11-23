@@ -13,6 +13,82 @@ use Gerencianet\Endpoints;
 // Client_Id_b80de2caf31c4dfa5e47dd4a016da4b03d2c6fc7
 // Client_Secret_91a0498f3638db8b7b21bad1db9659dd115f16be
 
+class PixCobrancaCalendario
+{
+    public string $criacao;
+    public int $expiracao;
+}
+
+class PixCobrancaLoc
+{
+    public int $id;
+    public string $location;
+    public string $tipoCob;
+    public string $criacao;
+}
+
+class PixCobrancaValor
+{
+    public string $original;
+}
+
+
+class PixCobrancaQrcode
+{
+    public string $qrcode;
+    public string $imagemQrcode;
+    public string $linkVisualizacao;
+}
+
+class PixCobrancaResponse
+{
+    public PixCobrancaCalendario $calendario;
+    public PixCobrancaQrcode $qrcode;
+    public string $txid;
+    public int $revisao;
+    public PixCobrancaLoc $loc;
+    public string $location;
+    public string $status;
+    public PixCobrancaValor $valor;
+    public string $chave;
+    public string $solicitacaoPagador;
+
+    public function __construct(array $pix)
+    {
+        $pix = json_decode(json_encode($pix));
+
+        $this->calendario = new PixCobrancaCalendario();
+        $this->qrcode     = new PixCobrancaQrcode();
+        $this->valor      = new PixCobrancaValor();
+        $this->loc        = new PixCobrancaLoc();
+
+        $this->calendario->criacao   = $pix->calendario->criacao;
+        $this->calendario->expiracao = $pix->calendario->expiracao;
+
+        $this->loc->id       = $pix->loc->id;
+        $this->loc->location = $pix->loc->location;
+        $this->loc->tipoCob  = $pix->loc->tipoCob;
+        $this->loc->criacao  = $pix->loc->criacao;
+
+        $this->qrcode->qrcode           = $pix->qrcode->qrcode;
+        $this->qrcode->imagemQrcode     = $pix->qrcode->imagemQrcode;
+        $this->qrcode->linkVisualizacao = $pix->qrcode->linkVisualizacao;
+
+        $this->txid               = $pix->txid;
+        $this->revisao            = $pix->revisao;
+        $this->location           = $pix->location;
+        $this->status             = $pix->status;
+        $this->valor->original    = $pix->valor->original;
+        $this->chave              = $pix->chave;
+        $this->solicitacaoPagador = $pix->solicitacaoPagador;
+    }
+
+    public function isPaid()
+    {
+        return $this->status == 'CONCLUIDA';
+    }
+}
+
 class PixHelper
 {
     private $business_id = null;
@@ -20,7 +96,6 @@ class PixHelper
 
     private array $options = [];
     private array $body = [];
-    private string $webhook_url;
 
     private ?Integration $integration;
 
@@ -67,7 +142,7 @@ class PixHelper
         return $this->gerencianet;
     }
 
-    public function create(): object
+    public function create(): PixCobrancaResponse
     {
         $body        = $this->getBody();
         $integration = $this->getIntegration();
@@ -93,7 +168,9 @@ class PixHelper
         if (!empty($pix['txid']) and !empty($integration->pix_split_plan))
             $this->splitLink($pix['txid'], $integration->pix_split_plan);
 
-        return json_decode(json_encode($pix));
+        // dd($pix);
+
+        return new PixCobrancaResponse($pix);
     }
 
     public function genQRCode(int $loc_id)
@@ -103,13 +180,15 @@ class PixHelper
         return $api->pixGenerateQRCode(['id' => $loc_id]);
     }
 
-    public function detailByTxID(string $txid)
+    public function detailByTxID(string $txid): PixCobrancaResponse
     {
         $api = $this->getApi();
 
         $pix = $api->pixDetailCharge(['txid' => $txid]);
 
-        return json_decode(json_encode($pix));
+        $pix['qrcode'] = $this->genQRLoc($pix['loc']['id']);
+
+        return new PixCobrancaResponse($pix);
     }
 
     public function genQRCodeTxID(string $txid)
@@ -187,30 +266,16 @@ class PixHelper
         return $chave;
     }
 
-    public function configWebhookURL()
+    public function configWebhookURL(string $webhook_url)
     {
         $api = $this->getApi();
 
         $integration = $this->getIntegration();
-        $webhook_url = $this->getWebhookUrl();
 
         return $api->pixConfigWebhook(
             ['chave' => $integration->pix_key],
             ['webhookUrl' => $webhook_url]
         );
-    }
-
-    public function getWebhookUrl()
-    {
-        if (!isset($this->webhook_url))
-            throw new Exception('Defina a URL de notificações ::setWebhookUrl');
-
-        return $this->webhook_url;
-    }
-
-    public function setWebhookUrl($url)
-    {
-        $this->webhook_url = $url;
     }
 
     public function setKey($key)
@@ -219,8 +284,7 @@ class PixHelper
         $integration->pix_key = $key;
         $integration->save();
 
-        $this->setWebhookUrl(url('/efi/pix/webhook'));
-        $this->configWebhookURL();
+        $this->configWebhookURL(url('/efi/pix/webhook'));
 
         return $key;
     }

@@ -407,6 +407,7 @@ class SellController extends Controller
                         if ($pixEnabled and ($payment_status == 'due' or $payment_status == 'partial')) {
                             $return .= (string) view('sell.partials.payment_pix_button', [
                                 'id'              => $row->id,
+                                'customer_name'   => $row->name,
                                 'phone'           => $row->mobile ?: $row->landline ?: $row->alternate_number,
                                 'total_remaining' => $row->final_total - $row->total_paid
                             ]);

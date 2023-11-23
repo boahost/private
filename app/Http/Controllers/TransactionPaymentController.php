@@ -122,6 +122,8 @@ class TransactionPaymentController extends Controller
                 $inputs['business_id'] = $request->session()->get('business.id');
                 $inputs['document']    = $this->transactionUtil->uploadFile($request, 'document', 'documents');
 
+                // logger($inputs);
+
                 $tp = TransactionPayment::create($inputs);
 
                 //update payment status

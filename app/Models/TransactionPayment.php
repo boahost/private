@@ -6,6 +6,35 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransactionPayment extends Model
 {
+    static $id;
+    static $transaction_id;
+    static $business_id;
+    static $is_return;
+    static $amount;
+    static $method;
+    static $transaction_no;
+    static $card_transaction_number;
+    static $card_number;
+    static $card_type;
+    static $card_holder_name;
+    static $card_month;
+    static $card_year;
+    static $card_security;
+    static $vencimento;
+    static $cheque_number;
+    static $bank_account_number;
+    static $paid_on;
+    static $created_by;
+    static $payment_for;
+    static $parent_id;
+    static $note;
+    static $document;
+    static $payment_ref_no;
+    static $account_id;
+    static $created_at;
+    static $updated_at;
+
+
     /**
      * The attributes that aren't mass assignable.
      *

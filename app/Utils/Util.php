@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use DB;
 use App\Models\Business;
 use App\Models\BusinessLocation;
 use App\Models\Contact;
@@ -13,7 +14,7 @@ use App\Models\TransactionSellLine;
 use App\Models\Unit;
 use App\Models\User;
 use App\VariationLocationDetails;
-use DB;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 use GuzzleHttp\Client;
@@ -304,7 +305,7 @@ class Util
     /**
      * Returns the list of modules enabled
      *
-     * @return array
+     * @return boolean
      */
     public function isModuleEnabled($module)
     {
@@ -322,7 +323,7 @@ class Util
      *
      * @param string $date
      * @param bool $time (default = false)
-     * @return strin
+     * @return string
      */
     public function uf_date($date, $time = false)
     {
@@ -337,14 +338,14 @@ class Util
             $mysql_format = 'Y-m-d H:i:s';
         }
 
-        return !empty($date_format) ? \Carbon::createFromFormat($date_format, $date)->format($mysql_format) : null;
+        return !empty($date_format) ? Carbon::createFromFormat($date_format, $date)->format($mysql_format) : null;
     }
 
     /**
      * Converts time in business format to mysql format
      *
      * @param string $time
-     * @return strin
+     * @return string
      */
     public function uf_time($time)
     {
@@ -352,14 +353,14 @@ class Util
         if (session('business.time_format') == 12) {
             $time_format = 'h:i A';
         }
-        return !empty($time_format) ? \Carbon::createFromFormat($time_format, $time)->format('H:i') : null;
+        return !empty($time_format) ? Carbon::createFromFormat($time_format, $time)->format('H:i') : null;
     }
 
     /**
      * Converts time in business format to mysql format
      *
      * @param string $time
-     * @return strin
+     * @return string
      */
     public function format_time($time)
     {
@@ -367,7 +368,7 @@ class Util
         if (session('business.time_format') == 12) {
             $time_format = 'h:i A';
         }
-        return !empty($time) ? \Carbon::createFromFormat('H:i:s', $time)->format($time_format) : null;
+        return !empty($time) ? Carbon::createFromFormat('H:i:s', $time)->format($time_format) : null;
     }
 
     /**
@@ -375,7 +376,7 @@ class Util
      *
      * @param string $date
      * @param bool $time (default = false)
-     * @return strin
+     * @return string
      */
     public function format_date($date, $show_time = false, $business_details = null)
     {
@@ -389,7 +390,7 @@ class Util
             }
         }
 
-        return !empty($date) ? \Carbon::createFromTimestamp(strtotime($date))->format($format) : null;
+        return !empty($date) ? Carbon::createFromTimestamp(strtotime($date))->format($format) : null;
     }
 
     /**
@@ -430,7 +431,7 @@ class Util
      * @param string $type
      * @param int $business_id
      *
-     * @return int
+     * @return string
      */
     public function generateReferenceNumber($type, $ref_count, $business_id = null, $default_prefix = null)
     {
@@ -452,7 +453,7 @@ class Util
         $ref_digits = str_pad($ref_count, 4, 0, STR_PAD_LEFT);
 
         if (!in_array($type, ['contacts', 'business_location', 'username'])) {
-            $ref_year   = \Carbon::now()->year;
+            $ref_year   = Carbon::now()->year;
             $ref_number = $prefix . $ref_year . '/' . $ref_digits;
         } else {
             $ref_number = $prefix . $ref_digits;

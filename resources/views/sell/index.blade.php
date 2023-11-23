@@ -102,7 +102,7 @@
 
     <!-- This will be printed -->
     <!-- <section class="invoice print_section" id="receipt_section">
-                                                                                                                                                                                        </section> -->
+                                                                                                                                                                                                                                                                                                                </section> -->
 
 @stop
 
@@ -327,8 +327,12 @@
     </script>
 
     <script>
+        console.log('a');
         $(() => {
+            console.log('a');
             $('body').on('click', '[trigger="gen_pix"]', async (e) => {
+                console.log('gen_pix');
+
                 const dataset = e.currentTarget.dataset
 
                 const input = $(
@@ -371,22 +375,37 @@
 
                 try {
                     const response = await $.ajax({
-                        url: '/pix/efi/',
-                        method: 'POST',
-                        data: {
-                            transactionId: dataset.id,
-                        },
+                        url: `/efi/pix/${dataset.id}`,
+                        method: 'POST'
                     })
 
+                    if (!response.qrcode)
+                        throw new Error('Ocorreu um erro ao gerar o PIX!')
+
+                    const text =
+                        `Olá, ${dataset.customer_name}!\n\nSeu pedido foi confirmado e está aguardando o pagamento.\n\nClique no link abaixo para efetuar o pagamento seguro via PIX:\n\n${response.qrcode.linkVisualizacao}\n\nAo abrir o link, clique em "Copiar" e cole no aplicativo do seu banco ou escaneie o QRCode.\n\nMuito Obrigado!`
+
+                    const params = new URLSearchParams()
+
+                    params.append('phone', `55${whatsapp}`)
+                    params.append('text', text)
+
+                    const html = $(`
+                        <div>
+                            <a href="https://api.whatsapp.com/send?${params.toString()}" target="_blank">Enviar link para o cliente</a>
+                        </div>
+                   `)
+
                     swal({
-                        title: 'Sucesso!',
-                        text: 'PIX gerado com sucesso!',
-                        icon: 'success',
+                        title: 'PIX gerado com sucesso',
+                        content: html[0],
                     })
                 } catch (error) {
+                    console.log(error);
                     swal({
                         title: 'Erro!',
-                        text: error.responseJSON.error || 'Ocorreu um erro ao gerar o PIX!',
+                        text: error || error.responseJSON.error ||
+                            'Ocorreu um erro ao gerar o PIX!',
                         icon: 'error',
                     })
                 }
