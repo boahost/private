@@ -102,7 +102,7 @@
 
     <!-- This will be printed -->
     <!-- <section class="invoice print_section" id="receipt_section">
-                                                                                                                                                                                                                                                                                                                </section> -->
+                                                                                                                                                                                                                                                                                                                            </section> -->
 
 @stop
 
@@ -324,93 +324,6 @@
         function link(link) {
             location.href = link
         }
-    </script>
-
-    <script>
-        console.log('a');
-        $(() => {
-            console.log('a');
-            $('body').on('click', '[trigger="gen_pix"]', async (e) => {
-                console.log('gen_pix');
-
-                const dataset = e.currentTarget.dataset
-
-                const input = $(
-                    `<input id="pix_whatsapp" class="form-control input-lg" value="${dataset.phone || '18998267294'}" placeholder="Ex: 11999999999" />`
-                )
-
-                input.on('input', (e) => {
-                    e.target.value = e.target.value.replace(/\D/g, '')
-                })
-
-                let prompt;
-                let whatsapp = '';
-
-                prompt = await swal({
-                    title: `Deseja gerar um PIX com o valor de ${__currency_trans_from_en(dataset.remaining)}?`,
-                    buttons: {
-                        cancel: 'Não',
-                        confirm: 'Sim',
-                    },
-                })
-
-                if (!prompt)
-                    return
-
-                while (prompt && whatsapp.length != 11 && whatsapp.length != 10) {
-                    prompt = await swal({
-                        title: `Informe o whatsapp do cliente${whatsapp.length  ?  ' corretamente' : ''}`,
-                        content: input[0],
-                        button: {
-                            text: "Gerar PIX",
-                            closeModal: false,
-                        },
-                    })
-
-                    whatsapp = input[0].value
-                }
-
-                if (!prompt)
-                    return
-
-                try {
-                    const response = await $.ajax({
-                        url: `/efi/pix/${dataset.id}`,
-                        method: 'POST'
-                    })
-
-                    if (!response.qrcode)
-                        throw new Error('Ocorreu um erro ao gerar o PIX!')
-
-                    const text =
-                        `Olá, ${dataset.customer_name}!\n\nSeu pedido foi confirmado e está aguardando o pagamento.\n\nClique no link abaixo para efetuar o pagamento seguro via PIX:\n\n${response.qrcode.linkVisualizacao}\n\nAo abrir o link, clique em "Copiar" e cole no aplicativo do seu banco ou escaneie o QRCode.\n\nMuito Obrigado!`
-
-                    const params = new URLSearchParams()
-
-                    params.append('phone', `55${whatsapp}`)
-                    params.append('text', text)
-
-                    const html = $(`
-                        <div>
-                            <a href="https://api.whatsapp.com/send?${params.toString()}" target="_blank">Enviar link para o cliente</a>
-                        </div>
-                   `)
-
-                    swal({
-                        title: 'PIX gerado com sucesso',
-                        content: html[0],
-                    })
-                } catch (error) {
-                    console.log(error);
-                    swal({
-                        title: 'Erro!',
-                        text: error || error.responseJSON.error ||
-                            'Ocorreu um erro ao gerar o PIX!',
-                        icon: 'error',
-                    })
-                }
-            })
-        })
     </script>
 
     <script src="{{ asset('js/payment.js?v=' . $asset_v) }}"></script>

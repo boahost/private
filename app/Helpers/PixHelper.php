@@ -154,14 +154,10 @@ class PixHelper
             throw new Exception('Defina a solicitação');
 
         if (!$integration->pix_key ?? null)
-            $this->getKey();
+            $body['chave'] = $this->getKey();
 
-        try {
-            $api = $this->getApi();
-            $pix = $api->pixCreateImmediateCharge([], $body);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
-        }
+        $api = $this->getApi();
+        $pix = $api->pixCreateImmediateCharge([], $body);
 
         $pix['qrcode'] = $this->genQRLoc($pix['loc']['id']);
 
@@ -257,34 +253,47 @@ class PixHelper
 
         try {
             $chave = $chaves[0] ?? $api->pixCreateEvp([])['chave'];
-        } catch (Exception $th) {
+        } catch (Exception $e) {
             throw new Exception('Não conseguimos permissão para gerar uma Chave PIX');
         }
 
+
         $this->setKey($chave);
 
-        return $chave;
+        return (string) $chave;
     }
 
-    public function configWebhookURL(string $webhook_url)
+    public function configWebhookURL(string $pix_key, string $webhook_url)
     {
         $api = $this->getApi();
 
-        $integration = $this->getIntegration();
-
         return $api->pixConfigWebhook(
-            ['chave' => $integration->pix_key],
+            ['chave' => $pix_key],
             ['webhookUrl' => $webhook_url]
         );
     }
 
-    public function setKey($key)
+    public function setKey(string $key)
     {
         $integration          = &$this->getIntegration();
         $integration->pix_key = $key;
         $integration->save();
 
-        $this->configWebhookURL(url('/efi/pix/webhook'));
+        $webhook_url = url('/efi/pix/webhook/' . $this->business_id) . '/';
+
+        logger('PIX - Nova Chave', [
+            'key'         => $key,
+            'webhook_url' => $webhook_url,
+        ]);
+
+        $webhook = $this->configWebhookURL(
+            $key,
+            $webhook_url
+        );
+
+        logger('Definindo WebHook - Response', [
+            $webhook
+        ]);
 
         return $key;
     }
