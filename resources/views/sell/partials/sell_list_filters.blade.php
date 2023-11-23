@@ -66,7 +66,7 @@
         <label> Formas de pagamento </label>
         <select id="formas_pagamento" style="width:100%" class="form-control select2">
             <option value="sem_pgto">Todas </option>
-            @foreach($payment_types as $row => $value)
+            @foreach($payment_types ?? [] as $row => $value)
                 <option value="{{ $row }}"> {!!  $value !!} </option>
             @endforeach
         </select>

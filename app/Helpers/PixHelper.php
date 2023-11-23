@@ -111,7 +111,7 @@ class PixHelper
         if (!isset($this->integration)) {
             $this->integration = Integration::where('business_id', $this->business_id)
                 ->where('integration', 'efi')
-                ->firstOrFail();
+                ->first();
         }
 
         return $this->integration;
@@ -121,7 +121,7 @@ class PixHelper
     {
         $integration = Integration::where('business_id', $business_id)
             ->where('integration', 'efi')
-            ->firstOrFail();
+            ->first();
 
         return (!empty($integration->key_client_id) and !empty($integration->key_client_secret));
 
