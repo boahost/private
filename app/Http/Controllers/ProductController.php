@@ -252,11 +252,11 @@ class ProductController extends Controller
                 return  '<input type="checkbox" class="row-select" value="' . $row->id .'">' ;
             })
             ->editColumn('current_stock', '
-                @if($enable_stock == 1) 
+                @if($enable_stock == 1)
                 @if($unit == "Unidade" || $unit == "Unid" || $unit == "UN")
-                {{@number_format($current_stock)}} 
+                {{@number_format($current_stock)}}
                 @else
-                {{@number_format($current_stock, 3)}} 
+                {{@number_format($current_stock, 3)}}
                 @endif
                 @else -- @endif {{$unit}}')
             ->addColumn(
@@ -463,7 +463,7 @@ class ProductController extends Controller
             $request->merge([ 'cCorDENATRAN' => $request->cCorDENATRAN ?? '']);
             $request->merge([ 'lota' => $request->lota ?? '']);
             $request->merge([ 'tpRest' => $request->tpRest ?? '']);
-            
+
             $business_id = $request->session()->get('user.business_id');
             $request->merge([ 'sell_price_inc_tax' => $request->single_dsp]);
 
@@ -479,16 +479,16 @@ class ProductController extends Controller
             $product_details['created_by'] = $request->session()->get('user.id');
             $product_details['valor_ecommerce'] = isset($product_details['valor_ecommerce']) ? str_replace(",", ".", $product_details['valor_ecommerce']) : 0;
 
-            $product_details['weight'] = isset($product_details['weight']) ? str_replace(",", ".", 
+            $product_details['weight'] = isset($product_details['weight']) ? str_replace(",", ".",
                 $product_details['weight']) : 0;
 
-            $product_details['altura'] = isset($product_details['altura']) ? str_replace(",", ".", 
+            $product_details['altura'] = isset($product_details['altura']) ? str_replace(",", ".",
                 $product_details['altura']) : 0;
 
-            $product_details['largura'] = isset($product_details['largura']) ? str_replace(",", ".", 
+            $product_details['largura'] = isset($product_details['largura']) ? str_replace(",", ".",
                 $product_details['largura']) : 0;
 
-            $product_details['comprimento'] = isset($product_details['comprimento']) ? str_replace(",", ".", 
+            $product_details['comprimento'] = isset($product_details['comprimento']) ? str_replace(",", ".",
                 $product_details['comprimento']) : 0;
 
             $product_details['enable_stock'] = (!empty($request->input('enable_stock')) &&  $request->input('enable_stock') == 1) ? 1 : 0;
@@ -715,8 +715,8 @@ class ProductController extends Controller
 
         try {
             $business_id = $request->session()->get('user.business_id');
-            $product_details = $request->only(['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_description', 'sub_unit_ids', 'perc_icms', 'perc_pis', 'perc_cofins', 'perc_ipi', 'cfop_interno', 'cfop_externo', 'cst_csosn', 'cst_pis', 'cst_cofins', 'cst_ipi', 'ncm', 'cest', 
-                'codigo_barras', 'codigo_anp', 'perc_glp', 'perc_gnn', 'perc_gni', 'valor_partida', 'unidade_tributavel', 'quantidade_tributavel', 
+            $product_details = $request->only(['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_description', 'sub_unit_ids', 'perc_icms', 'perc_pis', 'perc_cofins', 'perc_ipi', 'cfop_interno', 'cfop_externo', 'cst_csosn', 'cst_pis', 'cst_cofins', 'cst_ipi', 'ncm', 'cest',
+                'codigo_barras', 'codigo_anp', 'perc_glp', 'perc_gnn', 'perc_gni', 'valor_partida', 'unidade_tributavel', 'quantidade_tributavel',
                 'tipo', 'veicProd', 'tpOp', 'chassi', 'cCor', 'xCor', 'pot', 'cilin', 'pesoL', 'pesoB', 'nSerie', 'tpComb', 'nMotor', 'CMT', 'dist', 'anoMod', 'anoFab', 'tpPint', 'tpVeic', 'espVeic', 'VIN', 'condVeic', 'cMod', 'cCorDENATRAN', 'lota', 'tpRest', 'ecommerce', 'destaque', 'novo', 'altura', 'largura', 'comprimento', 'valor_ecommerce', 'origem'
             ]);
 
@@ -1281,7 +1281,7 @@ return $output;
      */
     public function getProducts()
     {
-        if (request()->ajax()) {
+        // if (request()->ajax()) {
             $search_term = request()->input('term', '');
             $location_id = request()->input('location_id', null);
             $check_qty = request()->input('check_qty', false);
@@ -1301,7 +1301,7 @@ return $output;
             }
 
             return json_encode($result);
-        }
+        // }
     }
 
     /**
@@ -1685,7 +1685,7 @@ return $output;
                         ->exists();
                         $can_be_deleted = !$exists_as_ingredient;
                     }
-                    
+
                     //Delete if no purchase found
                     if ($can_be_deleted) {
                         //Delete variation location details

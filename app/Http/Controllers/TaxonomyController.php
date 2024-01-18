@@ -46,6 +46,7 @@ class TaxonomyController extends Controller
 
             $category = Category::where('business_id', $business_id)
             ->where('category_type', $category_type)
+            ->where('id', "!=", 251)
             ->select(['name', 'short_code', 'description', 'id', 'parent_id', 'image',
                 'destaque', 'ecommerce']);
 

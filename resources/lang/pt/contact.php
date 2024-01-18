@@ -27,6 +27,6 @@ return [
     "total_paid"                           => "Total pago",
     "total_purchase_paid"                  => "Pagamento total da compra",
     "total_sale_paid"                      => "Pagamento total da venda",
-    "total_sale_due"                       => "Venda total devida",
+    "total_sale_due"                       => "R$ Devido",
     "customer"                             => "Cliente",
 ];

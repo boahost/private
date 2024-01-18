@@ -278,7 +278,7 @@ class NFeService
         $somaDesconto  = 0;
         $somaISS       = 0;
         $somaServico   = 0;
-        $totalDesconto = $venda->total_before_tax - $venda->final_total + $venda->valor_frete;
+        $totalDesconto = (float) $this->format($venda->total_before_tax - $venda->final_total + $venda->valor_frete, 2);
         $vbc           = 0;
         $somaFederal   = 0;
         $somaEstadual  = 0;
@@ -360,27 +360,44 @@ class NFeService
             $somaProdutos += ($i->quantity * $i->unit_price);
 
 
+
+
             if ($totalDesconto > 0) {
                 $valor_alto = [];
+
                 foreach ($venda->sell_lines as $item) {
                     array_unshift($valor_alto, $item->unit_price);
                 }
-                $valor_maximo = max($valor_alto);
+
+                // $valor_maximo = max($valor_alto);
+                // $vDD          = 0;
                 $vDesc        = 0;
-                $vDD          = 0;
+                $somaDesconto = $this->format($somaDesconto, 2);
 
                 if ($itemCont < sizeof($venda->sell_lines)) {
-                    $quantidade = (int) $i->quantity;
-                    if ($quantidade > 1) {
-                        $novoValor      = (float) ($totalDesconto / $totalItens) / $quantidade;
-                        $stdProd->vDesc = number_format($novoValor, 2, '.', '');
-                        $somaDesconto += $vDesc = (float) $novoValor;
-                    } else {
-                        $stdProd->vDesc = (float) $totalDesconto / $totalItens;
-                        $a              = (float) $totalDesconto / $totalItens;
-                        $somaDesconto += $vDesc = number_format($a, 2, '.', '');
+                    /**
+                     * Se não for o último item, calcula o desconto de acordo com o valor do item
+                     */
+
+                    $totalVenda = $venda->final_total;
+
+                    $media = (((($stdProd->vProd - $totalVenda) / $totalVenda)) * 100);
+                    $media = 100 - ($media * -1);
+
+                    $tempDesc = ($totalDesconto * $media) / 100;
+
+                    if ($tempDesc <= 0) {
+                        $tempDesc = $tempDesc * -1;
                     }
+
+                    $somaDesconto += $tempDesc;
+
+                    $stdProd->vDesc = $this->format($tempDesc);
                 } else {
+                    /**
+                     * Se for o último item, calcula o desconto de acordo com o valor restante
+                     */
+
                     $stdProd->vDesc = $somaDesconto = $vDesc = $totalDesconto - $somaDesconto;
                 }
 
@@ -389,35 +406,8 @@ class NFeService
                 }
             }
 
-            // $stdProd->vDesc = 1;
 
-            // dd($stdProd->vDesc);
 
-            // dump($somaDesconto);
-
-            // if($totalDesconto >= 0.1){
-            // 	if($itemCont < sizeof($venda->sell_lines)){
-            // 		$totalVenda = $venda->final_total;
-
-            // 		$media = (((($stdProd->vProd - $totalVenda)/$totalVenda))*100);
-            // 		$media = 100 - ($media * -1);
-
-            // 		// $tempDesc = ($totalDesconto*$media)/100;
-
-            // 		$tempDesc = ($totalDesconto*$media)/100;
-            //         if($tempDesc <= 0){
-            //             dump($tempDesc);
-            //             //$tempDesc = $tempDesc * -1;
-            //             dd($tempDesc);
-            //         }
-
-            // 		$somaDesconto += $tempDesc;
-
-            // 		$stdProd->vDesc = $this->format($tempDesc);
-            // 	}else{
-            // 		$stdProd->vDesc = $this->format($totalDesconto - $somaDesconto);
-            // 	}
-            // }
 
 
             if ($venda->valor_frete > 0) {

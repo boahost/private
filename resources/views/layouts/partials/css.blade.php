@@ -22,6 +22,11 @@
         background-size: cover;
         background-position: center;
     }
+
+    /* .dataTable,
+    .dataTables_scrollBody {
+        min-height: 400px;
+    } */
 </style>
 
 @if (isset($pos_layout) && $pos_layout)

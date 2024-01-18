@@ -49,7 +49,7 @@ class SellPosController extends Controller
     protected $contactUtil;
     protected $productUtil;
     protected $businessUtil;
-    protected $transactionUtil;
+    protected ?TransactionUtil $transactionUtil;
     protected $cashRegisterUtil;
     protected $moduleUtil;
     protected $notificationUtil;
@@ -112,8 +112,8 @@ class SellPosController extends Controller
         }
 
 
-        $business_id = request()->session()->get('user.business_id');
-        $payment_types     = $this->transactionUtil->payment_types(null, $business_id);
+        $business_id   = request()->session()->get('user.business_id');
+        $payment_types = $this->transactionUtil->payment_types(null, $business_id);
 
         $business_locations = BusinessLocation::forDropdown($business_id, false);
         $customers          = Contact::customersDropdown($business_id, false);
@@ -581,7 +581,14 @@ class SellPosController extends Controller
 
                 $is_credit_sale = isset($input['is_credit_sale']) && $input['is_credit_sale'] == 1 ? true : false;
 
-                // \Log::debug("input: ", $input);
+                // if ($business_id == 20) {
+                // EDIMILSON ALTEROU 28/12/2023
+                // PARA PREVINIR VENDA COM TROCO NEGATIVO
+                // if ($input['change_return'] < 0) {
+                //     throw new \Exception("O valor de troco não pode ser negativo. Está faltando R$ " . number_format($input['change_return'] * -1, 2, ',', '.') . " para completar o valor do pagamento.");
+                // }
+                // dd($input['payment']);
+                // }
 
                 if ($input['final_total'] < 1) {
                     $temp = [];
@@ -663,6 +670,8 @@ class SellPosController extends Controller
                     $business_details = $this->businessUtil->getDetails($business_id);
                     $pos_settings     = empty($business_details->pos_settings) ? $this->businessUtil->defaultPosSettings() : json_decode($business_details->pos_settings, true);
 
+
+
                     $business = [
                         'id'                => $business_id,
                         'accounting_method' => $request->session()->get('business.accounting_method'),
@@ -735,7 +744,7 @@ class SellPosController extends Controller
 
             $output = [
                 'success' => 0,
-                'msg'     => $e->getMessage() . " - " . $e->getFile()
+                'msg'     => $e->getMessage()
             ];
         }
 
@@ -1389,6 +1398,15 @@ class SellPosController extends Controller
                 //Update update lines
                 $is_credit_sale = isset($input['is_credit_sale']) && $input['is_credit_sale'] == 1 ? true : false;
 
+                // dinheiro BR $input['change_return'] para float
+                $change_return_float = $this->transactionUtil->num_uf($input['change_return']);
+
+                // EDIMILSON ALTEROU 28/12/2023
+                // PARA PREVINIR VENDA COM TROCO NEGATIVO
+                // if ($change_return_float < 0.0) {
+                //     throw new \Exception("O valor de troco não pode ser negativo. Está faltando R$ " . number_format($change_return_float * -1, 2, ',', '.') . " para completar o valor do pagamento.");
+                // }
+
                 if (!$is_direct_sale && !$transaction->is_suspend && !$is_credit_sale) {
                     //Add change return
                     $change_return              = $this->dummyPaymentLine;
@@ -1507,7 +1525,7 @@ class SellPosController extends Controller
             \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
             $output = [
                 'success' => 0,
-                'msg'     => __('messages.something_went_wrong')
+                'msg'     => $e->getMessage() ?: __('messages.something_went_wrong')
             ];
         }
 
@@ -1611,8 +1629,10 @@ class SellPosController extends Controller
 
             //Check for weighing scale barcode
             $weighing_barcode = request()->get('weighing_scale_barcode');
+
             if ($variation_id == 'null' && !empty($weighing_barcode)) {
                 $product_details = $this->__parseWeighingBarcode($weighing_barcode);
+
                 if ($product_details['success']) {
                     $variation_id = $product_details['variation_id'];
                     $quantity     = $product_details['qty'];
@@ -2437,12 +2457,20 @@ class SellPosController extends Controller
 
         $error_msg = trans("messages.something_went_wrong");
 
+        // dd( $scale_setting);
+
         //Check for prefix.
         if ((strlen($scale_setting['label_prefix']) == 0) || Str::startsWith($scale_barcode, $scale_setting['label_prefix'])) {
             $scale_barcode = substr($scale_barcode, strlen($scale_setting['label_prefix']));
 
             //Get product sku, trim left side 0
-            $sku = ltrim(substr($scale_barcode, 0, $scale_setting['product_sku_length'] + 1), '0');
+
+            /**
+             * Desabilitado por que o sku é cadastrado no produto com os zeros a esquerda
+             * $sku = ltrim(substr($scale_barcode, 0, $scale_setting['product_sku_length'] + 1), '0');
+             */
+
+            $sku = substr($scale_barcode, 0, $scale_setting['product_sku_length'] + 1);
 
             //Get quantity integer
             $qty_int = substr($scale_barcode, $scale_setting['product_sku_length'] + 1, $scale_setting['qty_length'] + 1);
@@ -2452,8 +2480,13 @@ class SellPosController extends Controller
 
             $qty = (float) $qty_int + (float) $qty_decimal;
 
+            // dd($sku);
+            // dd($business_id);
+
             //Find the variation id
             $result = $this->productUtil->filterProduct($business_id, $sku, null, false, null, [], ['sub_sku'], false)->first();
+
+            // dd($result);
 
             if (!empty($result)) {
                 return [

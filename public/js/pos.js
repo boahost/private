@@ -3,7 +3,12 @@ var isSuspend = false;
 var cpfNota = '';
 var path = window.location.protocol + '//' + window.location.host
 var TOTAL = 0;
+
+const input_total_sell_return_remaining = $('input#total_sell_return_remaining')
+const input_use_return_amount = $('input#use_return_amount')
+
 $(document).ready(function () {
+
     $('#json_boleto').val('')
     $('.payment_types_dropdown input:eq(0)').prop('checked', true).trigger('change')
     customer_set = false;
@@ -119,13 +124,18 @@ $(document).ready(function () {
             return markup;
         },
     });
+
     $('#customer_id').on('select2:select', function (e) {
         var data = e.params.data;
+
         if (data.pay_term_number) {
             $('input#pay_term_number').val(data.pay_term_number);
         } else {
             $('input#pay_term_number').val('');
         }
+
+        input_total_sell_return_remaining.val(data.total_sell_return_remaining ?? 0);
+        input_total_sell_return_remaining.trigger('change');
 
         if (data.pay_term_type) {
             $('#pay_term_type').val(data.pay_term_type);
@@ -133,6 +143,28 @@ $(document).ready(function () {
             $('#pay_term_type').val('');
         }
     });
+
+    input_total_sell_return_remaining.on('change', function (a, b, c) {
+        var total_sell_return_remaining = parseFloat(this.value);
+        var return_amount_div = $('#return_amount_div')
+        var return_amount_span = $('[for="use_return_amount"] span')
+
+        if (total_sell_return_remaining > 0) {
+            return_amount_div.removeClass('hide');
+            input_use_return_amount.prop('checked', true);
+            return_amount_span.text(__currency_trans_from_en(total_sell_return_remaining, true));
+        } else {
+            return_amount_div.addClass('hide');
+            input_use_return_amount.prop('checked', false);
+            return_amount_span.text('');
+        }
+
+        input_use_return_amount.trigger('change');
+    });
+
+    input_use_return_amount.on('change', () => {
+        pos_total_row()
+    })
 
     set_default_customer();
 
@@ -669,7 +701,7 @@ $(document).ready(function () {
                 .first();
             var first_row_val = __read_number(first_row);
             first_row_val = first_row_val + bal_due;
-            __write_number(first_row, first_row_val);
+            __write_number(first_row, 1);
             first_row.trigger('change');
         }
 
@@ -1885,6 +1917,11 @@ function calculate_billing_details(price_total) {
 
     var total_payable = price_total + order_tax - discount + shipping_charges + packing_charge;
 
+    if (input_use_return_amount.is(':checked')) {
+        var return_amount = parseFloat(input_total_sell_return_remaining.val());
+        total_payable = total_payable - return_amount;
+    }
+
     var rounding_multiple = $('#amount_rounding_method').val() ? parseFloat($('#amount_rounding_method').val()) : 0;
     var round_off_data = __round(total_payable, rounding_multiple);
     var total_payable_rounded = round_off_data.number;
@@ -2048,6 +2085,9 @@ function reset_pos_form() {
     //Reset shipping
     __write_number($('input#shipping_charges'), $('input#shipping_charges').data('default'));
     $('input#shipping_details').val($('input#shipping_details').data('default'));
+
+    // Reset sell return
+    input_total_sell_return_remaining.val(0).trigger('change');
 
     if ($('input#is_recurring').length > 0) {
         $('input#is_recurring').iCheck('update');

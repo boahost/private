@@ -151,14 +151,15 @@ class NFCeService
         $somaMunicipal = 0;
 
         if ($venda->discount_type == 'percentage') {
-            // $totalDesconto = ($venda->total_before_tax * $venda->discount_amount) / 100;
-            $totalDesconto = ($venda->total_before_tax - $venda->valor_recebido + $venda->troco);
-            $totalDesconto = number_format($totalDesconto, 2, '.', '');
-            // dd($venda->valor_recebido);
+            // $venda->total_before_tax (valor original)
+            // $venda->final_total (valor pago)
+            // $venda->troco (valor do troco)
+            $totalDesconto = number_format($venda->total_before_tax - $venda->final_total, 2, '.', '');
         } else {
             $totalDesconto = $venda->discount_amount;
         }
 
+        // dd($venda->toArray());
         // dd($totalDesconto);
 
         foreach ($venda->sell_lines as $i) {

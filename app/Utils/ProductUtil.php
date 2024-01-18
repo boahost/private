@@ -1409,9 +1409,6 @@ class ProductUtil extends Util
 
                 foreach ($sell_line_purchase_lines as $slpl) {
 
-                    // \Log::debug('adjustStockOverSelling loop loop');
-
-
                     if ($purchase_line_qty_avlbl > 0) {
                         if ($slpl->quantity <= $purchase_line_qty_avlbl) {
                             $purchase_line_qty_avlbl -= $slpl->quantity;
@@ -1434,7 +1431,7 @@ class ProductUtil extends Util
 
                             TransactionSellLinesPurchaseLines::create([
                                 'sell_line_id'     => $slpl->sell_line_id,
-                                'purchase_line_id' => 0,
+                                'purchase_line_id' => $purchase_line->id,
                                 'quantity'         => $diff
                             ]);
                             break;
@@ -1563,20 +1560,26 @@ class ProductUtil extends Util
         //Include search
         if (!empty($search_term)) {
 
+            // dd($business_id, $search_term, $location_id, $not_for_selling, $price_group_id, $product_types, $search_fields, $check_qty, );
+
             $query->where(function ($query) use ($search_term, $search_fields) {
 
                 if (in_array('name', $search_fields)) {
                     $query->where('products.name', 'like', '%' . $search_term . '%');
                 }
 
-                if (in_array('sku', $search_fields)) {
-                    $query->orWhere('sku', 'like', '%' . $search_term . '%');
+                /**
+                 * Edimilson Alterou 17/01/23
+                 * Alteração para pesquisar por SKU e Código de Barras na tela do PDV
+                 */
+                if (in_array('sku', $search_fields) || in_array('sub_sku', $search_fields)) {
+                    $query->orWhere('sku', $search_term);
 
-                    $query->orWhere('sub_sku', 'like', '%' . $search_term . '%');
+                    $query->orWhere('sub_sku', $search_term);
                 }
 
                 if (in_array('codigo_barras', $search_fields)) {
-                    $query->orWhere('codigo_barras', 'like', '%' . $search_term . '%');
+                    $query->orWhere('codigo_barras', $search_term);
                 }
 
 
@@ -1618,6 +1621,9 @@ class ProductUtil extends Util
         }
 
         $query->groupBy('variations.id');
+
+        // dd($query->toSql());
+
         return $query->orderBy('VLD.qty_available', 'desc')
             ->get();
     }

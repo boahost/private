@@ -438,6 +438,9 @@ class SellController extends Controller
                 })
                 ->editColumn('invoice_no', function ($row) {
                     $invoice_no = $row->invoice_no;
+
+                    // logger('$row', [$row]);
+
                     if (!empty($row->woocommerce_order_id)) {
                         $invoice_no .= ' <i class="fab fa-wordpress text-primary no-print" title="' . __('lang_v1.synced_from_woocommerce') . '"></i>';
                     }

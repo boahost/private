@@ -6,7 +6,7 @@ return [
     "purchases"                         => "Compras",
     "add_payment"                       => "Adicionar pagamento",
     "edit_payment"                      => "Editar pagamento",
-    "view_payments"                     => "Ver pagamentos",
+    "view_payments"                     => "Ver Pagamentos",
     "amount_already_paid"               => "Valor já pago",
     "payment_added_success"             => "Pagamento adicionado com sucesso",
     "payment_updated_success"           => "Pagamento atualizado com sucesso",

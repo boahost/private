@@ -1,11 +1,25 @@
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
         <div class="form-group" style="width: 100% !important">
+
+            @if (request()->session()->get('user.business_id') == 20)
+                <input type="hidden" id="total_sell_return_remaining">
+                <div id="return_amount_div" class="hide">
+                    <label for="use_return_amount">Usar saldo
+                        <span>0</span>
+                    </label>
+                    <input type="checkbox" id="use_return_amount" name="use_return_amount">
+                </div>
+            @endif
+
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon">
-                    <i class="fa fa-user">
-
-                    </i>
+                    <i class="fa fa-user"></i>
                 </span>
                 <input type="hidden" id="default_customer_id" value="{{ $walk_in_customer['id'] }}">
                 <input type="hidden" id="default_customer_name" value="{{ $walk_in_customer['name'] }}">
@@ -32,8 +46,7 @@
                 <div class="input-group-btn">
                     <button type="button" class="btn btn-default bg-white btn-flat" data-toggle="modal"
                         data-target="#configure_search_modal" title="{{ __('lang_v1.configure_product_search') }}">
-                        <i class="fa fa-barcode">
-                        </i>
+                        <i class="fa fa-barcode"> </i>
                     </button>
                 </div>
                 {!! Form::text('search_product', null, [
@@ -236,7 +249,8 @@
 
 <div class="row">
     <div class="col-sm-12 pos_product_div">
-        <input type="hidden" name="sell_price_tax" id="sell_price_tax" value="{{ $business_details->sell_price_tax }}">
+        <input type="hidden" name="sell_price_tax" id="sell_price_tax"
+            value="{{ $business_details->sell_price_tax }}">
 
         <!-- Keeps count of product rows -->
         <input type="hidden" id="product_row_count" value="0">

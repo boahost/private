@@ -3621,29 +3621,38 @@ class TransactionUtil extends Util
     {
         $qty_difference = $this->num_uf($new_quantity) - $this->num_uf($old_quantity);
 
+        // dd($qty_difference);
+
         if ($qty_difference != 0) {
             $qty_left_to_update       = $qty_difference;
             $sell_line_purchase_lines = TransactionSellLinesPurchaseLines::where('sell_line_id', $sell_line->id)->get();
+
+            // dd($sell_line_purchase_lines);
 
             //Return from each purchase line
             foreach ($sell_line_purchase_lines as $tslpl) {
                 //If differnce is +ve decrease quantity sold
                 if ($qty_difference > 0) {
+                    // dd("if $qty_difference");
+
                     if ($tslpl->qty_returned < $tslpl->quantity) {
                         //Quantity that can be returned from sell line purchase line
                         $tspl_qty_left_to_return = $tslpl->quantity - $tslpl->qty_returned;
 
                         $purchase_line = PurchaseLine::find($tslpl->purchase_line_id);
                         if ($qty_left_to_update <= $tspl_qty_left_to_return) {
-                            $purchase_line->quantity_sold -= $qty_left_to_update;
-                            $purchase_line->save();
-
+                            if ($purchase_line) {
+                                $purchase_line->quantity_sold -= $qty_left_to_update;
+                                $purchase_line->save();
+                            }
                             $tslpl->qty_returned += $qty_left_to_update;
                             $tslpl->save();
                             break;
                         } else {
-                            $purchase_line->quantity_sold -= $tspl_qty_left_to_return;
-                            $purchase_line->save();
+                            if ($purchase_line) {
+                                $purchase_line->quantity_sold -= $tspl_qty_left_to_return;
+                                $purchase_line->save();
+                            }
 
                             $tslpl->qty_returned += $tspl_qty_left_to_return;
                             $tslpl->save();
@@ -3651,9 +3660,14 @@ class TransactionUtil extends Util
                         }
                     }
                 } //If differnce is -ve increase quantity sold
-                elseif ($qty_difference < 0) {
+                else if ($qty_difference < 0) {
+                    // dd("else $qty_difference");
+
                     $purchase_line      = PurchaseLine::find($tslpl->purchase_line_id);
                     $tspl_qty_to_return = $tslpl->qty_returned + $qty_left_to_update;
+
+                    // dd($purchase_line);
+
                     if ($tspl_qty_to_return >= 0) {
                         $purchase_line->quantity_sold -= $qty_left_to_update;
                         $purchase_line->save();
@@ -4308,155 +4322,155 @@ class TransactionUtil extends Util
     public function getListSells($business_id, $pagamento)
     {
 
-        if($pagamento != 'sem_pgto'){
-
-        $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
-            ->leftJoin('transaction_payments as tp', 'transactions.id', '=', 'tp.transaction_id')
-            ->leftJoin('transaction_sell_lines as tsl', 'transactions.id', '=', 'tsl.transaction_id')
-            ->leftJoin('users as u', 'transactions.created_by', '=', 'u.id')
-            ->leftJoin('users as ss', 'transactions.res_waiter_id', '=', 'ss.id')
-            ->leftJoin('res_tables as tables', 'transactions.res_table_id', '=', 'tables.id')
-            ->join(
-                'business_locations AS bl',
-                'transactions.location_id',
-                '=',
-                'bl.id'
-            )
-            ->leftJoin(
-                'transactions AS SR',
-                'transactions.id',
-                '=',
-                'SR.return_parent_id'
-            )
-            ->leftJoin(
-                'types_of_services AS tos',
-                'transactions.types_of_service_id',
-                '=',
-                'tos.id'
-            )
-            ->where('transactions.business_id', $business_id)
-            ->where('transactions.type', 'sell')
-            ->where('transactions.status', 'final')
-            ->where('tp.method', $pagamento)
-            ->select(
-                'transactions.repair_job_sheet_id',
-                'transactions.id',
-                'transactions.pedido_ecommerce_id',
-                'transactions.transaction_date',
-                'transactions.is_direct_sale',
-                'transactions.invoice_no',
-                'transactions.invoice_no as invoice_no_text',
-                'contacts.name',
-                'contacts.mobile',
-                'contacts.landline',
-                'contacts.alternate_number',
-                'contacts.contact_id',
-                'transactions.payment_status',
-                'transactions.final_total',
-                'transactions.tax_amount',
-                'transactions.discount_amount',
-                'transactions.discount_type',
-                'transactions.total_before_tax',
-                'transactions.rp_redeemed',
-                'transactions.rp_redeemed_amount',
-                'transactions.rp_earned',
-                'transactions.types_of_service_id',
-                'transactions.shipping_status',
-                'transactions.pay_term_number',
-                'transactions.pay_term_type',
-                'transactions.additional_notes',
-                'transactions.staff_note',
-                'transactions.shipping_details',
-                DB::raw('DATE_FORMAT(transactions.transaction_date, "%Y/%m/%d") as sale_date'),
-                DB::raw("CONCAT(COALESCE(u.surname, ''),' ',COALESCE(u.first_name, ''),' ',COALESCE(u.last_name,'')) as added_by"),
-                DB::raw('(SELECT SUM(IF(TP.is_return = 1,-1*TP.amount,TP.amount)) FROM transaction_payments AS TP WHERE
-                TP.transaction_id=transactions.id and TP.paid_on is not null) as total_paid'),
-                'bl.name as business_location',
-                DB::raw('COUNT(SR.id) as return_exists'),
-                DB::raw('(SELECT SUM(TP2.amount) FROM transaction_payments AS TP2 WHERE
-                TP2.transaction_id=SR.id ) as return_paid'),
-                DB::raw('COALESCE(SR.final_total, 0) as amount_return'),
-                'SR.id as return_transaction_id',
-                'tos.name as types_of_service_name',
-                'transactions.service_custom_field_1',
-                DB::raw('COUNT( DISTINCT tsl.id) as total_items'),
-                DB::raw("CONCAT(COALESCE(ss.surname, ''),' ',COALESCE(ss.first_name, ''),' ',COALESCE(ss.last_name,'')) as waiter"),
-                'tables.name as table_name'
-            );
-
-        }else {
+        if ($pagamento != 'sem_pgto') {
 
             $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
-            ->leftJoin('transaction_payments as tp', 'transactions.id', '=', 'tp.transaction_id')
-            ->leftJoin('transaction_sell_lines as tsl', 'transactions.id', '=', 'tsl.transaction_id')
-            ->leftJoin('users as u', 'transactions.created_by', '=', 'u.id')
-            ->leftJoin('users as ss', 'transactions.res_waiter_id', '=', 'ss.id')
-            ->leftJoin('res_tables as tables', 'transactions.res_table_id', '=', 'tables.id')
-            ->join(
-                'business_locations AS bl',
-                'transactions.location_id',
-                '=',
-                'bl.id'
-            )
-            ->leftJoin(
-                'transactions AS SR',
-                'transactions.id',
-                '=',
-                'SR.return_parent_id'
-            )
-            ->leftJoin(
-                'types_of_services AS tos',
-                'transactions.types_of_service_id',
-                '=',
-                'tos.id'
-            )
-            ->where('transactions.business_id', $business_id)
-            ->where('transactions.type', 'sell')
-            ->where('transactions.status', 'final')
-            //->where('tp.method', $pagamento)
-            ->select(
-                'transactions.repair_job_sheet_id',
-                'transactions.id',
-                'transactions.pedido_ecommerce_id',
-                'transactions.transaction_date',
-                'transactions.is_direct_sale',
-                'transactions.invoice_no',
-                'transactions.invoice_no as invoice_no_text',
-                'contacts.name',
-                'contacts.mobile',
-                'contacts.contact_id',
-                'transactions.payment_status',
-                'transactions.final_total',
-                'transactions.tax_amount',
-                'transactions.discount_amount',
-                'transactions.discount_type',
-                'transactions.total_before_tax',
-                'transactions.rp_redeemed',
-                'transactions.rp_redeemed_amount',
-                'transactions.rp_earned',
-                'transactions.types_of_service_id',
-                'transactions.shipping_status',
-                'transactions.pay_term_number',
-                'transactions.pay_term_type',
-                'transactions.additional_notes',
-                'transactions.staff_note',
-                'transactions.shipping_details',
-                DB::raw('DATE_FORMAT(transactions.transaction_date, "%Y/%m/%d") as sale_date'),
-                DB::raw("CONCAT(COALESCE(u.surname, ''),' ',COALESCE(u.first_name, ''),' ',COALESCE(u.last_name,'')) as added_by"),
-                DB::raw('(SELECT SUM(IF(TP.is_return = 1,-1*TP.amount,TP.amount)) FROM transaction_payments AS TP WHERE
+                ->leftJoin('transaction_payments as tp', 'transactions.id', '=', 'tp.transaction_id')
+                ->leftJoin('transaction_sell_lines as tsl', 'transactions.id', '=', 'tsl.transaction_id')
+                ->leftJoin('users as u', 'transactions.created_by', '=', 'u.id')
+                ->leftJoin('users as ss', 'transactions.res_waiter_id', '=', 'ss.id')
+                ->leftJoin('res_tables as tables', 'transactions.res_table_id', '=', 'tables.id')
+                ->join(
+                    'business_locations AS bl',
+                    'transactions.location_id',
+                    '=',
+                    'bl.id'
+                )
+                ->leftJoin(
+                    'transactions AS SR',
+                    'transactions.id',
+                    '=',
+                    'SR.return_parent_id'
+                )
+                ->leftJoin(
+                    'types_of_services AS tos',
+                    'transactions.types_of_service_id',
+                    '=',
+                    'tos.id'
+                )
+                ->where('transactions.business_id', $business_id)
+                ->where('transactions.type', 'sell')
+                ->where('transactions.status', 'final')
+                ->where('tp.method', $pagamento)
+                ->select(
+                    'transactions.repair_job_sheet_id',
+                    'transactions.id',
+                    'transactions.pedido_ecommerce_id',
+                    'transactions.transaction_date',
+                    'transactions.is_direct_sale',
+                    'transactions.invoice_no',
+                    'transactions.invoice_no as invoice_no_text',
+                    'contacts.name',
+                    'contacts.mobile',
+                    'contacts.landline',
+                    'contacts.alternate_number',
+                    'contacts.contact_id',
+                    'transactions.payment_status',
+                    'transactions.final_total',
+                    'transactions.tax_amount',
+                    'transactions.discount_amount',
+                    'transactions.discount_type',
+                    'transactions.total_before_tax',
+                    'transactions.rp_redeemed',
+                    'transactions.rp_redeemed_amount',
+                    'transactions.rp_earned',
+                    'transactions.types_of_service_id',
+                    'transactions.shipping_status',
+                    'transactions.pay_term_number',
+                    'transactions.pay_term_type',
+                    'transactions.additional_notes',
+                    'transactions.staff_note',
+                    'transactions.shipping_details',
+                    DB::raw('DATE_FORMAT(transactions.transaction_date, "%Y/%m/%d") as sale_date'),
+                    DB::raw("CONCAT(COALESCE(u.surname, ''),' ',COALESCE(u.first_name, ''),' ',COALESCE(u.last_name,'')) as added_by"),
+                    DB::raw('(SELECT SUM(IF(TP.is_return = 1,-1*TP.amount,TP.amount)) FROM transaction_payments AS TP WHERE
                 TP.transaction_id=transactions.id and TP.paid_on is not null) as total_paid'),
-                'bl.name as business_location',
-                DB::raw('COUNT(SR.id) as return_exists'),
-                DB::raw('(SELECT SUM(TP2.amount) FROM transaction_payments AS TP2 WHERE
+                    'bl.name as business_location',
+                    DB::raw('COUNT(SR.id) as return_exists'),
+                    DB::raw('(SELECT SUM(TP2.amount) FROM transaction_payments AS TP2 WHERE
                 TP2.transaction_id=SR.id ) as return_paid'),
-                DB::raw('COALESCE(SR.final_total, 0) as amount_return'),
-                'SR.id as return_transaction_id',
-                'tos.name as types_of_service_name',
-                'transactions.service_custom_field_1',
-                DB::raw('COUNT( DISTINCT tsl.id) as total_items'),
-                DB::raw("CONCAT(COALESCE(ss.surname, ''),' ',COALESCE(ss.first_name, ''),' ',COALESCE(ss.last_name,'')) as waiter"),
-                'tables.name as table_name'
-            );
+                    DB::raw('COALESCE(SR.final_total, 0) as amount_return'),
+                    'SR.id as return_transaction_id',
+                    'tos.name as types_of_service_name',
+                    'transactions.service_custom_field_1',
+                    DB::raw('COUNT( DISTINCT tsl.id) as total_items'),
+                    DB::raw("CONCAT(COALESCE(ss.surname, ''),' ',COALESCE(ss.first_name, ''),' ',COALESCE(ss.last_name,'')) as waiter"),
+                    'tables.name as table_name'
+                );
+
+        } else {
+
+            $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
+                ->leftJoin('transaction_payments as tp', 'transactions.id', '=', 'tp.transaction_id')
+                ->leftJoin('transaction_sell_lines as tsl', 'transactions.id', '=', 'tsl.transaction_id')
+                ->leftJoin('users as u', 'transactions.created_by', '=', 'u.id')
+                ->leftJoin('users as ss', 'transactions.res_waiter_id', '=', 'ss.id')
+                ->leftJoin('res_tables as tables', 'transactions.res_table_id', '=', 'tables.id')
+                ->join(
+                    'business_locations AS bl',
+                    'transactions.location_id',
+                    '=',
+                    'bl.id'
+                )
+                ->leftJoin(
+                    'transactions AS SR',
+                    'transactions.id',
+                    '=',
+                    'SR.return_parent_id'
+                )
+                ->leftJoin(
+                    'types_of_services AS tos',
+                    'transactions.types_of_service_id',
+                    '=',
+                    'tos.id'
+                )
+                ->where('transactions.business_id', $business_id)
+                ->where('transactions.type', 'sell')
+                ->where('transactions.status', 'final')
+                //->where('tp.method', $pagamento)
+                ->select(
+                    'transactions.repair_job_sheet_id',
+                    'transactions.id',
+                    'transactions.pedido_ecommerce_id',
+                    'transactions.transaction_date',
+                    'transactions.is_direct_sale',
+                    'transactions.invoice_no',
+                    'transactions.invoice_no as invoice_no_text',
+                    'contacts.name',
+                    'contacts.mobile',
+                    'contacts.contact_id',
+                    'transactions.payment_status',
+                    'transactions.final_total',
+                    'transactions.tax_amount',
+                    'transactions.discount_amount',
+                    'transactions.discount_type',
+                    'transactions.total_before_tax',
+                    'transactions.rp_redeemed',
+                    'transactions.rp_redeemed_amount',
+                    'transactions.rp_earned',
+                    'transactions.types_of_service_id',
+                    'transactions.shipping_status',
+                    'transactions.pay_term_number',
+                    'transactions.pay_term_type',
+                    'transactions.additional_notes',
+                    'transactions.staff_note',
+                    'transactions.shipping_details',
+                    DB::raw('DATE_FORMAT(transactions.transaction_date, "%Y/%m/%d") as sale_date'),
+                    DB::raw("CONCAT(COALESCE(u.surname, ''),' ',COALESCE(u.first_name, ''),' ',COALESCE(u.last_name,'')) as added_by"),
+                    DB::raw('(SELECT SUM(IF(TP.is_return = 1,-1*TP.amount,TP.amount)) FROM transaction_payments AS TP WHERE
+                TP.transaction_id=transactions.id and TP.paid_on is not null) as total_paid'),
+                    'bl.name as business_location',
+                    DB::raw('COUNT(SR.id) as return_exists'),
+                    DB::raw('(SELECT SUM(TP2.amount) FROM transaction_payments AS TP2 WHERE
+                TP2.transaction_id=SR.id ) as return_paid'),
+                    DB::raw('COALESCE(SR.final_total, 0) as amount_return'),
+                    'SR.id as return_transaction_id',
+                    'tos.name as types_of_service_name',
+                    'transactions.service_custom_field_1',
+                    DB::raw('COUNT( DISTINCT tsl.id) as total_items'),
+                    DB::raw("CONCAT(COALESCE(ss.surname, ''),' ',COALESCE(ss.first_name, ''),' ',COALESCE(ss.last_name,'')) as waiter"),
+                    'tables.name as table_name'
+                );
 
         }
 

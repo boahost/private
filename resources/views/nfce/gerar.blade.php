@@ -19,10 +19,10 @@
       <div class="col-md-5">
         <h4>Local: <strong>{{$transaction->location->name}} - {{$transaction->location->location_id}}</strong></h4>
         <h4>Ultimo numero NFC-e: <strong>{{$transaction->lastNFCe($transaction)}}</strong></h4>
-        <h4>Valor: <strong>{{number_format($transaction->total_before_tax, 2, ',', '.')}}</strong></h4>
+        <h4>Valor: <strong>{{number_format($transaction->final_total, 2, ',', '.')}}</strong></h4>
 
       </div>
-      
+
       <div class="clearfix"></div>
 
       <div class="col-md-12">
@@ -31,13 +31,13 @@
         <a class="btn btn-lg btn-success" id="send-sefaz">Transmitir para Sefaz</a>
       </div>
 
-      
+
       @endcomponent
     </div>
 
   </div>
 
-  
+
 
   <input type="hidden" id="token" value="{{csrf_token()}}" name="">
 
