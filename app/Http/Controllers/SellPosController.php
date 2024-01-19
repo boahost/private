@@ -590,6 +590,111 @@ class SellPosController extends Controller
                 // dd($input['payment']);
                 // }
 
+
+
+
+                /**
+                 * SE O CLIENTE TIVER SALDO DISPONÍVEL, DEBITA O VALOR USADO
+                 * IMPLEMETADO POR EDIMILSON
+                 * 18/01/2024
+                 */
+                // if ($business_id == 20) {
+                    $usou_saldo = array_filter($input['payment'], function ($p) {
+                        if (($p['method'] ?? null) == 'sell_return_remaining') {
+                            $p['method'] = 'other';
+                            return true;
+                        }
+                    });
+
+                    if (sizeof($usou_saldo) > 0) {
+                        $saldo                    = $this->transactionUtil->getSaldoCiente($business_id, $contact_id);
+                        $valor_usado              = $this->productUtil->num_uf($usou_saldo[0]['amount']);
+                        $valor_dedutivel_restante = $valor_usado;
+
+                        if ($valor_usado > $saldo) {
+                            throw new \Exception("O valor de saldo usado é maior que o saldo disponível no cliente. Saldo disponível: R$ " . number_format($saldo, 2, ',', '.'));
+                        }
+
+                        $transaction_return = Transaction::query()
+                            ->select('id', 'final_total', 'payment_status')
+                            ->with([
+                                'payments' => function ($query) {
+                                    $query->select('transaction_id', 'amount');
+                                }
+                            ])
+                            ->where('business_id', $business_id)
+                            ->where('type', 'sell_return')
+                            ->where('status', '!=', 'draft')
+                            ->where('payment_status', '!=', 'paid')
+                            ->where('contact_id', $contact_id)
+                            ->get();
+
+
+                        foreach ($transaction_return as $key => $tsr) {
+                            $soma_sado_debitado = array_sum(array_column($tsr->payments->toArray(), 'amount'));
+
+                            /**
+                             * Se a soma dos pagamentos for maior ou igual ao valor total da transação, marca como paga e continua para a próxima transação
+                             */
+                            if ($soma_sado_debitado >= $tsr->final_total) {
+                                $tsr->fill(['payment_status' => 'paid']);
+                                $tsr->save();
+
+                                continue;
+                            }
+
+                            $valor_disponivel = $tsr->final_total - $soma_sado_debitado;
+
+                            /**
+                             * Verifica se o valor usado é maior que o valor disponível nesta transação
+                             * Se for, debita o valor disponível e continua para a próxima transação
+                             */
+                            if ($valor_dedutivel_restante > $valor_disponivel) {
+                                $valor_dedutivel_restante -= $valor_disponivel;
+
+                                $this->transactionUtil->debitarSaldoCiente(
+                                    $tsr->id,
+                                    $input['location_id'],
+                                    $business_id,
+                                    $contact_id,
+                                    $valor_disponivel,
+                                    auth()->user()->id
+                                );
+
+                                $tsr->fill(['payment_status' => 'paid']);
+                                $tsr->save();
+
+                                continue;
+                            }
+
+                            /**
+                             * Debita o valor usado restante e para o loop
+                             */
+                            $this->transactionUtil->debitarSaldoCiente(
+                                $tsr->id,
+                                $input['location_id'],
+                                $business_id,
+                                $contact_id,
+                                $valor_dedutivel_restante,
+                                auth()->user()->id
+                            );
+
+                            /**
+                             * Se o valor usado restante for igual ao valor disponível, marca a transação como paga
+                             */
+                            if ($valor_dedutivel_restante == $valor_disponivel) {
+                                $tsr->fill(['payment_status' => 'paid']);
+                                $tsr->save();
+                            }
+
+                            break;
+                        }
+                    }
+                // }
+
+
+
+
                 if ($input['final_total'] < 1) {
                     $temp = [];
                     foreach ($input['payment'] as $key => $pay) {
@@ -735,7 +840,10 @@ class SellPosController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::emergency("File:" . $e->getFile() . "Line:" . $e->getLine() . "Message:" . $e->getMessage());
+
+            if ($business_id != 20)
+                \Log::emergency("File:" . $e->getFile() . ":" . $e->getLine() . " Message:" . $e->getMessage());
+
             $msg = trans("messages.something_went_wrong");
 
             if (get_class($e) == \App\Exceptions\PurchaseSellMismatch::class) {

@@ -248,6 +248,7 @@
 <script>
     window.addEventListener('load', function() {
         $(() => {
+            //
             const keys = [
                 'd',
                 'f',

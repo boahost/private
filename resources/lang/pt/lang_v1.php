@@ -272,7 +272,7 @@ return [
     'quotation_updated'                          => 'Cotação atualizada com sucesso',
     'product_sold_details_register'              => 'Detalhes dos produtos vendidos',
     'grand_total'                                => 'Total ótimo',
-    'change_return'                              => 'Alterar o retorno',
+    'change_return'                              => 'Troco',
     'date_format'                                => 'Formato de data',
     'time_format'                                => 'Formato da hora',
     '12_hour'                                    => '12 horas ',

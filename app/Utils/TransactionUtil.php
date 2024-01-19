@@ -233,6 +233,49 @@ class TransactionUtil extends Util
         return $transaction;
     }
 
+    function getSaldoCiente($business_id, $contact_id)
+    {
+        $transaction = Transaction::query()
+            ->where('business_id', $business_id)
+            ->where('type', 'sell_return')
+            ->where('status', '!=', 'draft')
+            ->where('payment_status', '!=', 'paid')
+            ->where('contact_id', $contact_id)
+            ->sum(DB::raw('final_total - COALESCE ((SELECT SUM(amount) FROM transaction_payments WHERE transaction_payments.transaction_id = transactions.id), 0)'))
+        ;
+
+        return $transaction;
+    }
+
+    function debitarSaldoCiente($transaction_id, $location_id, $business_id, $contact_id, $valor_usado, $user_id)
+    {
+        $payment_data = [
+            'amount'         => $valor_usado,
+            'method'         => 'other',
+            'business_id'    => $business_id,
+            'is_return'      => 0,
+            'transaction_id' => $transaction_id,
+            'vencimento'     => date('Y-m-d'),
+            'paid_on'        => \Carbon::now()->toDateTimeString(),
+            'created_by'     => $user_id,
+            'payment_for'    => $contact_id,
+            'payment_ref_no' => 'Saldo',
+            'account_id'     => null
+        ];
+
+        $payment = TransactionPayment::query()->create($payment_data);
+
+        $payment->save();
+
+        return $payment;
+    }
+
+    function zerarSaldoCiente($business_id, $contact_id)
+    {
+
+    }
+
+
     /**
      * Add/Edit transaction sell lines
      *

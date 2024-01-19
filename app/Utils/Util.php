@@ -275,12 +275,14 @@ class Util
         if ($business_id) {
             $integrations = Integration::where('business_id', $business_id)->get()->toArray();
 
-            foreach ($integrations as $key => $integration) {
-                if ($integration['integration'] == 'efi') {
-                    $payment_types['pix_efi'] = 'PIX - Efi';
-                }
+            $integrationKeys = array_column($integrations, 'integration');
+            if (in_array('efi', $integrationKeys)) {
+                $payment_types['pix_efi'] = __('integration.pix_efi');
             }
         }
+
+        $payment_types['sell_return_remaining'] = 'Saldo';
+
 
         // var_dump($payment_types);
         // exit;

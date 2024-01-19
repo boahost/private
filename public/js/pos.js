@@ -865,7 +865,12 @@ $(document).ready(function () {
             dataType: 'html',
             success: function (result) {
                 if (result) {
-                    var appended = $('#payment_rows_div').append(result);
+                    const row = $(result)
+
+                    row.find('[value="sell_return_remaining"]').parent('.radio-button').remove();
+                    row.find('[value="cash"]').prop('checked', true);
+
+                    var appended = $('#payment_rows_div').append(row);
 
                     var total_payable = __read_number($('input#final_total_input'));
                     var total_paying = __read_number($('input#total_paying_input'));
@@ -880,6 +885,7 @@ $(document).ready(function () {
                         .change()
                         .select();
                     __select2($(appended).find('.select2'));
+
                     $(appended).find('#method_' + row_index).change();
                     $('#payment_row_index').val(parseInt(row_index) + 1);
                     $('#data_base_' + row_index).val($('#payment_' + row_index).val())
@@ -1917,14 +1923,22 @@ function calculate_billing_details(price_total) {
 
     var total_payable = price_total + order_tax - discount + shipping_charges + packing_charge;
 
-    if (input_use_return_amount.is(':checked')) {
-        var return_amount = parseFloat(input_total_sell_return_remaining.val());
-        total_payable = total_payable - return_amount;
-    }
-
     var rounding_multiple = $('#amount_rounding_method').val() ? parseFloat($('#amount_rounding_method').val()) : 0;
     var round_off_data = __round(total_payable, rounding_multiple);
     var total_payable_rounded = round_off_data.number;
+
+    if (input_use_return_amount.is(':checked')) {
+        $('#method_0_sell_return_remaining').prop('checked', true).parent('.radio-button').show();
+        __write_number($('.payment-amount').first(), parseFloat(input_total_sell_return_remaining.val()));
+    } else {
+        //Check if edit form then don't update price.
+        // if ($('form#edit_pos_sell_form').length == 0 || parseFloat($('.payment-amount').first().val()) <= 0) {
+        __write_number($('.payment-amount').first(), total_payable_rounded);
+        // }
+        // remove .parent('.radio-button')
+        $('#method_0_cash').prop('checked', true)
+        $('#method_0_sell_return_remaining').parent('.radio-button').hide();
+    }
 
     var round_off_amount = round_off_data.diff;
     if (round_off_amount != 0) {
@@ -1943,11 +1957,6 @@ function calculate_billing_details(price_total) {
     $('#total_payable').text(__currency_trans_from_en(shown_total, false));
 
     $('span.total_payable_span').text(__currency_trans_from_en(total_payable_rounded, true));
-
-    //Check if edit form then don't update price.
-    // if ($('form#edit_pos_sell_form').length == 0 || parseFloat($('.payment-amount').first().val()) <= 0) {
-    __write_number($('.payment-amount').first(), total_payable_rounded);
-    // }
 
     $(document).trigger('invoice_total_calculated');
 

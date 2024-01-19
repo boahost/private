@@ -225,7 +225,12 @@ class Transaction extends Model
         return $this->hasMany(\App\Models\PurchaseLine::class);
     }
 
-    public function sell_lines()
+     public function payments()
+    {
+        return $this->hasMany(\App\Models\TransactionPayment::class, 'transaction_id');
+    }
+
+     public function sell_lines()
     {
         return $this->hasMany(\App\Models\TransactionSellLine::class)->orderBy('unit_price');
     }

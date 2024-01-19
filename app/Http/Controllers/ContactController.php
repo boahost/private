@@ -1019,14 +1019,14 @@ class ContactController extends Controller
 
             $total_sell_return = "select
                                         SUM(
-                                            final_total - (
+                                            final_total - COALESCE((
                                                 SELECT
                                                     SUM(amount)
                                                 FROM
                                                     transaction_payments
                                                 WHERE
                                                     transaction_payments.transaction_id = transactions.id
-                                            )
+                                            ), 0)
                                         )
                                     from
                                         `transactions`
