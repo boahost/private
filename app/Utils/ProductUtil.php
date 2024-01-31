@@ -1573,9 +1573,9 @@ class ProductUtil extends Util
                  * Alteração para pesquisar por SKU e Código de Barras na tela do PDV
                  */
                 if (in_array('sku', $search_fields) || in_array('sub_sku', $search_fields)) {
-                    $query->orWhere('sku', $search_term);
+                    $query->orWhere('sku', 'like', "%$search_term");
 
-                    $query->orWhere('sub_sku', $search_term);
+                    $query->orWhere('sub_sku', 'like', "%$search_term");
                 }
 
                 if (in_array('codigo_barras', $search_fields)) {
