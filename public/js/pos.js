@@ -193,6 +193,8 @@ $(document).ready(function () {
                     response
                 );
             },
+
+            delay: 1500,
             minLength: 2,
             response: function (event, ui) {
                 if (ui.content.length == 1) {

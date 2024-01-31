@@ -9,9 +9,9 @@
             <small>@lang('superadmin::lang.manage_business')</small>
         </h1>
         <!-- <ol class="breadcrumb">
-                                        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-                                        <li class="active">Here</li>
-                                    </ol> -->
+                                                                <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+                                                                <li class="active">Here</li>
+                                                            </ol> -->
     </section>
 
     <!-- Main content -->
@@ -51,17 +51,25 @@
                                     </div>
                                     <!-- /.widget-user-image -->
                                     <h4 class="widget-user-username">{{ $business->name }}</h4>
-                                    <h5 class="widget-user-desc"><i class="fa fa-user-secret" title="Owner"></i>
-                                        {{ $business->owner->first_name . ' ' . $business->owner->last_name }}</h5>
 
-                                    <h5 class="widget-user-desc"><i class="fa fa-file" title="Owner"></i> {{ $business->cnpj }}
-                                    </h5>
-                                    <h5 class="widget-user-desc"><i class="fa fa-envelope" title="Owner Email"></i>
-                                        {{ $business->owner->email }}</h5>
-                                    <h5 class="widget-user-desc"><i class="fa fa-mobile" title="Owner Contact"></i>
-                                        {{ $business->owner->contact_no }}</h5>
-                                    <h5 class="widget-user-desc"><i class="fa fa-phone" title="Business Contact"></i>
-                                        {{ implode([', ', $address->mobile, $address->alternate_number]) }}</h5>
+                                    @if ($business->owner)
+                                        <h5 class="widget-user-desc"><i class="fa fa-user-secret" title="Owner"></i>
+                                            {{ $business->owner->first_name . ' ' . $business->owner->last_name }}
+                                        </h5>
+                                        <h5 class="widget-user-desc"><i class="fa fa-file" title="Owner"></i>
+                                            {{ $business->cnpj }}
+                                        </h5>
+                                        <h5 class="widget-user-desc"><i class="fa fa-envelope" title="Owner Email"></i>
+                                            {{ $business->owner->email }}
+                                        </h5>
+                                        <h5 class="widget-user-desc"><i class="fa fa-mobile" title="Owner Contact"></i>
+                                            {{ $business->owner->contact_no }}
+                                        </h5>
+                                        <h5 class="widget-user-desc"><i class="fa fa-phone" title="Business Contact"></i>
+                                            {{ implode([', ', $address->mobile, $address->alternate_number]) }}
+                                        </h5>
+                                    @endif
+
                                     <address class="widget-user-desc">
                                         @php
                                             $address_array = [];

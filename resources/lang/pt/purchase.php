@@ -2,7 +2,7 @@
 return [
     "supplier"                          => "Fornecedor",
     "ref_no"                            => "Referência",
-    "business_location"                 => "Localização da empresa",
+    "business_location"                 => "Empresa",
     "purchases"                         => "Compras",
     "add_payment"                       => "Adicionar pagamento",
     "edit_payment"                      => "Editar pagamento",

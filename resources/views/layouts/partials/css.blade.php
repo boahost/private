@@ -23,10 +23,14 @@
         background-position: center;
     }
 
-    /* .dataTable,
+    /* .dataTable, */
     .dataTables_scrollBody {
         min-height: 400px;
-    } */
+    }
+
+    th.sorting {
+        white-space: nowrap;
+    }
 </style>
 
 @if (isset($pos_layout) && $pos_layout)

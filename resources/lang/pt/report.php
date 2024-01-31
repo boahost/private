@@ -20,7 +20,7 @@
 "contact" => "Contato",
 "stock_report" => "Relatório de estoque",
 "products" => "Produtos",
-"current_stock" => "Estoque atual",
+"current_stock" => "Estoque",
 "total_unit_sold" => "Unidade total vendida",
 "tax_report" => "Relatório fiscal",
 "tax_report_msg" => "Detalhes do imposto para o período selecionado",
