@@ -89,7 +89,9 @@ class RevenueController extends Controller
                     </span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-left" role="menu">';
-                    
+                    if(!$row->boleto){
+                        $html .= '<li><a href="'.action('RevenueController@edit', [$row->id]).'"><i class="glyphicon glyphicon-edit"></i> Editar</a></li>';
+                    }
 
                     if(!$row->status){
                         $html .= '<li><a href="'.action('RevenueController@receive', [$row->id]).'"><i class="glyphicon glyphicon-ok"></i> Receber</a></li>';
@@ -105,6 +107,22 @@ class RevenueController extends Controller
                     <a data-href="'.action('RevenueController@destroy', [$row->id]).'" class="delete_revenue"><i class="glyphicon glyphicon-trash"></i> Excluir</a>
                     </li>
                     <li class="divider"></li>';
+
+                    if(!$row->boleto){
+                        if($row->contact && $row->contact->name != 'Cliente padrão'){
+                            $html .= '<li>
+                            <a href="'.action('BoletoController@create', [$row->id]).'" class=""><i class="glyphicon glyphicon-list-alt"></i> Gerar boleto</a>
+                            </li>';
+                        }
+                    }else{
+                        $html .= '<li>
+                        <a target="_blank" href="'.action('BoletoController@ver', [$row->id]).'" class=""><i class="glyphicon glyphicon-list-alt"></i> Download boleto</a>
+                        </li>';
+
+                        $html .= '<li>
+                        <a href="'.action('BoletoController@gerarRemessa', [$row->id]).'" class=""><i class="glyphicon glyphicon-file"></i> Gerar remessa</a>
+                        </li>';
+                    }
 
                     $html .= '</ul></div>';
                     return $html;
@@ -194,7 +212,6 @@ class RevenueController extends Controller
 
         $business_locations = BusinessLocation::forDropdown($business_id, true);
 
-        
         return view('revenues.index')
         ->with(compact('categories', 'business_locations', 'users'));
     }

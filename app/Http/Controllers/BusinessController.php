@@ -165,7 +165,7 @@ class BusinessController extends Controller
                     'email.email'                => __('validation.unique', ['attribute' => __('business.email')]),
                     'first_name.required'        => __('validation.required', [
                         'attribute' =>
-                        __('business.first_name')
+                            __('business.first_name')
                     ]),
                     'username.required'          => __('validation.required', ['attribute' => __('business.username')]),
                     'username.min'               => __('validation.min', ['attribute' => __('business.username')]),
@@ -499,6 +499,45 @@ class BusinessController extends Controller
             ->with('listaCST_IPI', $listaCST_IPI)
             ->with('pessoa', $pessoa)
             ->with('cities', $this->prepareCities());
+    }
+
+    public function downloadCertificado()
+    {
+        // if (!auth()->user()->can('business_settings.access')) {
+        //     abort(403, 'Unauthorized action.');
+        // }
+
+        // try{
+        //     $business_id = request()->session()->get('user.business_id');
+        //     $business = Business::where('id', $business_id)->first();
+
+        //     $headers = [
+        //         'Content-Type' => 'bin',
+        //     ];
+        //     if(!is_dir(public_path('certificados'))){
+        //         mkdir(public_path('certificados'), 0777, true);
+        //     }
+        //     $cnpj = preg_replace('/[^0-9]/', '', $business->cnpj);
+
+        //     file_put_contents("certificados/$cnpj.bin", $business->certificado);
+
+        //     return response()->download("certificados/$cnpj.bin");
+        // }catch(\Exception $e){
+
+        // }
+
+        $business_id = request()->session()->get('user.business_id');
+
+        $file = public_path("/uploads/business_certificados/") . Business::find($business_id)->certificado_urn;
+        // echo $file;
+        // die;
+        if (!file_exists($file)) {
+            $HOSTNAME_FILES = getenv('HOSTNAME_FILES');
+            $file           = $HOSTNAME_FILES . "/uploads/business_certificados/" . Business::find($business_id)->certificado_urn;
+            return redirect($file);
+        }
+
+        return response()->download($file);
     }
 
     private function getMeses($i)
@@ -851,6 +890,9 @@ class BusinessController extends Controller
             //update current financial year to session
             $financial_year = $this->businessUtil->getCurrentFinancialYear($business->id);
             $request->session()->put('financial_year', $financial_year);
+
+            \Artisan::call('cache:clear');
+            \Artisan::call('view:clear');
 
             $output = [
                 'success' => 1,

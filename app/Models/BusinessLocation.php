@@ -99,6 +99,11 @@ class BusinessLocation extends Model
         return $this->belongsTo(\App\Models\City::class);
     }
 
+    public function business()
+    {
+        return $this->belongsTo(\App\Models\Business::class);
+    }
+
     /**
      * Return list of locations for a business
      *

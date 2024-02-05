@@ -101,7 +101,7 @@ class OpeningStockController extends Controller
                     unset($locations[$key]);
                 }
             }
-            
+
 
             $enable_expiry = request()->session()->get('business.enable_product_expiry');
             $enable_lot = request()->session()->get('business.enable_lot_number');
@@ -126,7 +126,7 @@ class OpeningStockController extends Controller
                 'enable_lot'
             ));
         }else{
-            echo "po";
+            return redirect()->route('products.index');
         }
     }
 
@@ -321,7 +321,7 @@ class OpeningStockController extends Controller
                             ->where('location_id', $location_id)
                             ->with(['purchase_lines'])
                             ->first();
-                            
+
                             if (!empty($delete_transaction)) {
                                 $delete_purchase_lines = $delete_transaction->purchase_lines;
 

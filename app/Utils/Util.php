@@ -230,12 +230,11 @@ class Util
     {
         $payment_types = [
             'cash'          => 'Dinheiro',
-            // 'pix_efi'       => 'pix_efi',
             'card'          => 'Crédito',
             //'cd' => 'Cartão de Débito',
             //'pix' => 'PIX',
             'bank_transfer' => "Transferência",
-            //'boleto' => 'Boleto',
+            'boleto'        => 'Boleto',
 
             // 'other'         => __('Cheque')
         ];

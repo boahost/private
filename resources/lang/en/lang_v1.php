@@ -181,7 +181,7 @@ return [
     'show_time_with_date' => 'Show time with date',
     'show_sale_description' => 'Show sale description',
     'product_imei_or_sn' => '(Product IMEI or Serial Number)',
-    'purchase_already_exist' => "Product can't be deleted because purchases related to 
+    'purchase_already_exist' => "Product can't be deleted because purchases related to
 								this product exist",
     'opening_stock_sold' => "Product can't be deleted because some stocks are sold",
     'stock_adjusted' => "Product can't be deleted because some stocks are adjusted",
@@ -936,8 +936,8 @@ return [
     'amount_rounding_method' => 'Amount rounding method',
     'round_to_nearest_whole_number' => 'Round to nearest whole number',
     'round_to_nearest_decimal' => 'Round to nearest decimal (multiple of :multiple)',
-    'amount_rounding_method_help' => 'Example: <br><b>Round to nearest 
-    whole number:</b> 2.23 => 2, 2.50 => 3, 2.73 => 3 <br><b>Round to nearest 
+    'amount_rounding_method_help' => 'Example: <br><b>Round to nearest
+    whole number:</b> 2.23 => 2, 2.50 => 3, 2.73 => 3 <br><b>Round to nearest
     decimal (multiple of 0.05):</b> 2.11 => 2.10, 2.12 => 2.10, 2.13 => 2.15',
     'round_off' => 'Round Off',
     'round_off_label' => 'Round off label',
@@ -1075,6 +1075,6 @@ return [
     'select_invoice_layout' => 'Selecione o layout da fatura',
     'max_sales_discount_percent' => 'Max sales discount percent',
     'max_sales_discount_percent_help' => 'Maximum discount percentage that a user can give during sale. Leave it blank for no constraints',
-    'max_discount_error_msg' => 'You can give max :discount% discount per sale',
+    'max_discount_error_msg' => 'Você pode dar desconto máximo :discount% por venda',
     'show_invoice_layout' => 'Show invoice layout dropdown',
 ];

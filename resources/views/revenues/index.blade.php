@@ -51,7 +51,20 @@
                             <a class="btn btn-block btn-primary" href="{{action('RevenueController@create')}}">
                             <i class="fa fa-plus"></i> @lang('messages.add')</a>
                         </div>
+                        <div class="box-tools" style="margin-right: 3px;">
+                            <a class="btn btn-block btn-warning" href="{{action('RemessaController@index')}}">
+                            <i class="fa fa-file"></i> Ver remessas</a>
+                        </div>
 
+                        <div class="box-tools" style="margin-right: 3px;">
+                            <button type="button" class="btn btn-block btn-info" onclick="selecionarVarios()">
+                            <i class="fa fa-file"></i> Selecionar varios</button>
+                        </div>
+
+                        <div class="box-tools" style="margin-right: 3px;">
+                            <button style="display: none;" type="button" class="btn btn-block btn-success btn-gerar-boletos" onclick="gerarBoletos()">
+                            <i class="fa fa-file"></i> Gerar Boletos</button>
+                        </div>
                     @endslot
                 @endcan
 

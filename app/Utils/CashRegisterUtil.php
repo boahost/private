@@ -228,6 +228,7 @@ class CashRegisterUtil extends Util
         }
 
         $register_details = $query->select(
+            'cash_registers.id as id',
             'cash_registers.created_at as open_time',
             'cash_registers.closed_at as closed_at',
             'cash_registers.user_id',
@@ -238,6 +239,8 @@ class CashRegisterUtil extends Util
             DB::raw("SUM(IF(pay_method='cash', IF(transaction_type='sell', amount, 0), 0)) as total_cash"),
             DB::raw("SUM(IF(pay_method='cheque', IF(transaction_type='sell', amount, 0), 0)) as total_cheque"),
             DB::raw("SUM(IF(pay_method='card', IF(transaction_type='sell', amount, 0), 0)) as total_card"),
+            // DB::raw("SUM(IF(pay_method='debit', IF(transaction_type='sell', amount, 0), 0)) as total_debit"),
+            DB::raw("SUM(IF(pay_method='boleto', IF(transaction_type='sell', amount, 0), 0)) as total_boleto"),
             DB::raw("SUM(IF(pay_method='bank_transfer', IF(transaction_type='sell', amount, 0), 0)) as total_bank_transfer"),
             DB::raw("SUM(IF(pay_method='other', IF(transaction_type='sell', amount, 0), 0)) as total_other"),
             DB::raw("SUM(IF(pay_method='custom_pay_1', IF(transaction_type='sell', amount, 0), 0)) as total_custom_pay_1"),
