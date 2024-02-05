@@ -551,7 +551,22 @@ Route::middleware(['authh', 'auth', 'SetSessionData', 'language', 'timezone', 'A
     Route::get('/revenues/receive/{id}', 'RevenueController@receive')->name('revenue.receive');
     Route::put('/revenues/{id}/receivePut', 'RevenueController@receivePut')->name('revenue.receivePut');
 
-    // oi lindo
+
+    Route::get('/boletos/create/{id}', 'BoletoController@create');
+    Route::get('/boletos/ver/{id}', 'BoletoController@ver');
+    Route::get('/boletos/gerarRemessa/{id}', 'BoletoController@gerarRemessa');
+    Route::post('/boletos/store', 'BoletoController@store');
+    Route::post('/boletos/storeMulti', 'BoletoController@storeMulti');
+    Route::get('/boletos/gerarMultiplos/{ids}', 'BoletoController@gerarMultiplos');
+
+
+    Route::get('/remessasBoleto', 'RemessaController@index');
+    Route::get('/remessasBoleto/download/{id}', 'RemessaController@download');
+    Route::delete('/remessasBoleto/{id}/destroy', 'RemessaController@destroy')->name('remessa.destroy');
+    Route::get('/remessasBoleto/boletosSemRemessa', 'RemessaController@boletosSemRemessa');
+    Route::get('/remessasBoleto/gerarRemessas', 'RemessaController@gerarRemessas');
+    Route::get('/remessasBoleto/gerarRemessaMulti/{ids}', 'RemessaController@gerarRemessaMulti');
+
 
     //Transaction payments...
     // Route::get('/payments/opening-balance/{contact_id}', 'TransactionPaymentController@getOpeningBalancePayments');

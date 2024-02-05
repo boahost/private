@@ -86,6 +86,7 @@
         @endif
 
         @include('sale_pos.partials.edit_shipping_modal')
+        @include('sale_pos.partials.payment_modal_pedido')
 
     </section>
     <!-- This will be printed -->
