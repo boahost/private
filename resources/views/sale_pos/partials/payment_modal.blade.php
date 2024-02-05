@@ -458,7 +458,7 @@
 
                         buttonDisables(false)
                         modal_els.qr_code.attr('src',
-                            'https://placehold.co/228x228/fff/222?text=Tente%20Novamente'
+                            'https://placehold.co/228x228/fff/222?text=Clique%20em%20Atualizar'
                         );
 
                         if (responseJSON && responseJSON.error) {

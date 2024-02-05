@@ -19,7 +19,7 @@
                         {!! Form::select('location_id', $business_locations, null, ['class' => 'form-control select2', 'style' => 'width:100%']); !!}
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="form-group">
                         {!! Form::label('expense_category_id', 'Categoria:') !!}
@@ -51,7 +51,7 @@
                             <a class="btn btn-block btn-primary" href="{{action('RevenueController@create')}}">
                             <i class="fa fa-plus"></i> @lang('messages.add')</a>
                         </div>
-                        
+
                     @endslot
                 @endcan
 
@@ -91,11 +91,11 @@
 </section>
 <!-- /.content -->
 <!-- /.content -->
-<div class="modal fade payment_modal" tabindex="-1" role="dialog" 
+<div class="modal fade payment_modal" tabindex="-1" role="dialog"
     aria-labelledby="gridSystemModalLabel">
 </div>
 
-<div class="modal fade edit_payment_modal" tabindex="-1" role="dialog" 
+<div class="modal fade edit_payment_modal" tabindex="-1" role="dialog"
     aria-labelledby="gridSystemModalLabel">
 </div>
 @stop
