@@ -392,13 +392,23 @@ class NFeService
 
                     $somaDesconto += $tempDesc;
 
+                    // verificar se ja deu o desconto maximo
+                    if ($somaDesconto > $totalDesconto) {
+                        $tempDesc = $tempDesc - ($somaDesconto - $totalDesconto);
+                    }
+
+                    // logger($somaDesconto);
+
                     $stdProd->vDesc = $this->format($tempDesc);
                 } else {
                     /**
                      * Se for o último item, calcula o desconto de acordo com o valor restante
                      */
-
-                    $stdProd->vDesc = $somaDesconto = $vDesc = $totalDesconto - $somaDesconto;
+                    if ($somaDesconto < $totalDesconto) {
+                        $stdProd->vDesc = $somaDesconto = $vDesc = $totalDesconto - $somaDesconto;
+                    } else {
+                        $stdProd->vDesc = 0;
+                    }
                 }
 
                 if ($stdProd->vDesc == 0) {
@@ -406,7 +416,7 @@ class NFeService
                 }
             }
 
-
+            // dd('aqui    ' . $somaDesconto);
 
 
 
