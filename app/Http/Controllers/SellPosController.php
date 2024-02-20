@@ -350,7 +350,11 @@ class SellPosController extends Controller
      */
     public function store(Request $request)
     {
-        // \Log::debug("request: ", $request->all());
+
+        $business_id = request()->session()->get('user.business_id');
+        if(!empty($request->input("id_venda"))){
+            $this->destroy($request->input("id_venda"));
+        }
 
         if (!auth()->user()->can('sell.create') && !auth()->user()->can('direct_sell.access')) {
             abort(403, 'Unauthorized action.');
@@ -1708,6 +1712,38 @@ class SellPosController extends Controller
             }
 
             return $output;
+        } else {
+
+            try {
+                $business_id = request()->session()->get('user.business_id');
+
+                DB::beginTransaction();
+
+                $transaction = Transaction::find($id);
+
+                Revenue::where('referencia', 'Venda ' . $transaction->id)->delete();
+
+                if ($transaction->numero_nfce > 0) {
+                    $output['success'] = false;
+                    $output['msg']     = "Não é possível remover venda com NFCe emitida!";
+                } else {
+                    $output = $this->transactionUtil->deleteSale($business_id, $id);
+
+                    DB::commit();
+
+                    return true;
+                }
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+
+                \Log::emergency("File:" . $e->getFile() . ":" . $e->getLine() . " Message:" . $e->getMessage());
+
+                $output['success'] = false;
+                $output['msg']     = trans("messages.something_went_wrong") . $e->getMessage();
+
+                return false;
+            }
         }
     }
 

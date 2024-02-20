@@ -40,7 +40,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	@if(!empty($accounts))
 		<div class="{{$col_class}}">
 			<div class="form-group">

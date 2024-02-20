@@ -121,6 +121,12 @@ class DataController extends Controller
                     );
 
                     $sub->url(
+                        action('\Modules\Superadmin\Http\Controllers\YoutubeVideoLessonController@index'),
+                        'Link de Videos Youtube',
+                        ['icon' => 'fa fas fa-play', 'active' => request()->segment(1) == 'superadmin' && request()->segment(2) == 'youtube-video-lessons']
+                        );
+                        
+                    $sub->url(
                         action('\Modules\Superadmin\Http\Controllers\PackagesController@index'),
                         'Planos',
                         ['icon' => 'fa fas fa-credit-card', 'active' => request()->segment(1) == 'superadmin' && request()->segment(2) == 'packages']

@@ -1279,8 +1279,9 @@ return $output;
      *
      * @return JSON
      */
-    public function getProducts()
+    public function getProducts(Request $request)
     {
+
         // if (request()->ajax()) {
             $search_term = request()->input('term', '');
             $location_id = request()->input('location_id', null);

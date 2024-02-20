@@ -196,18 +196,41 @@
 					</div>
 				</div>
 			</div>
-
-
 			@endcomponent
 
-			@component('components.widget', ['class' => 'box-primary', 'title' => 'Produtos da Venda'])
-			<div class="col-sm-10 col-sm-offset-1">
+            <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $('ul').on('click', 'a', function(e) {
+                        e.preventDefault();
+                        var ncm = $(this).closest('li').data('ncm');
+                        $('#search_product').val(ncm).trigger('input');
+                        $('#search_product').trigger('change');
+                    });
+                });
+                </script>
+
+                @component('components.widget', ['class' => 'box-primary', 'title' => 'Produtos da Venda'])
+                <div class="col-sm-10 col-sm-offset-1">
+                @if(!empty($produto))
+                <input type="hidden" value="{!! Request::input('id_venda') !!}" name="id_venda">
+                <h5> Produtos do PDV </h5>
+                    <ul>
+                    @foreach($produto as $row)
+                        <li data-ncm="{!! $row["produto"]->name !!}">
+                            <a href="#"><span class="btn btn-success btn-sm mt-2">{!! $row["produto"]->name !!} - Adicionar a nota fiscal </span> -
+                                Quantidade - {!! $row['quantidade'] !!}</a>
+                        </li>
+                    @endforeach
+                        </ul>
+                @endif
+
 				<div class="form-group">
 					<div class="input-group">
 						<div class="input-group-btn">
 							<button type="button" class="btn btn-default bg-white btn-flat" data-toggle="modal" data-target="#configure_search_modal" title="{{__('lang_v1.configure_product_search')}}"><i class="fa fa-barcode"></i></button>
 						</div>
-						{!! Form::text('search_product', null, ['class' => 'form-control mousetrap', 'id' => 'search_product', 'placeholder' => __('lang_v1.search_product_placeholder'),
+						{!! Form::text('search_product',null, ['class' => 'form-control', 'id' => 'search_product', 'placeholder' => __('lang_v1.search_product_placeholder'),
 						'disabled' => is_null($default_location)? true : false,
 						'autofocus' => is_null($default_location)? false : true,
 						]); !!}

@@ -3,6 +3,10 @@
 
 @section('content')
 
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+
+
+
 <!-- Content Header (Page header) -->
 <section class="content-header">
 	<h1>Nova conta a pagar</h1>
@@ -62,7 +66,7 @@
 							<span class="input-group-addon">
 								<i class="fa fa-calendar"></i>
 							</span>
-							{!! Form::text('transaction_date', @format_datetime('now'), ['class' => 'form-control', 'readonly', 'required', 'id' => 'expense_transaction_date']); !!}
+							{!! Form::text('transaction_date', @format_datetime('now'), ['class' => 'form-control', 'readonly', 'required', 'id' => 'expense_transaction_date dataInicial']); !!}
 						</div>
 					</div>
 				</div>
@@ -87,7 +91,7 @@
 					</div>
 				</div>
 				<div class="clearfix"></div>
-				<div class="col-md-4">
+				<div class="col-md-2">
 					<div class="form-group">
 						{!! Form::label('tax_id', __('product.applicable_tax') . ':' ) !!}
 						<div class="input-group">
@@ -101,14 +105,154 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-sm-4">
+
+            <div class="col-sm-2">
 					<div class="form-group">
 						{!! Form::label('final_total', __('sale.total_amount') . ':*') !!}
-						{!! Form::text('final_total', null, ['class' => 'form-control input_number', 'placeholder' => __('sale.total_amount'), 'required']); !!}
+						{!! Form::text('final_total', null, ['class' => 'form-control input_number', 'id' => 'ValorFatura' ,'placeholder' => __('sale.total_amount'), 'required']); !!}
 					</div>
 				</div>
+
+                <div class="col-sm-2">
+                    <div class="form-group">
+                        <label> Fatura recorrente? </label>
+                        <select class="form-control" name="recorrente" id="recorrente">
+                            <option value="1">Sim</option>
+                            <option selected value="2">Não</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-sm-2" id="parcela">
+                    <div class="form-group">
+                        <label> Quantas parcelas? </label>
+                        <select class="form-control" id="numParcelas" name="numParcelas">
+                            <option value="1">1x</option>
+                            <option value="2">2x</option>
+                            <option value="3">3x</option>
+                            <option value="4">4x</option>
+                            <option value="5">5x</option>
+                            <option value="6">6x</option>
+                            <option value="7">7x</option>
+                            <option value="8">8x</option>
+                            <option value="9">9x</option>
+                            <option value="10">10x</option>
+                            <option value="11">11x</option>
+                            <option value="12">12x</option>
+                        </select>
+                    </div>
+                </div>
+
+                 <div class="col-sm-2" id="vencimento">
+                    <div class="form-group">
+                        <label> Vencimento de cada mês </label>
+                        <select class="form-control" id="diaVencimento" name="diaVencimento">
+                            <option value='01'>1</option>
+                            <option value='02'>2</option>
+                            <option value='03'>3</option>
+                            <option value='04'>4</option>
+                            <option value='05'>5</option>
+                            <option value='06'>6</option>
+                            <option value='07'>7</option>
+                            <option value='08'>8</option>
+                            <option value='09'>9</option>
+                            <option value='10'>10</option>
+                            <option value='11'>11</option>
+                            <option value='12'>12</option>
+                            <option value='13'>13</option>
+                            <option value='14'>14</option>
+                            <option value='15'>15</option>
+                            <option value='16'>16</option>
+                            <option value='17'>17</option>
+                            <option value='18'>18</option>
+                            <option value='19'>19</option>
+                            <option value='20'>20</option>
+                            <option value='21'>21</option>
+                            <option value='22'>22</option>
+                            <option value='23'>23</option>
+                            <option value='24'>24</option>
+                            <option value='25'>25</option>
+                            <option value='26'>26</option>
+                            <option value='27'>27</option>
+                            <option value='28'>28</option>
+                            <option value='29'>29</option>
+                            <option value='30'>30</option>
+                            <option value='31'>31</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-2" id="boleto">
+                    <label> # </label>
+                    <div class="form-group">
+                        <a id="gerarFaturas" class="btn btn-primary"> Gerar faturas </a>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div id="faturas"></div>
+                </div>
 			</div>
 		</div>
+        <script>
+
+        $("#parcela").hide()
+        $("#vencimento").hide()
+        $("#boleto").hide()
+        $('#recorrente').change(function(){
+      var respostaForm = $('#recorrente').val()
+
+        if (respostaForm == 1){
+            $("#parcela").show()
+            $("#vencimento").show()
+            $("#boleto").show()
+        } else {
+            $("#parcela").hide()
+            $("#vencimento").hide()
+            $("#boleto").hide()
+        }
+
+  })
+
+  </script>
+
+
+<script>
+        $("#gerarFaturas").click(function(){
+
+            var hoje = new Date();
+            var dia = hoje.getDate();
+            var mes = hoje.getMonth() + 1;
+            var ano = hoje.getFullYear();
+            if (dia < 10) {
+                dia = '0' + dia;
+            }
+            if (mes < 10) {
+                mes = '0' + mes;
+            }
+            var dataInicial = ano + '-' + mes + '-' + dia;
+
+
+            var numParcelas = parseInt($("#numParcelas").val());
+            var diaVencimento = parseInt($("#diaVencimento").val());
+            var valorFatura = $("#ValorFatura").val(); // Obtém o valor da fatura do campo de entrada
+
+
+            var faturasDiv = $("#faturas");
+            faturasDiv.empty();
+
+            for (var i = 0; i < numParcelas; i++) {
+                var novaData = new Date(dataInicial);
+                novaData.setMonth(novaData.getMonth() + i);
+                novaData.setDate(diaVencimento);
+
+                var novaFatura = $("<div class='col-sm-12'><labe>Fatura " + (i + 1 +1) + ": " + novaData.toLocaleDateString('pt-BR') + " </label> <input class='form-control' name='fatura[]' type='text' value='" + valorFatura + "'></div>");
+                faturasDiv.append(novaFatura);
+            }
+        });
+</script>
+
+
+
 	</div> <!--box end-->
 	@component('components.widget', ['class' => 'box-primary', 'id' => "payment_rows_div", 'title' => __('purchase.add_payment')])
 	<div class="payment_row">

@@ -121,13 +121,13 @@ class NfeController extends Controller
 
 			} catch (InvalidArgumentException $e) {
 				echo "Ocorreu um erro durante o processamento :" . $e->getMessage();
-			}  
+			}
 		}else{
 			foreach($nfe['xml_erros'] as $e){
 				echo $e . "<br>";
 			}
 		}
-		
+
 	}
 
 
@@ -375,7 +375,7 @@ class NfeController extends Controller
 			}
 		} catch (InvalidArgumentException $e) {
 			echo "Ocorreu um erro durante o processamento :" . $e->getMessage();
-		}  
+		}
 
 	}
 
@@ -416,7 +416,7 @@ class NfeController extends Controller
 				$daevento = new Daevento($xml, $dadosEmitente);
 				$daevento->debugMode(true);
 				$pdf = $daevento->render($logo);
-				
+
 				return response($pdf)
 				->header('Content-Type', 'application/pdf');
 			}else{
@@ -428,7 +428,7 @@ class NfeController extends Controller
 			}
 		} catch (InvalidArgumentException $e) {
 			echo "Ocorreu um erro durante o processamento :" . $e->getMessage();
-		}  
+		}
 
 	}
 
@@ -479,7 +479,7 @@ class NfeController extends Controller
 			}
 		} catch (InvalidArgumentException $e) {
 			echo "Ocorreu um erro durante o processamento :" . $e->getMessage();
-		}  
+		}
 
 	}
 
@@ -622,7 +622,7 @@ class NfeController extends Controller
 		$business_id = request()->session()->get('user.business_id');
 		$notasAprovadas = Transaction::where('business_id', $business_id)
 		->whereBetween('created_at', [
-			$data_inicio_convert, 
+			$data_inicio_convert,
 			$data_final_convert])
 		->where('numero_nfe', '>', 0)
 		->where('estado', 'APROVADO')
@@ -635,7 +635,7 @@ class NfeController extends Controller
 
 		$notasCanceladas = Transaction::where('business_id', $business_id)
 		->whereBetween('created_at', [
-			$data_inicio_convert, 
+			$data_inicio_convert,
 			$data_final_convert])
 		->where('numero_nfe', '>', 0)
 		->where('estado', 'CANCELADO')
@@ -864,7 +864,7 @@ class NfeController extends Controller
 			$pdf = public_path('temp/'.$cnpj.'/'.$transaction->chave.'.pdf');
 
 			try{
-				Mail::send('mail.nfe', ['transaction' => $transaction, 'saudacao' => $this->saudacao(), 
+				Mail::send('mail.nfe', ['transaction' => $transaction, 'saudacao' => $this->saudacao(),
 					'business' => $business], function($m) use ($transaction, $email, $xml, $pdf){
 
 						$emailEnvio = getenv("MAIL_USERNAME");
@@ -899,7 +899,7 @@ class NfeController extends Controller
 
 		// $business = Business::find($business_id);
 		$business = Business::getConfig($business_id, $transaction);
-		
+
 		$cnpj = str_replace(".", "", $business->cnpj);
 		$cnpj = str_replace("/", "", $cnpj);
 		$cnpj = str_replace("-", "", $cnpj);
@@ -945,18 +945,18 @@ class NfeController extends Controller
 			}
 		} catch (InvalidArgumentException $e) {
 			return "Ocorreu um erro durante o processamento :" . $e->getMessage();
-		}  
+		}
 	}
 
-	private function saudacao() {		
-		date_default_timezone_set('America/Sao_Paulo');		
-		$hora = date('H');		
-		if( $hora >= 6 && $hora <= 12)			
-			return 'Bom dia';		
-		else if ( $hora > 12 && $hora <= 18  )			
-			return 'Boa tarde';		
-		else			
-			return 'Boa noite';	
+	private function saudacao() {
+		date_default_timezone_set('America/Sao_Paulo');
+		$hora = date('H');
+		if( $hora >= 6 && $hora <= 12)
+			return 'Bom dia';
+		else if ( $hora > 12 && $hora <= 18  )
+			return 'Boa tarde';
+		else
+			return 'Boa noite';
 	}
 
 }

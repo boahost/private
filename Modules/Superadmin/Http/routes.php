@@ -30,7 +30,11 @@ Route::group(['middleware' => ['web', 'auth', 'language', 'AdminSidebarMenu', 's
     Route::get('/edit-subscription/{id}', 'SuperadminSubscriptionsController@editSubscription');
     Route::post('/update-subscription', 'SuperadminSubscriptionsController@updateSubscription');
     Route::resource('/superadmin-subscription', 'SuperadminSubscriptionsController');
-
+    Route::resource('youtube-video-lessons', 'YoutubeVideoLessonController', [
+        'names' => [
+            'edit' => 'youtube-video-lessons.edit'
+        ]
+    ]);
     Route::get('/communicator', 'CommunicatorController@index');
     Route::post('/communicator/send', 'CommunicatorController@send');
     Route::get('/communicator/get-history', 'CommunicatorController@getHistory');

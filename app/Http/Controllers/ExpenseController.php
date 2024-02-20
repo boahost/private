@@ -30,7 +30,7 @@ class ExpenseController extends Controller
         $this->transactionUtil = $transactionUtil;
         $this->moduleUtil = $moduleUtil;
         $this->dummyPaymentLine = ['method' => 'cash', 'amount' => 0, 'note' => '', 'card_transaction_number' => '', 'card_number' => '', 'card_type' => '', 'card_holder_name' => '', 'card_month' => '', 'card_year' => '', 'card_security' => '', 'cheque_number' => '', 'bank_account_number' => '',
-        'is_return' => 0, 'transaction_no' => '', 'data_base' => date('d/m/Y'), 'intervalo' => '', 
+        'is_return' => 0, 'transaction_no' => '', 'data_base' => date('d/m/Y'), 'intervalo' => '',
         'vencimento' => date('d/m/Y'), 'qtd_parcelas' => 1];
     }
 
@@ -141,19 +141,19 @@ class ExpenseController extends Controller
             if (!$is_admin && auth()->user()->can('view_own_expense')) {
                 $expenses->where('transactions.created_by', request()->session()->get('user.id'));
             }
-            
+
             return Datatables::of($expenses)
             ->addColumn(
                 'action',
                 '<div class="btn-group">
-                <button type="button" class="btn btn-info dropdown-toggle btn-xs" 
+                <button type="button" class="btn btn-info dropdown-toggle btn-xs"
                 data-toggle="dropdown" aria-expanded="false"> @lang("messages.actions")<span class="caret"></span><span class="sr-only">Toggle Dropdown
                 </span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-left" role="menu">
                 <li><a href="{{action(\'ExpenseController@edit\', [$id])}}"><i class="glyphicon glyphicon-edit"></i> @lang("messages.edit")</a></li>
                 @if($document)
-                <li><a href="{{ url(\'uploads/documents/\' . $document)}}" 
+                <li><a href="{{ url(\'uploads/documents/\' . $document)}}"
                 download=""><i class="fa fa-download" aria-hidden="true"></i> @lang("purchase.download_document")</a></li>
                 @if(isFileImage($document))
                 <li><a href="#" data-href="{{ url(\'uploads/documents/\' . $document)}}" class="view_uploaded_document"><i class="fa fa-picture-o" aria-hidden="true"></i>@lang("lang_v1.view_document")</a></li>
@@ -161,7 +161,7 @@ class ExpenseController extends Controller
                 @endif
                 <li>
                 <a data-href="{{action(\'ExpenseController@destroy\', [$id])}}" class="delete_expense"><i class="glyphicon glyphicon-trash"></i> @lang("messages.delete")</a></li>
-                <li class="divider"></li> 
+                <li class="divider"></li>
                 @if($payment_status != "paid")
                 <li><a href="{{action("TransactionPaymentController@addPayment", [$id])}}" class="add_payment_modal"><i class="fas fa-money-bill-alt" aria-hidden="true"></i> @lang("purchase.add_payment")</a></li>
                 @endif
@@ -227,7 +227,7 @@ class ExpenseController extends Controller
         }
 
         $business_id = request()->session()->get('user.business_id');
-        
+
         //Check if subscribed or not
         if (!$this->moduleUtil->isSubscribed($business_id)) {
             return $this->moduleUtil->expiredResponse(action('ExpenseController@index'));
@@ -240,7 +240,7 @@ class ExpenseController extends Controller
         $users = User::forDropdown($business_id, true, true);
 
         $taxes = TaxRate::forBusinessDropdown($business_id, true, true);
-        
+
         $payment_line = $this->dummyPaymentLine;
 
         $payment_types = $this->transactionUtil->payment_types();
@@ -336,86 +336,192 @@ class ExpenseController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        try {
-            $business_id = $request->session()->get('user.business_id');
+        $business_id = $request->session()->get('user.business_id');
 
-            //Check if subscribed or not
-            if (!$this->moduleUtil->isSubscribed($business_id)) {
-                return $this->moduleUtil->expiredResponse(action('ExpenseController@index'));
+        //Check if subscribed or not
+        if (!$this->moduleUtil->isSubscribed($business_id)) {
+            return $this->moduleUtil->expiredResponse(action('ExpenseController@index'));
+        }
+
+        $request->validate([
+            'document' => 'file|max:'. (config('constants.document_size_limit') / 1000)
+        ]);
+
+
+        if($request->input("recorrente") == "1"){
+
+            $vencimento = [];
+            $currentMonth = (int)date("m");
+            $numParcelas = $request->input("numParcelas");
+            for ($i = 0; $i < $numParcelas; $i++) {
+                $month = ($currentMonth + $i) % 12;
+                if ($month == 0) $month = 12;
+                $vencimento[] = $month;
             }
 
-            //Validate document size
-            $request->validate([
-                'document' => 'file|max:'. (config('constants.document_size_limit') / 1000)
-            ]);
+            $contador = 0;
+            foreach($request->input("fatura") as $row){
+                $mesVencimento = $vencimento[$contador];
 
-            $transaction_data = $request->only([ 'ref_no', 'transaction_date', 'location_id', 'final_total', 'expense_for', 'additional_notes', 'expense_category_id', 'tax_id']);
+                $dataVencimento = date("{$request->input('diaVencimento')}/0{$mesVencimento}/Y H:i");
 
-            $user_id = $request->session()->get('user.id');
-            $transaction_data['business_id'] = $business_id;
-            $transaction_data['created_by'] = $user_id;
+                $request->merge([
+                    "novoValor" => $row,
+                    "novoVencimento" => $dataVencimento
+                ]);
 
-            $transaction_data['contact_id'] = $request->contact_id;
+                // dd($request->input());
 
-            $transaction_data['type'] = 'expense';
-            $transaction_data['status'] = 'final';
-            $transaction_data['payment_status'] = 'due';
-            $transaction_data['transaction_date'] = $this->transactionUtil->uf_date($transaction_data['transaction_date'], true);
-            $transaction_data['final_total'] = $this->transactionUtil->num_uf(
-                $transaction_data['final_total']
-            );
+                try {
 
-            $transaction_data['total_before_tax'] = $transaction_data['final_total'];
-            if (!empty($transaction_data['tax_id'])) {
-                $tax_details = TaxRate::find($transaction_data['tax_id']);
-                $transaction_data['total_before_tax'] = $this->transactionUtil->calc_percentage_base($transaction_data['final_total'], $tax_details->amount);
-                $transaction_data['tax_amount'] = $transaction_data['final_total'] - $transaction_data['total_before_tax'];
+                    $transaction_data = $request->only([ 'ref_no', 'novoVencimento', 'location_id', 'novoValor', 'expense_for', 'additional_notes', 'expense_category_id', 'tax_id']);
+
+                    $user_id = $request->session()->get('user.id');
+                    $transaction_data['business_id'] = $business_id;
+                    $transaction_data['created_by'] = $user_id;
+
+                    $transaction_data['contact_id'] = $request->contact_id;
+
+                    $transaction_data['type'] = 'expense';
+                    $transaction_data['status'] = 'final';
+                    $transaction_data['payment_status'] = 'due';
+                    $transaction_data['novoVencimento'] = $this->transactionUtil->uf_date($transaction_data['novoVencimento'], true);
+
+                    $transaction_data['novoValor'] = $this->transactionUtil->num_uf(
+                        $transaction_data['novoValor']
+                    );
+
+                    $transaction_data['transaction_date'] = $transaction_data['novoVencimento'];
+
+                    $transaction_data['total_before_tax'] = $transaction_data['novoValor'];
+                    if (!empty($transaction_data['tax_id'])) {
+                        $tax_details = TaxRate::find($transaction_data['tax_id']);
+                        $transaction_data['total_before_tax'] = $this->transactionUtil->calc_percentage_base($transaction_data['novoValor'], $tax_details->amount);
+                        $transaction_data['tax_amount'] = $transaction_data['novoValor'] - $transaction_data['total_before_tax'];
+                    }
+
+                    // DB::beginTransaction();
+
+                    //Update reference count
+                    $ref_count = $this->transactionUtil->setAndGetReferenceCount('expense');
+                    //Generate reference number
+                    if (empty($transaction_data['ref_no'])) {
+                        $transaction_data['ref_no'] = $this->transactionUtil->generateReferenceNumber('expense', $ref_count);
+                    }
+
+                    //upload document
+                    $document_name = $this->transactionUtil->uploadFile($request, 'document', 'documents');
+                    if (!empty($document_name)) {
+                        $transaction_data['document'] = $document_name;
+                    }
+
+                    $transaction_data['final_total'] = $transaction_data['novoValor'];
+
+                    $transaction = Transaction::create($transaction_data);
+
+                    //add expense payment
+                    $this->transactionUtil->createOrUpdatePaymentLines($transaction, $request->input('payment'), $business_id);
+
+                    //update payment status
+                    $this->transactionUtil->updatePaymentStatus($transaction->id, $transaction->final_total);
+
+                    // DB::commit();
+
+                    $output = [
+                        'success' => 1,
+                        'msg' => __('expense.expense_add_success')
+                    ];
+                } catch (\Exception $e) {
+                    // DB::rollBack();
+
+                    // \Log::emergency("File:" . $e->getFile(). "Line:" . $e->getLine(). "Message:" . $e->getMessage());
+
+                    echo $e->getMessage();
+                    die;
+
+                    $output = [
+                        'success' => 0,
+                        'msg' => __('messages.something_went_wrong')
+                    ];
+                }
+
+                $contador++;
             }
 
-            DB::beginTransaction();
-            
-            //Update reference count
-            $ref_count = $this->transactionUtil->setAndGetReferenceCount('expense');
-            //Generate reference number
-            if (empty($transaction_data['ref_no'])) {
-                $transaction_data['ref_no'] = $this->transactionUtil->generateReferenceNumber('expense', $ref_count);
+
+        } else {
+            try {
+
+                $transaction_data = $request->only([ 'ref_no', 'transaction_date', 'location_id', 'final_total', 'expense_for', 'additional_notes', 'expense_category_id', 'tax_id']);
+
+                $user_id = $request->session()->get('user.id');
+                $transaction_data['business_id'] = $business_id;
+                $transaction_data['created_by'] = $user_id;
+
+                $transaction_data['contact_id'] = $request->contact_id;
+
+                $transaction_data['type'] = 'expense';
+                $transaction_data['status'] = 'final';
+                $transaction_data['payment_status'] = 'due';
+                $transaction_data['transaction_date'] = $this->transactionUtil->uf_date($transaction_data['transaction_date'], true);
+                $transaction_data['final_total'] = $this->transactionUtil->num_uf(
+                    $transaction_data['final_total']
+                );
+
+                $transaction_data['total_before_tax'] = $transaction_data['final_total'];
+                if (!empty($transaction_data['tax_id'])) {
+                    $tax_details = TaxRate::find($transaction_data['tax_id']);
+                    $transaction_data['total_before_tax'] = $this->transactionUtil->calc_percentage_base($transaction_data['final_total'], $tax_details->amount);
+                    $transaction_data['tax_amount'] = $transaction_data['final_total'] - $transaction_data['total_before_tax'];
+                }
+
+                DB::beginTransaction();
+
+                //Update reference count
+                $ref_count = $this->transactionUtil->setAndGetReferenceCount('expense');
+                //Generate reference number
+                if (empty($transaction_data['ref_no'])) {
+                    $transaction_data['ref_no'] = $this->transactionUtil->generateReferenceNumber('expense', $ref_count);
+                }
+
+                //upload document
+                $document_name = $this->transactionUtil->uploadFile($request, 'document', 'documents');
+                if (!empty($document_name)) {
+                    $transaction_data['document'] = $document_name;
+                }
+
+                $transaction = Transaction::create($transaction_data);
+
+                //add expense payment
+                $this->transactionUtil->createOrUpdatePaymentLines($transaction, $request->input('payment'), $business_id);
+
+                //update payment status
+                $this->transactionUtil->updatePaymentStatus($transaction->id, $transaction->final_total);
+
+                DB::commit();
+
+                $output = [
+                    'success' => 1,
+                    'msg' => __('expense.expense_add_success')
+                ];
+            } catch (\Exception $e) {
+                DB::rollBack();
+
+                \Log::emergency("File:" . $e->getFile(). "Line:" . $e->getLine(). "Message:" . $e->getMessage());
+
+                echo $e->getMessage();
+                die;
+
+                $output = [
+                    'success' => 0,
+                    'msg' => __('messages.something_went_wrong')
+                ];
             }
 
-            //upload document
-            $document_name = $this->transactionUtil->uploadFile($request, 'document', 'documents');
-            if (!empty($document_name)) {
-                $transaction_data['document'] = $document_name;
-            }
-
-            $transaction = Transaction::create($transaction_data);
-            
-            //add expense payment
-            $this->transactionUtil->createOrUpdatePaymentLines($transaction, $request->input('payment'), $business_id);
-
-            //update payment status
-            $this->transactionUtil->updatePaymentStatus($transaction->id, $transaction->final_total);
-
-            DB::commit();
-
-            $output = [
-                'success' => 1,
-                'msg' => __('expense.expense_add_success')
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            \Log::emergency("File:" . $e->getFile(). "Line:" . $e->getLine(). "Message:" . $e->getMessage());
-
-            echo $e->getMessage();
-            die;
-            
-            $output = [
-                'success' => 0,
-                'msg' => __('messages.something_went_wrong')
-            ];
         }
 
         return redirect('expenses')->with('status', $output);
+
     }
 
     /**
@@ -501,7 +607,7 @@ class ExpenseController extends Controller
             $transaction_data = $request->only([ 'ref_no', 'transaction_date', 'location_id', 'final_total', 'expense_for', 'additional_notes', 'expense_category_id', 'tax_id']);
 
             $business_id = $request->session()->get('user.business_id');
-            
+
             //Check if subscribed or not
             if (!$this->moduleUtil->isSubscribed($business_id)) {
                 return $this->moduleUtil->expiredResponse(action('ExpenseController@index'));
@@ -513,7 +619,7 @@ class ExpenseController extends Controller
             );
 
             $transaction_data['contact_id'] = $request->contact_id;
-            
+
             //upload document
             $document_name = $this->transactionUtil->uploadFile($request, 'document', 'documents');
             if (!empty($document_name)) {
@@ -578,7 +684,7 @@ class ExpenseController extends Controller
                 ];
             } catch (\Exception $e) {
                 \Log::emergency("File:" . $e->getFile(). "Line:" . $e->getLine(). "Message:" . $e->getMessage());
-                
+
                 $output = [
                     'success' => false,
                     'msg' => __("messages.something_went_wrong")

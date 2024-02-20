@@ -93,11 +93,14 @@
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $total  = 0 ;
+                @endphp
                 @foreach($notasAprovadas as $n)
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($n->created_at)->format('d/m/Y H:i:s')}}</td>
                     <td>{{$n->numero_nfce}}</td>
-                    <td>{{number_format($n->total_before_tax, 2)}}</td>
+                    <td>{{number_format($n->final_total, 2, ',' , '.')}}</td>
                     <td>{{$n->chave}}</td>
                     <td>{{$n->estado}}</td>
                     <td>
@@ -115,10 +118,25 @@
                         </a>
                         @endif
 
+                        @php
+
+                            $total+=$n->final_total;
+
+                        @endphp
+
                     </td>
                 </tr>
                 @endforeach
             </tbody>
+            <tfoot>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>R$ {!! number_format($total,2,",",".") !!}</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tfoot>
         </table>
     </div>
 
@@ -190,7 +208,7 @@
     @endcan
     @endcomponent
 
-    <div class="modal fade user_modal" tabindex="-1" role="dialog" 
+    <div class="modal fade user_modal" tabindex="-1" role="dialog"
     aria-labelledby="gridSystemModalLabel">
 </div>
 

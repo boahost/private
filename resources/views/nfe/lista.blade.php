@@ -86,16 +86,21 @@
                 <th>Data</th>
                 <th>Número</th>
                 <th>Chave</th>
+                <th>Valor</th>
                 <th>Estado</th>
                 <th>Ação</th>
             </tr>
         </thead>
         <tbody>
+            @php
+                $total = 0;
+            @endphp
             @foreach($notasAprovadas as $n)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($n->created_at)->format('d/m/Y H:i:s')}}</td>
                 <td>{{$n->numero_nfe}}</td>
                 <td>{{$n->chave}}</td>
+                <td>R$ {{number_format($n->final_total, 2, ",",".")}}</td>
                 <td>{{$n->estado}}</td>
                 <td>
                     @if($n->estado == 'APROVADO')
@@ -115,8 +120,21 @@
 
                 </td>
             </tr>
+            @php
+
+                $total+=$n->final_total
+            @endphp
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>R$ {!! number_format($total,2,",",".") !!}</td>
+              <td></td>
+            </tr>
+          </tfoot>
     </table>
 
 
@@ -194,7 +212,7 @@
 @endcan
 @endcomponent
 
-<div class="modal fade user_modal" tabindex="-1" role="dialog" 
+<div class="modal fade user_modal" tabindex="-1" role="dialog"
 aria-labelledby="gridSystemModalLabel">
 </div>
 

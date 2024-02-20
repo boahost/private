@@ -29,6 +29,8 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Models\NaturezaOperacao;
 use App\Models\Transportadora;
 use App\Models\Pais;
+use App\Services\NFCeService;
+use App\Models\Product;
 
 class SellController extends Controller
 {
@@ -527,7 +529,10 @@ class SellController extends Controller
                         if ($t->numero_nfce > 0) {
                             $html = '<a class="btn btn-xs btn-danger" href="/nfce/ver/' . $row->id . '">Ver NFC-e</a>';
                         } else {
-                            $html = '<a class="btn btn-xs btn-primary" href="/nfce/gerar/' . $row->id . '">Gerar NFC-e</a>';
+                            $html = '<a class="btn btn-xs btn-primary" href="/nfce/gerar/' . $row->id . '">Gerar NFC-e</a> <BR>
+                            <a class="btn btn-xs btn-success" href="/sells/create/?id_venda=' . $row->id . '">Gerar NFe</a>
+
+                            ' ;
                         }
 
                     }
@@ -593,8 +598,26 @@ class SellController extends Controller
      * Show the form for creating a new resource.
      *
      */
-    public function create()
+    public function create(Request $request)
     {
+
+        $business_id = request()->session()->get('user.business_id');
+
+        if(!empty($request->input("id_venda"))){
+            $transaction = Transaction::where('business_id', $business_id)
+                ->where('id', $request->id_venda)
+                ->first();
+
+                $config = Business::getConfig($business_id, $transaction);
+
+                $produto = [];
+                foreach($transaction->sell_lines as $i){
+                    $produto[] = ["produto" => Product::find($i->product_id), "quantidade" => $i->quantity];
+                }
+        }
+
+            #dd($produto);
+
         if (!auth()->user()->can('direct_sell.access')) {
             abort(403, 'Unauthorized action.');
         }
@@ -688,7 +711,9 @@ class SellController extends Controller
         $change_return   = $this->dummyPaymentLine;
         $business        = Business::find($business_id);
 
-        return view('sell.create')
+        return view('sell.create', [
+            "produto" => !empty($produto) ? $produto : null
+        ])
             ->with('tipo', 'customer')
             ->with('cities', $this->prepareCities())
             ->with('paises', $this->preparePaises())
@@ -720,7 +745,7 @@ class SellController extends Controller
                     'default_invoice_schemes',
                     'types_of_service',
                     'accounts',
-                    'shipping_statuses'
+                    'shipping_statuses',
                 )
             );
     }

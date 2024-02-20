@@ -194,7 +194,7 @@ $(document).ready(function () {
                 );
             },
 
-            delay: 1500,
+            delay: 750,
             minLength: 2,
             response: function (event, ui) {
                 if (ui.content.length == 1) {

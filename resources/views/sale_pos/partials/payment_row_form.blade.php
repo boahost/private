@@ -1,27 +1,68 @@
 <div class="flex flex-col gap-2 md:flex-row">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Importando jQuery -->
+
     <div class="flex-auto flex-grow">
         <div class="row">
             <input type="hidden" class="payment_row_index" value="{{ $row_index }}">
             @php
-                $col_class = 'col-md-6';
+                $col_class = 'col-md-12';
                 if (!empty($accounts)) {
-                    $col_class = 'col-md-4';
+                    $col_class = 'col-md-12';
                 }
             @endphp
             <div class="{{ $col_class }}">
                 <div class="form-group">
-                    {!! Form::label("amount_$row_index", 'Valor' . ':*') !!}
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <i class="fas fa-money-bill-alt"></i>
-                        </span>
-                        {!! Form::text("payment[$row_index][amount]", @num_format($payment_line['amount']), [
-                            'class' => 'form-control payment-amount input_number',
+                    <div class="col-md-12">
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fas fa-money-bill-alt"></i>
+                                    </span>
+                                    <!-- Campo de valor a ser dividido -->
+                                    {{-- <input type="text" class="form-control payment-amount input_number reckreck" id="amount_{{$row_index}}" placeholder="Amount" value="{{$payment_line['amount']}}"> --}}
+                                    {!! Form::text("payment[$row_index][amount]", @num_format($payment_line['amount']), [
+                            'class' => 'form-control payment-amount input_number reckreck',
                             'required',
                             'id' => "amount_$row_index",
                             'placeholder' => __('sale.amount'),
                         ]) !!}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fas fa-divide"></i>
+                                    </span>
+                                    <!-- Campo de quantidade de divisão -->
+                                    <input type="text" class="form-control input_number" id="quantidade_divisao" placeholder="Dividir para quantas pessoas?">
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <h4 id="resultado_divisao"></h4>
+                            </div>
+
+                        </div>
                     </div>
+
+                    <script>
+                        function calcularDivisao() {
+                            var valor = parseFloat($(".reckreck").val().replace(',', '.')); // Remover possíveis formatações
+                            var quantidadeDivisao = parseFloat($("#quantidade_divisao").val());
+
+                            if (!isNaN(valor) && !isNaN(quantidadeDivisao) && quantidadeDivisao !== 0) {
+                                var resultado = valor / quantidadeDivisao;
+                                $("#resultado_divisao").text("R$ " + resultado.toFixed(2).replace(".", ",")); // Fixar em duas casas decimais
+                            } else {
+                                $("#resultado_divisao").text("");
+                            }
+                        }
+                        $(".reckreck, #quantidade_divisao").on("input", calcularDivisao);
+                        calcularDivisao();
+                    </script>
                 </div>
             </div>
             <div class="col-md-12">

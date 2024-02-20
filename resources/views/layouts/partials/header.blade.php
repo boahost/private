@@ -52,9 +52,21 @@
               <strong><i class="fa fa-th-large"></i> &nbsp; PDV</strong>
             </a>
           @endcan
+         @endif
+         
+        @php
+          //Coloca os link do youtube na pagina
+            $youtube = App\Models\YoutubeVideoLesson::where('url_from_app',Request::fullUrl())->first();
+          @endphp
 
-
-        @endif
+          @if($youtube)
+              @can('sell.create')
+                  <a href="{{$youtube->url_from_youtube}}" title="Youtube" data-toggle="tooltip" target="_blank" data-placement="bottom" style="background-color: {{$youtube->background_color}};border-color: {{$youtube->background_color}} " class="btn btn-success btn-flat pull-left m-8 hidden-xs btn-sm mt-10">
+                      <strong><i class="{{$youtube->icone}}"></i> &nbsp; {{$youtube->label_button}}</strong>
+                  </a>
+              @endcan
+          @endif
+          
         @can('profit_loss_report.view')
           <button type="button" id="view_todays_profit" title="{{ __('home.todays_profit') }}" data-toggle="tooltip" data-placement="bottom" class="btn btn-success btn-flat pull-left m-8 hidden-xs btn-sm mt-10">
             <strong><i class="fas fa-money-bill-alt fa-lg"></i></strong>

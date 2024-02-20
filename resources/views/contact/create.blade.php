@@ -152,8 +152,8 @@
                     <div class="form-group">
                         <label> Abrir Comanda ? </label>
                         <select name="select_comanda" class="reck form-control select2 feature-field">
-                            <option>Não</option>
-                            <option selected>Sim</option>
+                            <option selected>Não</option>
+                            <option>Sim</option>
                         </select>
                     </div>
                 </div>
